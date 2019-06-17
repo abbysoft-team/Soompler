@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="Afi22G" name="Soompler" projectType="audioplug" jucerVersion="5.4.3">
+<JUCERPROJECT id="Afi22G" name="Soompler" projectType="audioplug" jucerVersion="5.4.3"
+              version="0.0.1" companyName="AbbySoft" companyCopyright="AbbySoft 2019"
+              companyWebsite="abbysoft.ru" companyEmail="contact@abbysoft.ru"
+              pluginFormats="buildAU,buildStandalone,buildVST,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              pluginDesc="Easy to use sampler" pluginManufacturerCode="abby"
+              pluginCode="as1">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
       <FILE id="S57gtU" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -35,7 +40,7 @@
         <MODULEPATH id="juce_opengl" path="../../../software/JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
-    <CLION targetFolder="Builds/CLion">
+    <CLION targetFolder="Builds/CLion" clionMakefileEnabled="1">
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../software/JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../../software/JUCE/modules"/>
