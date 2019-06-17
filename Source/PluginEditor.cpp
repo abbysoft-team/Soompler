@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Strings.h"
 
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
@@ -18,6 +19,12 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (400, 300);
+
+    // init components state
+    openFileButton.setButtonText(BUTTON_OPEN_FILE_TEXT);
+    openFileButton.addListener(this);
+
+    addAndMakeVisible(openFileButton);
 }
 
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
@@ -29,14 +36,35 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-
-    g.setColour (Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), Justification::centred, 1);
 }
 
 void SoomplerAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
+    openFileButton.setBounds(BUTTON_OPEN_FILE_POSITION);
+}
+
+void SoomplerAudioProcessorEditor::buttonClicked(Button *button)
+{
+    if (button->getButtonText().equalsIgnoreCase(BUTTON_OPEN_FILE_TEXT)) {
+        openFileButtonClicked();
+    }
+}
+
+void SoomplerAudioProcessorEditor::openFileButtonClicked()
+{
+    FileChooser chooser(OPEN_FILE_DIALOG_TEXT,
+                        File::getSpecialLocation(File::userHomeDirectory),
+                        "*.mp3,*.wav,*.ogg");
+
+    if (chooser.browseForFileToOpen())
+    {
+        File sampleFile (chooser.getResult());
+
+        loadSample(sampleFile);
+    }
+}
+
+void SoomplerAudioProcessorEditor::loadSample(File sampleFile)
+{
+
 }
