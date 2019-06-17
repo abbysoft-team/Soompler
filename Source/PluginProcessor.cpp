@@ -10,12 +10,15 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "Strings.h"
 
 //==============================================================================
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withInput  ("Input",  AudioChannelSet::stereo(), true)
-                                                   .withOutput ("Output", AudioChannelSet::stereo(), true))
+                                                   .withOutput ("Output", AudioChannelSet::stereo(), true)),
+                                                   loadedSample(nullptr)
 {
+    synth.addVoice(new SamplerVoice());
 }
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
@@ -149,6 +152,46 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 }
+
+void SoomplerAudioProcessor::loadSample(File sampleFile)
+{
+    this->loadedSample = new File(sampleFile);
+
+    synth.removeSound(0);
+    synth.addSound(getSampleData(loadedSample));
+}
+
+SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
+{
+    auto* soundBuffer = sampleFile->createInputStream();
+    AudioFormat* format = getFormatForFileOrNullptr(sampleFile);
+    if (format == nullptr) {
+        return;
+    }
+
+    std::unique_ptr<AudioFormatReader> formatReader(
+                format->createReaderFor(soundBuffer, true));
+
+    BigInteger midiNotes;
+    midiNotes.setRange(0, 126, true);
+    return new SamplerSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
+}
+
+AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File *sampleFile)
+{
+    AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile->getFileExtension());
+
+    if (format == nullptr) {
+        NativeMessageBox::showMessageBox(
+                    AlertWindow::AlertIconType::WarningIcon,
+                    UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE,
+                    UNSUPPORTED_FILE_EXTENSION_ERROR_MESSAGE);
+    }
+
+    return format;
+}
+
+
 
 //==============================================================================
 // This creates new instances of the plugin..

@@ -55,7 +55,22 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    File* getLoadedSample() const {
+        return loadedSample;
+    }
+
+    void loadSample(File sample);
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
+
+    File* loadedSample;
+    Synthesiser synth;
+
+    SynthesiserSound::Ptr getSampleData(File* sampleFile);
+    AudioFormat* getFormatForFileOrNullptr(File* sampleFile);
+
+    AudioFormatManager formatManager;
+
 };

@@ -37,7 +37,6 @@ public:
 private:
     void buttonClicked(Button*) override;
     void openFileButtonClicked();
-    void loadSample(File);
     String getLoadedSampleNameOrPlaceholder();
 
     // This reference is provided as a quick way for your editor to
@@ -45,8 +44,6 @@ private:
     SoomplerAudioProcessor& processor;
 
     TextButton openFileButton;
-
-    File *loadedSample;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };

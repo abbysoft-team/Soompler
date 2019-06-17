@@ -14,7 +14,7 @@
 
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), loadedSample(nullptr)
+    : AudioProcessorEditor (&p), processor (p)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -65,18 +65,15 @@ void SoomplerAudioProcessorEditor::openFileButtonClicked()
     {
         File sampleFile (chooser.getResult());
 
-        loadSample(sampleFile);
+        processor.loadSample(sampleFile);
+        repaint();
     }
-}
-
-void SoomplerAudioProcessorEditor::loadSample(File sampleFile)
-{
-    this->loadedSample = new File(sampleFile);
-    repaint();
 }
 
 String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
 {
+    File* loadedSample = processor.getLoadedSample();
+
     if (loadedSample == nullptr) {
         return NO_SAMPLE_LOADED_TEXT;
     } else {
