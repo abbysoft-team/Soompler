@@ -24,7 +24,12 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     openFileButton.setButtonText(BUTTON_OPEN_FILE_TEXT);
     openFileButton.addListener(this);
 
+    playSampleButton.setButtonText(BUTTON_PLAY_SAMPLE_TEXT);
+    playSampleButton.addListener(this);
+    playSampleButton.setEnabled(false);                         // make enabled when sample is loaded
+
     addAndMakeVisible(openFileButton);
+    addAndMakeVisible(playSampleButton);
 }
 
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
@@ -46,12 +51,15 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
 void SoomplerAudioProcessorEditor::resized()
 {
     openFileButton.setBounds(BUTTON_OPEN_FILE_POSITION);
+    playSampleButton.setBounds(BUTTON_PLAY_SAMPLE_POSITION);
 }
 
 void SoomplerAudioProcessorEditor::buttonClicked(Button *button)
 {
     if (button->getButtonText().equalsIgnoreCase(BUTTON_OPEN_FILE_TEXT)) {
         openFileButtonClicked();
+    } else if (button->getButtonText().equalsIgnoreCase(BUTTON_PLAY_SAMPLE_TEXT)) {
+        playSampleButtonClicked();
     }
 }
 
@@ -66,8 +74,16 @@ void SoomplerAudioProcessorEditor::openFileButtonClicked()
         File sampleFile (chooser.getResult());
 
         processor.loadSample(sampleFile);
+
+        playSampleButton.setEnabled(true);
+
         repaint();
     }
+}
+
+void SoomplerAudioProcessorEditor::playSampleButtonClicked()
+{
+    processor.playSample();
 }
 
 String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()

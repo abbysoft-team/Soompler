@@ -61,15 +61,19 @@ public:
 
     void loadSample(File sample);
 
+    void playSample();
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 
     File* loadedSample;
     Synthesiser synth;
+    int currentSample;
 
     SynthesiserSound::Ptr getSampleData(File* sampleFile);
     AudioFormat* getFormatForFileOrNullptr(File* sampleFile);
+    MidiBuffer filterMidiMessagesForChannel(const MidiBuffer& input, int channel);
 
     AudioFormatManager formatManager;
 

@@ -11,6 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Strings.h"
+#include "juce_audio_formats/codecs/juce_MP3AudioFormat.h"
 
 //==============================================================================
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
@@ -19,6 +20,11 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    loadedSample(nullptr)
 {
     synth.addVoice(new SamplerVoice());
+
+    formatManager.registerBasicFormats();
+    formatManager.registerFormat(new MP3AudioFormat());
+
+    currentSample = -1;                             // -1 means that it wont played until someone turn on note
 }
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
@@ -101,30 +107,17 @@ bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+    if (currentSample == 0) {
+        synth.noteOn(0, 0x40, 100);
+        currentSample == -1;
+    }
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
+    auto busCount = getBusCount(false);
+    for (auto busIndex = 0; busIndex < busCount; ++busIndex) {
+        auto audioBusBuffer = getBusBuffer(buffer, false, busIndex);
+        auto midiChannelBuffer = filterMidiMessagesForChannel(midiMessages, busIndex + 1);
+        synth.renderNextBlock(audioBusBuffer, midiChannelBuffer, 0, audioBusBuffer.getNumSamples());
     }
 }
 
@@ -158,15 +151,33 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
     this->loadedSample = new File(sampleFile);
 
     synth.removeSound(0);
-    synth.addSound(getSampleData(loadedSample));
+    SynthesiserSound::Ptr sound = getSampleData(loadedSample);
+    if (sound != nullptr)
+    {
+        synth.addSound(sound);
+    } else {
+        loadedSample = nullptr;
+    }
+}
+
+void SoomplerAudioProcessor::playSample()
+{
+    if (loadedSample == nullptr)
+    {
+        DBG("loaded sample in nullptr and cannot be played");
+        return;
+    }
+
+    currentSample = 0;
 }
 
 SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
 {
     auto* soundBuffer = sampleFile->createInputStream();
     AudioFormat* format = getFormatForFileOrNullptr(sampleFile);
-    if (format == nullptr) {
-        return;
+    if (format == nullptr)
+    {
+        return nullptr;
     }
 
     std::unique_ptr<AudioFormatReader> formatReader(
@@ -182,6 +193,7 @@ AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File *sampleFile)
     AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile->getFileExtension());
 
     if (format == nullptr) {
+        DBG(sampleFile->getFileExtension());
         NativeMessageBox::showMessageBox(
                     AlertWindow::AlertIconType::WarningIcon,
                     UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE,
@@ -189,6 +201,20 @@ AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File *sampleFile)
     }
 
     return format;
+}
+
+MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
+{
+    MidiBuffer output;
+    int samplePosition;
+    MidiMessage msg;
+
+    for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
+    {
+        if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
+    }
+
+    return output;
 }
 
 
