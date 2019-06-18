@@ -11,7 +11,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Strings.h"
-#include "juce_audio_formats/codecs/juce_MP3AudioFormat.h"
 
 //==============================================================================
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
@@ -22,7 +21,8 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
     synth.addVoice(new SamplerVoice());
 
     formatManager.registerBasicFormats();
-    formatManager.registerFormat(new MP3AudioFormat());
+    formatManager.registerFormat(new MP3AudioFormat(), false);
+    formatManager.registerFormat(new OggVorbisAudioFormat(), false);
 
     currentSample = -1;                             // -1 means that it wont played until someone turn on note
 }
