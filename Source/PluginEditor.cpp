@@ -67,7 +67,7 @@ void SoomplerAudioProcessorEditor::openFileButtonClicked()
 {
     FileChooser chooser(OPEN_FILE_DIALOG_TEXT,
                         File::getSpecialLocation(File::userHomeDirectory),
-                        "*.mp3,*.wav,*.ogg");
+                        "*.mp3;*.wav;*.ogg");
 
     if (chooser.browseForFileToOpen())
     {
