@@ -18,7 +18,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (WINDOW_WIDTH, WINDOW_HEIGHT);
+    setSize (Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
 
     // init components state
     openFileButton.setButtonText(Strings::BUTTON_OPEN_FILE_TEXT);
@@ -44,18 +44,21 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-    g.drawImage(backgroundImage, Rectangle<float>(WINDOW_WIDTH, WINDOW_HEIGHT));
+    g.drawImage(backgroundImage, Rectangle<float>(Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT));
 
-    g.setColour(SAMPLE_NAME_COLOR);
-    g.setFont(SAMPLE_NAME_FONT_SIZE);
+    g.setColour(Settings::SAMPLE_NAME_COLOR);
+    g.setFont(Settings::SAMPLE_NAME_FONT_SIZE);
 
-    g.drawSingleLineText(getLoadedSampleNameOrPlaceholder(), SAMPLE_NAME_TEXT_X, SAMPLE_NAME_TEXT_Y, Justification::horizontallyCentred);
+    g.drawSingleLineText(getLoadedSampleNameOrPlaceholder(),
+        Settings::SAMPLE_NAME_TEXT_X,
+        Settings::SAMPLE_NAME_TEXT_Y,
+        Justification::horizontallyCentred);
 }
 
 void SoomplerAudioProcessorEditor::resized()
 {
-    openFileButton.setBounds(BUTTON_OPEN_FILE_POSITION);
-    playSampleButton.setBounds(BUTTON_PLAY_SAMPLE_POSITION);
+    openFileButton.setBounds(Settings::BUTTON_OPEN_FILE_POSITION);
+    playSampleButton.setBounds(Settings::BUTTON_PLAY_SAMPLE_POSITION);
 }
 
 void SoomplerAudioProcessorEditor::buttonClicked(Button *button)
