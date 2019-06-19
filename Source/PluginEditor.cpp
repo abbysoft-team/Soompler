@@ -21,10 +21,10 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     setSize (WINDOW_WIDTH, WINDOW_HEIGHT);
 
     // init components state
-    openFileButton.setButtonText(BUTTON_OPEN_FILE_TEXT);
+    openFileButton.setButtonText(Strings::BUTTON_OPEN_FILE_TEXT);
     openFileButton.addListener(this);
 
-    playSampleButton.setButtonText(BUTTON_PLAY_SAMPLE_TEXT);
+    playSampleButton.setButtonText(Strings::BUTTON_PLAY_SAMPLE_TEXT);
     playSampleButton.addListener(this);
     playSampleButton.setEnabled(false);                         // make enabled when sample is loaded
 
@@ -60,16 +60,16 @@ void SoomplerAudioProcessorEditor::resized()
 
 void SoomplerAudioProcessorEditor::buttonClicked(Button *button)
 {
-    if (button->getButtonText().equalsIgnoreCase(BUTTON_OPEN_FILE_TEXT)) {
+    if (button->getButtonText().equalsIgnoreCase(Strings::BUTTON_OPEN_FILE_TEXT)) {
         openFileButtonClicked();
-    } else if (button->getButtonText().equalsIgnoreCase(BUTTON_PLAY_SAMPLE_TEXT)) {
+    } else if (button->getButtonText().equalsIgnoreCase(Strings::BUTTON_PLAY_SAMPLE_TEXT)) {
         playSampleButtonClicked();
     }
 }
 
 void SoomplerAudioProcessorEditor::openFileButtonClicked()
 {
-    FileChooser chooser(OPEN_FILE_DIALOG_TEXT,
+    FileChooser chooser(Strings::OPEN_FILE_DIALOG_TEXT,
                         File::getSpecialLocation(File::userHomeDirectory),
                         "*.mp3;*.wav;*.ogg", false);
 
@@ -95,7 +95,7 @@ String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
     File* loadedSample = processor.getLoadedSample();
 
     if (loadedSample == nullptr) {
-        return NO_SAMPLE_LOADED_TEXT;
+        return Strings::NO_SAMPLE_LOADED_TEXT;
     } else {
         return loadedSample->getFileName();
     }
