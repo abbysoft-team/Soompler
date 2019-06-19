@@ -12,10 +12,18 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+enum TransportState
+{
+    Stopped,
+    Starting,
+    Playing,
+    Stopping
+};
+
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessor  : public AudioProcessor
+class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener
 {
 public:
     //==============================================================================
@@ -71,10 +79,15 @@ private:
     Synthesiser synth;
     int currentSample;
 
+    AudioFormatManager formatManager;
+    std::unique_ptr<AudioFormatReaderSource> readerSource;
+    AudioTransportSource transportSource;
+    TransportState transportState;
+
     SynthesiserSound::Ptr getSampleData(File* sampleFile);
     AudioFormat* getFormatForFileOrNullptr(File* sampleFile);
     MidiBuffer filterMidiMessagesForChannel(const MidiBuffer& input, int channel);
-
-    AudioFormatManager formatManager;
-
+    void changeListenerCallback(ChangeBroadcaster* source) override;
+    void changeTransportState(TransportState newState);
+    void setTransportSource(AudioFormatReader*);
 };
