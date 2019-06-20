@@ -5,7 +5,7 @@ Notice. At this point license is proprietary, thus any commercial usage of this 
 
 # Building
 
-Сurrent build instruction based on ElementaryOS 5.0 or it will be compatible with Ubuntu 18.08 and many more Linux distributions.
+Сurrent build instruction based on ElementaryOS 5.0 bui I think it will be compatible with Ubuntu 18.08 and many more Linux distributions.
 
 1. Obtain free JUCE Framework from official web-site. https://shop.juce.com/get-juce
 2. Open Projucer from downloaded JUCE framework.
