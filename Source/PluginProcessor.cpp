@@ -254,7 +254,7 @@ void SoomplerAudioProcessor::changeTransportState(TransportState newState)
 
 void SoomplerAudioProcessor::setTransportSource(AudioFormatReader* reader)
 {
-    std::unique_ptr<AudioFormatReaderSource> newSource(new AudioFormatReaderSource(reader, true));
+    auto newSource = std::make_unique<AudioFormatReaderSource>(reader, true);
     transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
     readerSource.reset(newSource.release());
 }
