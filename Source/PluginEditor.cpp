@@ -14,7 +14,7 @@
 
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
+    : AudioProcessorEditor (&p), processor (p), mainFont("DejaVu Sans", 12, Font::plain)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -44,6 +44,8 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     processor.setTransportStateListener(this);
     // subscribe to thumbnail events, to catch thumbnail fully loaded time
     processor.getThumbnail().addChangeListener(this);
+
+    LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypefaceName(mainFont.getTypefaceName());
 }
 
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
@@ -56,6 +58,7 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     g.drawImage(backgroundImage, Rectangle<float>(Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT));
+    g.setFont(mainFont);
 
     drawThumbnail(g);
     drawSampleNameOrMessage(g);

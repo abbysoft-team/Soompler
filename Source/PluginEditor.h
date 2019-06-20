@@ -56,5 +56,7 @@ private:
 
     Image backgroundImage;
 
+    Font mainFont;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };
