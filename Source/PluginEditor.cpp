@@ -30,6 +30,9 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
 
     addAndMakeVisible(openFileButton);
     addAndMakeVisible(playSampleButton);
+
+    // load background image
+    backgroundImage = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
 }
 
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
@@ -41,6 +44,7 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+    g.drawImage(backgroundImage, Rectangle<float>(WINDOW_WIDTH, WINDOW_HEIGHT));
 
     g.setColour(SAMPLE_NAME_COLOR);
     g.setFont(SAMPLE_NAME_FONT_SIZE);

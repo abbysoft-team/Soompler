@@ -48,5 +48,7 @@ private:
     TextButton openFileButton;
     TextButton playSampleButton;
 
+    Image backgroundImage;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };

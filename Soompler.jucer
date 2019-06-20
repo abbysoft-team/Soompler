@@ -16,6 +16,7 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="xoPeua" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <FILE id="SJMWVx" name="background.png" compile="1" resource="1" file="Resources/background.png"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
