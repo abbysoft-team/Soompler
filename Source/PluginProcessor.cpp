@@ -14,7 +14,6 @@
 
 //==============================================================================
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
-                                                   .withInput  ("Input",  AudioChannelSet::stereo(), true)
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
                                                    loadedSample(nullptr)
@@ -31,6 +30,7 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
+    delete loadedSample;
 }
 
 //==============================================================================
