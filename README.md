@@ -11,8 +11,9 @@ Notice. At this point license is proprietary, thus any commercial usage of this 
 
 1. Obtain free JUCE Framework from official web-site. https://shop.juce.com/get-juce
 2. Open Projucer from downloaded JUCE framework.
-3. Edit global paths in Projucer (location of framework directories, VST2, VST3, and other sdk's location if you want to build specific plugin types)
-4. Select desired exporter or add for your system. 
-5. Click on LinuxMake exported, right click and choose "Save this exporter"
-6. Do the same as 5 with CLion exporter, if you want to open it in CLion or QtCreator
-7. Open project in desired IDE
+3. Open soompler.jucer project file in Projucer
+4. Edit global paths in Projucer (location of framework directories, VST2, VST3, and other sdk's location if you want to build specific plugin types)
+5. Select desired exporter or add for your system. 
+6. Click on LinuxMake exported, right click and choose "Save this exporter"
+7. Do the same as 5 with CLion exporter, if you want to open it in CLion or QtCreator
+8. Open project in desired IDE
