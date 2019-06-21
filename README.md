@@ -17,3 +17,4 @@ Notice. At this point license is proprietary, thus any commercial usage of this 
 6. Click on LinuxMake exported, right click and choose "Save this exporter"
 7. Do the same as 5 with CLion exporter, if you want to open it in CLion or QtCreator
 8. Open project in desired IDE
+9. Build it like plain project for your OS
