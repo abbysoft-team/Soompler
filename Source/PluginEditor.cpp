@@ -186,7 +186,7 @@ String SoomplerAudioProcessorEditor::getCroppedNameIfNeeded(String fileName)
     String result =  fileName.substring(0, Settings::MAX_SAMPLE_NAME_LENGTH - 4);
     result.append("...", 3);
 
-    return String(result);
+    return result;
 }
 
 void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
