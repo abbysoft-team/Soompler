@@ -16,7 +16,8 @@
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
-                                                   loadedSample(nullptr)
+                                                   loadedSample(nullptr),
+                                                   transportStateListener(nullptr)
 {
     synth.addVoice(new SamplerVoice());
     synth.setCurrentPlaybackSampleRate(44100);
@@ -172,6 +173,16 @@ void SoomplerAudioProcessor::playSample()
     currentSample = 0;
 }
 
+void SoomplerAudioProcessor::stopSamplePlayback()
+{
+    changeTransportState(Stopping);
+}
+
+void SoomplerAudioProcessor::setTransportStateListener(TransportStateListener* listener)
+{
+    this->transportStateListener = listener;
+}
+
 SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
 {
     auto* soundBuffer = sampleFile->createInputStream();
@@ -235,21 +246,33 @@ void SoomplerAudioProcessor::changeListenerCallback(ChangeBroadcaster *source)
 
 void SoomplerAudioProcessor::changeTransportState(TransportState newState)
 {
-    if (transportState != newState)
+    if (transportState == newState)
     {
-        transportState = newState;
-
-        switch (transportState)
-        {
-            case Playing:
-                break;
-            case Starting:
-                transportSource.start();
-                break;
-            default:
-                break;
-        }
+        return;
     }
+
+
+    transportState = newState;
+
+    if (transportStateListener != nullptr) {
+        transportStateListener->transportStateChanged(newState);
+    }
+
+    switch (transportState)
+    {
+        case Playing:
+            break;
+        case Starting:
+            transportSource.start();
+            break;
+        case Stopping:
+        case Stopped:
+            transportSource.stop();
+            transportSource.setNextReadPosition(0);
+            break;
+        default:
+            break;
+   }
 }
 
 void SoomplerAudioProcessor::setTransportSource(AudioFormatReader* reader)

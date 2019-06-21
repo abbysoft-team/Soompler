@@ -28,11 +28,20 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     playSampleButton.addListener(this);
     playSampleButton.setEnabled(false);                         // make enabled when sample is loaded
 
+    stopSampleButton.setButtonText(BUTTON_STOP_SAMPLE_TEXT);
+    stopSampleButton.addListener(this);
+
     addAndMakeVisible(openFileButton);
     addAndMakeVisible(playSampleButton);
+    addAndMakeVisible(stopSampleButton);
+
+    stopSampleButton.setVisible(false);
 
     // load background image
     backgroundImage = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
+
+    // subscribe to all transport events from processor
+    processor.setTransportStateListener(this);
 }
 
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
@@ -56,6 +65,7 @@ void SoomplerAudioProcessorEditor::resized()
 {
     openFileButton.setBounds(BUTTON_OPEN_FILE_POSITION);
     playSampleButton.setBounds(BUTTON_PLAY_SAMPLE_POSITION);
+    stopSampleButton.setBounds(BUTTON_PLAY_SAMPLE_POSITION);
 }
 
 void SoomplerAudioProcessorEditor::buttonClicked(Button *button)
@@ -64,6 +74,8 @@ void SoomplerAudioProcessorEditor::buttonClicked(Button *button)
         openFileButtonClicked();
     } else if (button->getButtonText().equalsIgnoreCase(BUTTON_PLAY_SAMPLE_TEXT)) {
         playSampleButtonClicked();
+    } else if (button->getButtonText().equalsIgnoreCase(BUTTON_STOP_SAMPLE_TEXT)) {
+        stopSampleButtonClicked();
     }
 }
 
@@ -88,6 +100,13 @@ void SoomplerAudioProcessorEditor::openFileButtonClicked()
 void SoomplerAudioProcessorEditor::playSampleButtonClicked()
 {
     processor.playSample();
+    playSampleButton.setVisible(false);
+    stopSampleButton.setVisible(true);
+}
+
+void SoomplerAudioProcessorEditor::stopSampleButtonClicked()
+{
+    processor.stopSamplePlayback();
 }
 
 String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
@@ -98,5 +117,17 @@ String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
         return NO_SAMPLE_LOADED_TEXT;
     } else {
         return loadedSample->getFileName();
+    }
+}
+
+void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
+{
+    switch (state) {
+    case Stopped:
+        stopSampleButton.setVisible(false);
+        playSampleButton.setVisible(true);
+        break;
+    default:
+        break;
     }
 }

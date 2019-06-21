@@ -21,11 +21,12 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+#include "TransportStateListener.h"
 
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessorEditor  : public AudioProcessorEditor, private Button::Listener
+class SoomplerAudioProcessorEditor  : public AudioProcessorEditor, private Button::Listener, private TransportStateListener
 {
 public:
     SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
@@ -39,7 +40,9 @@ private:
     void buttonClicked(Button*) override;
     void openFileButtonClicked();
     void playSampleButtonClicked();
+    void stopSampleButtonClicked();
     String getLoadedSampleNameOrPlaceholder();
+    void transportStateChanged(TransportState state);
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -47,6 +50,7 @@ private:
 
     TextButton openFileButton;
     TextButton playSampleButton;
+    TextButton stopSampleButton;
 
     Image backgroundImage;
 

@@ -8,6 +8,9 @@
               pluginCode="as1" cppLanguageStandard="latest">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="PIRvl8" name="TransportStateListener.h" compile="0" resource="0"
+            file="Source/TransportStateListener.h"/>
+      <FILE id="EOiBjr" name="Strings.h" compile="0" resource="0" file="Source/Strings.h"/>
       <FILE id="S57gtU" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="tv9Gm3" name="PluginProcessor.h" compile="0" resource="0"

@@ -11,14 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-
-enum TransportState
-{
-    Stopped,
-    Starting,
-    Playing,
-    Stopping
-};
+#include "TransportStateListener.h"
 
 //==============================================================================
 /**
@@ -67,9 +60,13 @@ public:
         return loadedSample;
     }
 
-    void loadSample(File sample);
+    void loadSample(File);
 
     void playSample();
+
+    void stopSamplePlayback();
+
+    void setTransportStateListener(TransportStateListener*);
 
 private:
     //==============================================================================
@@ -83,6 +80,7 @@ private:
     std::unique_ptr<AudioFormatReaderSource> readerSource;
     AudioTransportSource transportSource;
     TransportState transportState;
+    TransportStateListener* transportStateListener;
 
     SynthesiserSound::Ptr getSampleData(File* sampleFile);
     AudioFormat* getFormatForFileOrNullptr(File* sampleFile);
