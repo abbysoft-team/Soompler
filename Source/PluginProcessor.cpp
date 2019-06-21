@@ -210,8 +210,8 @@ AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File *sampleFile)
         DBG(sampleFile->getFileExtension());
         NativeMessageBox::showMessageBox(
                     AlertWindow::AlertIconType::WarningIcon,
-                    UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE,
-                    UNSUPPORTED_FILE_EXTENSION_ERROR_MESSAGE);
+                    Strings::UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE,
+                    Strings::UNSUPPORTED_FILE_EXTENSION_ERROR_MESSAGE);
     }
 
     return format;
