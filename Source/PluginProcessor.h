@@ -60,6 +60,10 @@ public:
         return loadedSample;
     }
 
+    AudioThumbnail& getThumbnail() {
+        return thumbnail;
+    }
+
     void loadSample(File);
 
     void playSample();
@@ -67,6 +71,8 @@ public:
     void stopSamplePlayback();
 
     void setTransportStateListener(TransportStateListener*);
+
+    double getCurrentAudioPosition() const;
 
 private:
     //==============================================================================
@@ -81,6 +87,9 @@ private:
     AudioTransportSource transportSource;
     TransportState transportState;
     TransportStateListener* transportStateListener;
+
+    AudioThumbnailCache thumbnailCache;
+    AudioThumbnail thumbnail;
 
     SynthesiserSound::Ptr getSampleData(File* sampleFile);
     AudioFormat* getFormatForFileOrNullptr(File* sampleFile);

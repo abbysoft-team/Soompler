@@ -18,7 +18,8 @@
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessorEditor  : public AudioProcessorEditor, private Button::Listener, private TransportStateListener
+class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
+        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer
 {
 public:
     SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
@@ -35,6 +36,13 @@ private:
     void stopSampleButtonClicked();
     String getLoadedSampleNameOrPlaceholder();
     void transportStateChanged(TransportState state);
+
+    void changeListenerCallback(ChangeBroadcaster* source);
+    void thumbnailChanged(AudioThumbnail& thumbnail);
+    void drawThumbnail(Graphics& graphics);
+    void drawSampleNameOrMessage(Graphics& graphics);
+
+    void timerCallback();
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

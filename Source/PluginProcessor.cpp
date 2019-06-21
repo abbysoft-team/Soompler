@@ -17,7 +17,9 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
                                                    loadedSample(nullptr),
-                                                   transportStateListener(nullptr)
+                                                   transportStateListener(nullptr),
+                                                   thumbnailCache(5),
+                                                   thumbnail(512, formatManager, thumbnailCache)
 {
     synth.addVoice(new SamplerVoice());
     synth.setCurrentPlaybackSampleRate(44100);
@@ -183,6 +185,11 @@ void SoomplerAudioProcessor::setTransportStateListener(TransportStateListener* l
     this->transportStateListener = listener;
 }
 
+double SoomplerAudioProcessor::getCurrentAudioPosition() const
+{
+    return transportSource.getCurrentPosition();
+}
+
 SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
 {
     auto* soundBuffer = sampleFile->createInputStream();
@@ -195,6 +202,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
     auto formatReader = formatManager.createReaderFor(*sampleFile);
 
     setTransportSource(formatReader);
+    thumbnail.setSource(new FileInputSource(*sampleFile));
 
 //    BigInteger midiNotes;
 //    midiNotes.setRange(0, 126, true);
@@ -281,7 +289,6 @@ void SoomplerAudioProcessor::setTransportSource(AudioFormatReader* reader)
     transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
     readerSource.reset(newSource.release());
 }
-
 
 
 //==============================================================================

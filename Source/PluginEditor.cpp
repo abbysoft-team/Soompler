@@ -42,6 +42,8 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
 
     // subscribe to all transport events from processor
     processor.setTransportStateListener(this);
+    // subscribe to thumbnail events, to catch thumbnail fully loaded time
+    processor.getThumbnail().addChangeListener(this);
 }
 
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
@@ -55,13 +57,65 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
     g.drawImage(backgroundImage, Rectangle<float>(Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT));
 
-    g.setColour(Settings::SAMPLE_NAME_COLOR);
-    g.setFont(Settings::SAMPLE_NAME_FONT_SIZE);
+    drawThumbnail(g);
+    drawSampleNameOrMessage(g);
+}
 
+void SoomplerAudioProcessorEditor::drawThumbnail(Graphics &g)
+{
+    AudioThumbnail& thumbnail = processor.getThumbnail();
+    if (thumbnail.getNumChannels() == 0)
+    {
+        return;
+    }
+
+    g.setColour(Settings::THUMBNAIL_BOUNDS_COLOR);
+    g.drawRect(Settings::THUMBNAIL_BOUNDS);
+    g.setColour(Settings::THUMBNAIL_COLOR);
+
+    auto audioLength = thumbnail.getTotalLength();
+    thumbnail.drawChannels(g,
+                           Settings::THUMBNAIL_BOUNDS,
+                           0.0,
+                           audioLength,
+                           1.0f);
+
+    g.setColour(Settings::THUMBNAIL_HEADER_COLOR);
+    g.fillRect(Settings::THUMBNAIL_HEADER_BOUNDS);
+
+    // draw position line
+    g.setColour(Settings::POSITION_LINE_COLOR);
+
+    auto audioPosition = processor.getCurrentAudioPosition();
+    auto drawPosition = ((audioPosition / audioLength)
+                         * Settings::THUMBNAIL_BOUNDS.getWidth() + Settings::THUMBNAIL_BOUNDS.getX());
+
+    g.drawLine(drawPosition, Settings::THUMBNAIL_BOUNDS.getY(), drawPosition, Settings::THUMBNAIL_BOUNDS.getBottom(), 3.0f);
+}
+
+void SoomplerAudioProcessorEditor::drawSampleNameOrMessage(Graphics &g)
+{
+    int y;
+    if (processor.getLoadedSample() != nullptr) {
+        g.setColour(Settings::SAMPLE_NAME_COLOR);
+        y = Settings::SAMPLE_NAME_TEXT_Y;
+    } else {
+        g.setColour(Colours::black);
+
+        // this is not actuall name of sample, but message to load sample
+        y = Settings::SAMPLE_NAME_TEXT_Y + 20;
+    }
+
+    g.setFont(Settings::SAMPLE_NAME_FONT_SIZE);
     g.drawSingleLineText(getLoadedSampleNameOrPlaceholder(),
                          Settings::SAMPLE_NAME_TEXT_X,
                          Settings::SAMPLE_NAME_TEXT_Y,
                          Justification::horizontallyCentred);
+}
+
+void SoomplerAudioProcessorEditor::timerCallback()
+{
+    repaint();
 }
 
 void SoomplerAudioProcessorEditor::resized()
@@ -126,11 +180,27 @@ String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
 void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
 {
     switch (state) {
+    case Starting:
+        startTimer(40);
+        break;
     case Stopped:
         stopSampleButton.setVisible(false);
         playSampleButton.setVisible(true);
+        stopTimer();
         break;
     default:
         break;
     }
+}
+
+void SoomplerAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster *source)
+{
+    if (source == &processor.getThumbnail()) {
+        thumbnailChanged(processor.getThumbnail());
+    }
+}
+
+void SoomplerAudioProcessorEditor::thumbnailChanged(AudioThumbnail &thumbnail)
+{
+    repaint();
 }

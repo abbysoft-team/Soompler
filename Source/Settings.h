@@ -7,12 +7,19 @@ namespace Settings {
 
 constexpr int WINDOW_WIDTH = 500;
 constexpr int WINDOW_HEIGHT = 300;
-const auto BUTTON_OPEN_FILE_POSITION = Rectangle<int>(WINDOW_WIDTH/2-50, 233, 100, 40);
-const auto BUTTON_PLAY_SAMPLE_POSITION = Rectangle<int>(WINDOW_WIDTH/2-50, 180, 100, 40);
+const auto BUTTON_OPEN_FILE_POSITION = Rectangle<int>(WINDOW_WIDTH/2-100, 233, 100, 40);
+const auto BUTTON_PLAY_SAMPLE_POSITION = Rectangle<int>(WINDOW_WIDTH/2 + 5, 233, 100, 40);
+const auto THUMBNAIL_BOUNDS = Rectangle<int>(10, 100, WINDOW_WIDTH - 20, 100);
+const auto THUMBNAIL_HEADER_BOUNDS = Rectangle<int>(10, 80, WINDOW_WIDTH - 20, 20);
 
-const auto SAMPLE_NAME_COLOR = Colours::black;
+const auto THUMBNAIL_COLOR = Colour(23, 54, 38);
+const auto THUMBNAIL_HEADER_COLOR = Colour((uint8) 255, (uint8) 128, (uint8) 128, (uint8) 200);
+const auto THUMBNAIL_BOUNDS_COLOR = Colour(256, 128, 128);
+const auto SAMPLE_NAME_COLOR = THUMBNAIL_COLOR;
+const auto POSITION_LINE_COLOR = THUMBNAIL_HEADER_COLOR;
+
 constexpr auto SAMPLE_NAME_TEXT_X = (WINDOW_WIDTH / 2);
-constexpr auto SAMPLE_NAME_TEXT_Y = 120;
+constexpr auto SAMPLE_NAME_TEXT_Y = 95;
 constexpr auto SAMPLE_NAME_FONT_SIZE = 17.0f;
 }
 
