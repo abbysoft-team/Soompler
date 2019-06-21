@@ -42,6 +42,8 @@ private:
     void drawThumbnail(Graphics& graphics);
     void drawSampleNameOrMessage(Graphics& graphics);
 
+    String getCroppedNameIfNeeded(String fileName);
+
     void timerCallback();
 
     // This reference is provided as a quick way for your editor to

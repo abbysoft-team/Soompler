@@ -21,6 +21,8 @@ const auto POSITION_LINE_COLOR = THUMBNAIL_HEADER_COLOR;
 constexpr auto SAMPLE_NAME_TEXT_X = (WINDOW_WIDTH / 2);
 constexpr auto SAMPLE_NAME_TEXT_Y = 95;
 constexpr auto SAMPLE_NAME_FONT_SIZE = 17.0f;
+constexpr auto MAX_SAMPLE_NAME_LENGTH = 60;
+
 }
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H

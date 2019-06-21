@@ -173,8 +173,20 @@ String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
     if (loadedSample == nullptr) {
         return Strings::NO_SAMPLE_LOADED_TEXT;
     } else {
-        return loadedSample->getFileName();
+        return getCroppedNameIfNeeded(loadedSample->getFileName());
     }
+}
+
+String SoomplerAudioProcessorEditor::getCroppedNameIfNeeded(String fileName)
+{
+    if (fileName.length() <= Settings::MAX_SAMPLE_NAME_LENGTH) {
+        return fileName;
+    }
+
+    String result =  fileName.substring(0, Settings::MAX_SAMPLE_NAME_LENGTH - 4);
+    result.append("...", 3);
+
+    return String(result);
 }
 
 void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
