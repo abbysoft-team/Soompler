@@ -96,7 +96,7 @@ void SoomplerAudioProcessorEditor::drawThumbnail(Graphics &g)
 void SoomplerAudioProcessorEditor::drawSampleNameOrMessage(Graphics &g)
 {
     int y;
-    if (processor.getLoadedSample() != nullptr) {
+    if (processor.getLoadedSample().has_value()) {
         g.setColour(Settings::SAMPLE_NAME_COLOR);
         y = Settings::SAMPLE_NAME_TEXT_Y;
     } else {
@@ -168,9 +168,9 @@ void SoomplerAudioProcessorEditor::stopSampleButtonClicked()
 
 String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
 {
-    File* loadedSample = processor.getLoadedSample();
+    std::optional<File> loadedSample = processor.getLoadedSample();
 
-    if (loadedSample == nullptr) {
+    if (!loadedSample.has_value()) {
         return Strings::NO_SAMPLE_LOADED_TEXT;
     } else {
         return getCroppedNameIfNeeded(loadedSample->getFileName());

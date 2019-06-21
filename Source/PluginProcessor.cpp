@@ -184,9 +184,9 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
 {
-    this->loadedSample = std::make_unique<File>(sampleFile);
+    this->loadedSample = sampleFile;
 
-    SynthesiserSound::Ptr sound = getSampleData(loadedSample.get());
+    SynthesiserSound::Ptr sound = getSampleData(loadedSample);
     if (sound != nullptr)
     {
         synth.removeSound(0);
@@ -196,9 +196,9 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
 
 void SoomplerAudioProcessor::playSample()
 {
-    if (loadedSample == nullptr)
+    if (!loadedSample.has_value())
     {
-        DBG("loaded sample in nullptr and cannot be played");
+        DBG("sample is not loaded and cannot be played");
         return;
     }
 
@@ -222,7 +222,7 @@ double SoomplerAudioProcessor::getCurrentAudioPosition() const
     return transportSource.getCurrentPosition();
 }
 
-SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
+SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> sampleFile)
 {
     //auto* soundBuffer = sampleFile->createInputStream();
     AudioFormat* format = getFormatForFileOrNullptr(sampleFile);
@@ -241,7 +241,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
     return new SamplerSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
 }
 
-AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File *sampleFile)
+AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)
 {
     AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile->getFileExtension());
 

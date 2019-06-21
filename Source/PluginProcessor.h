@@ -56,8 +56,8 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    File* getLoadedSample() const {
-        return loadedSample.get();
+    std::optional<File> getLoadedSample() const {
+        return loadedSample;
     }
 
     AudioThumbnail& getThumbnail() {
@@ -80,7 +80,7 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 
-    std::unique_ptr<File> loadedSample;
+    std::optional<File> loadedSample;
     Synthesiser synth;
     SynthesiserSound::Ptr synthSound;
     int currentSample;
@@ -94,8 +94,8 @@ private:
     AudioThumbnailCache thumbnailCache;
     AudioThumbnail thumbnail;
 
-    SynthesiserSound::Ptr getSampleData(File* sampleFile);
-    AudioFormat* getFormatForFileOrNullptr(File* sampleFile);
+    SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
+    AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);
     MidiBuffer filterMidiMessagesForChannel(const MidiBuffer& input, int channel);
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
