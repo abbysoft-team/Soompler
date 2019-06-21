@@ -74,12 +74,15 @@ public:
 
     double getCurrentAudioPosition() const;
 
+    void processTransport(AudioBuffer<float>& buffer);
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 
     File* loadedSample;
     Synthesiser synth;
+    SynthesiserSound::Ptr synthSound;
     int currentSample;
 
     AudioFormatManager formatManager;

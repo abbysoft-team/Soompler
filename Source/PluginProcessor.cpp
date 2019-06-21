@@ -90,6 +90,7 @@ void SoomplerAudioProcessor::changeProgramName (int index, const String& newName
 void SoomplerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     transportSource.prepareToPlay(samplesPerBlock, sampleRate);
+    synth.setCurrentPlaybackSampleRate(sampleRate);
 }
 
 void SoomplerAudioProcessor::releaseResources()
@@ -110,17 +111,52 @@ bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    if (readerSource.get() == nullptr)
-    {
+    if (readerSource.get() == nullptr) {
         buffer.clear();
         return;
     }
 
+    if (midiMessages.isEmpty() && !synth.getVoice(0)->isVoiceActive()) {
+        processTransport(buffer);
+        return;
+    }
+
+    // TODO maybe this all multi-bus thing is unnesesary?
+//    auto busCount = getBusCount(false);
+//    for (auto busNr = 0; busNr < busCount; ++busNr) {
+//        auto midiChannelBuffer = filterMidiMessagesForChannel(MidiBuffer, busNr + 1);
+//        auto audioBusBuffer = getBusBuffer(buffer, false, busNr);
+
+//        synth.renderNextBlock();
+//    }
+
+    auto midiChannelBuffer = filterMidiMessagesForChannel(midiMessages, 1);
+    auto audioBusBuffer = getBusBuffer(buffer, false, 0);
+
+    synth.renderNextBlock(audioBusBuffer, midiChannelBuffer, 0, audioBusBuffer.getNumSamples());
+}
+
+void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
+{
     AudioSourceChannelInfo audioSource;
     audioSource.buffer = &buffer;
     audioSource.startSample = 0;
     audioSource.numSamples = buffer.getNumSamples();
     transportSource.getNextAudioBlock(audioSource);
+}
+
+MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
+{
+    MidiBuffer output;
+    int samplePosition;
+    MidiMessage msg;
+
+    for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
+    {
+        if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
+    }
+
+    return output;
 }
 
 //==============================================================================
@@ -152,14 +188,12 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
 {
     this->loadedSample = new File(sampleFile);
 
-    synth.removeSound(0);
     SynthesiserSound::Ptr sound = getSampleData(loadedSample);
-//    if (sound != nullptr)
-//    {
-//        synth.addSound(sound);
-//    } else {
-//        loadedSample = nullptr;
-//    }
+    if (sound != nullptr)
+    {
+        synth.removeSound(0);
+        synth.addSound(sound);
+    }
 }
 
 void SoomplerAudioProcessor::playSample()
@@ -204,10 +238,9 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
     setTransportSource(formatReader);
     thumbnail.setSource(new FileInputSource(*sampleFile));
 
-//    BigInteger midiNotes;
-//    midiNotes.setRange(0, 126, true);
-//    return new SamplerSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
-    return nullptr;
+    BigInteger midiNotes;
+    midiNotes.setRange(0, 126, true);
+    return new SamplerSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
 }
 
 AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File *sampleFile)
@@ -223,20 +256,6 @@ AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File *sampleFile)
     }
 
     return format;
-}
-
-MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
-{
-    MidiBuffer output;
-    int samplePosition;
-    MidiMessage msg;
-
-    for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
-    {
-        if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
-    }
-
-    return output;
 }
 
 void SoomplerAudioProcessor::changeListenerCallback(ChangeBroadcaster *source)
