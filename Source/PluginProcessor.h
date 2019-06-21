@@ -57,7 +57,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     File* getLoadedSample() const {
-        return loadedSample;
+        return loadedSample.get();
     }
 
     AudioThumbnail& getThumbnail() {
@@ -80,7 +80,7 @@ private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 
-    File* loadedSample;
+    std::unique_ptr<File> loadedSample;
     Synthesiser synth;
     SynthesiserSound::Ptr synthSound;
     int currentSample;

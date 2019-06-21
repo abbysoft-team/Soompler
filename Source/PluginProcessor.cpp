@@ -16,7 +16,6 @@
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
-                                                   loadedSample(nullptr),
                                                    transportStateListener(nullptr),
                                                    thumbnailCache(5),
                                                    thumbnail(512, formatManager, thumbnailCache)
@@ -33,7 +32,6 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
-    delete loadedSample;
 }
 
 //==============================================================================
@@ -186,9 +184,9 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
 {
-    this->loadedSample = new File(sampleFile);
+    this->loadedSample = std::make_unique<File>(sampleFile);
 
-    SynthesiserSound::Ptr sound = getSampleData(loadedSample);
+    SynthesiserSound::Ptr sound = getSampleData(loadedSample.get());
     if (sound != nullptr)
     {
         synth.removeSound(0);
