@@ -16,7 +16,6 @@
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
-                                                   transportStateListener(nullptr),
                                                    thumbnailCache(5),
                                                    thumbnail(512, formatManager, thumbnailCache)
 {
@@ -32,6 +31,7 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
+    transportSource.releaseResources();
 }
 
 //==============================================================================
@@ -224,7 +224,7 @@ double SoomplerAudioProcessor::getCurrentAudioPosition() const
 
 SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
 {
-    auto* soundBuffer = sampleFile->createInputStream();
+    //auto* soundBuffer = sampleFile->createInputStream();
     AudioFormat* format = getFormatForFileOrNullptr(sampleFile);
     if (format == nullptr)
     {
