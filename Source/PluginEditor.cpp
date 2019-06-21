@@ -49,8 +49,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
 }
 
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
-{
-}
+= default;
 
 //==============================================================================
 void SoomplerAudioProcessorEditor::paint (Graphics& g)
@@ -169,6 +168,18 @@ void SoomplerAudioProcessorEditor::stopSampleButtonClicked()
     processor.stopSamplePlayback();
 }
 
+String getCroppedNameIfNeeded(String fileName)
+{
+  if (fileName.length() <= Settings::MAX_SAMPLE_NAME_LENGTH) {
+    return fileName;
+  }
+
+  String result =  fileName.substring(0, Settings::MAX_SAMPLE_NAME_LENGTH - 4);
+  result.append("...", 3);
+
+  return result;
+}
+
 String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
 {
     std::optional<File> loadedSample = processor.getLoadedSample();
@@ -178,18 +189,6 @@ String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
     } else {
         return getCroppedNameIfNeeded(loadedSample->getFileName());
     }
-}
-
-String SoomplerAudioProcessorEditor::getCroppedNameIfNeeded(String fileName)
-{
-    if (fileName.length() <= Settings::MAX_SAMPLE_NAME_LENGTH) {
-        return fileName;
-    }
-
-    String result =  fileName.substring(0, Settings::MAX_SAMPLE_NAME_LENGTH - 4);
-    result.append("...", 3);
-
-    return result;
 }
 
 void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)

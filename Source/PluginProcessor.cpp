@@ -77,7 +77,7 @@ void SoomplerAudioProcessor::setCurrentProgram (int index)
 
 const String SoomplerAudioProcessor::getProgramName (int index)
 {
-    return {};
+    return "Soompler";
 }
 
 void SoomplerAudioProcessor::changeProgramName (int index, const String& newName)
@@ -100,16 +100,27 @@ bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 {
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
-        return false;
+  return !(layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
+      && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo());
+}
 
-    return true;
+MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
+{
+  MidiBuffer output;
+  int samplePosition;
+  MidiMessage msg;
+
+  for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
+  {
+    if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
+  }
+
+  return output;
 }
 
 void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    if (readerSource.get() == nullptr) {
+    if (readerSource == nullptr) {
         buffer.clear();
         return;
     }
@@ -119,15 +130,6 @@ void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
         return;
     }
 
-    // TODO maybe this all multi-bus thing is unnesesary?
-//    auto busCount = getBusCount(false);
-//    for (auto busNr = 0; busNr < busCount; ++busNr) {
-//        auto midiChannelBuffer = filterMidiMessagesForChannel(MidiBuffer, busNr + 1);
-//        auto audioBusBuffer = getBusBuffer(buffer, false, busNr);
-
-//        synth.renderNextBlock();
-//    }
-
     auto midiChannelBuffer = filterMidiMessagesForChannel(midiMessages, 1);
     auto audioBusBuffer = getBusBuffer(buffer, false, 0);
 
@@ -136,25 +138,11 @@ void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
 
 void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
 {
-    AudioSourceChannelInfo audioSource;
+    AudioSourceChannelInfo audioSource{};
     audioSource.buffer = &buffer;
     audioSource.startSample = 0;
     audioSource.numSamples = buffer.getNumSamples();
     transportSource.getNextAudioBlock(audioSource);
-}
-
-MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
-{
-    MidiBuffer output;
-    int samplePosition;
-    MidiMessage msg;
-
-    for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
-    {
-        if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
-    }
-
-    return output;
 }
 
 //==============================================================================
@@ -304,7 +292,7 @@ void SoomplerAudioProcessor::setTransportSource(AudioFormatReader* reader)
 {
     auto newSource = std::make_unique<AudioFormatReaderSource>(reader, true);
     transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
-    readerSource.reset(newSource.release());
+    readerSource = std::move(newSource);
 }
 
 

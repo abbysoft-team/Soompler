@@ -13,8 +13,8 @@ const auto THUMBNAIL_BOUNDS = Rectangle<int>(10, 100, WINDOW_WIDTH - 20, 100);
 const auto THUMBNAIL_HEADER_BOUNDS = Rectangle<int>(10, 80, WINDOW_WIDTH - 20, 20);
 
 const auto THUMBNAIL_COLOR = Colour(23, 54, 38);
-const auto THUMBNAIL_HEADER_COLOR = Colour((uint8) 255, (uint8) 128, (uint8) 128, (uint8) 200);
-const auto THUMBNAIL_BOUNDS_COLOR = Colour(256, 128, 128);
+const auto THUMBNAIL_HEADER_COLOR = Colour((uint8) 255, 128, 128, 0.7f);
+const auto THUMBNAIL_BOUNDS_COLOR = Colour(255, 128, 128);
 const auto SAMPLE_NAME_COLOR = THUMBNAIL_COLOR;
 const auto POSITION_LINE_COLOR = THUMBNAIL_HEADER_COLOR;
 

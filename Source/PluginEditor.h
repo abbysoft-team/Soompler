@@ -22,8 +22,8 @@ class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
         private Button::Listener, private TransportStateListener, private ChangeListener, private Timer
 {
 public:
-    SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
-    ~SoomplerAudioProcessorEditor();
+    explicit SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
+    ~SoomplerAudioProcessorEditor() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -35,16 +35,14 @@ private:
     void playSampleButtonClicked();
     void stopSampleButtonClicked();
     String getLoadedSampleNameOrPlaceholder();
-    void transportStateChanged(TransportState state);
+    void transportStateChanged(TransportState state) override;
 
-    void changeListenerCallback(ChangeBroadcaster* source);
+    void changeListenerCallback(ChangeBroadcaster* source) override ;
     void thumbnailChanged(AudioThumbnail& thumbnail);
     void drawThumbnail(Graphics& graphics);
     void drawSampleNameOrMessage(Graphics& graphics);
 
-    String getCroppedNameIfNeeded(String fileName);
-
-    void timerCallback();
+    void timerCallback() override;
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
