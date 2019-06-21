@@ -63,7 +63,7 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
 
 void SoomplerAudioProcessorEditor::drawThumbnail(Graphics &g)
 {
-    AudioThumbnail& thumbnail = processor.getThumbnail();
+    auto thumbnail = processor.getThumbnail();
     if (thumbnail.getNumChannels() == 0)
     {
         return;
