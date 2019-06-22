@@ -10,26 +10,20 @@
 
 #pragma once
 
-#define WINDOW_WIDTH 500
-#define WINDOW_HEIGHT 300
-#define BUTTON_OPEN_FILE_POSITION Rectangle<int>(WINDOW_WIDTH/2-50, 233, 100, 40)
-#define BUTTON_PLAY_SAMPLE_POSITION Rectangle<int>(WINDOW_WIDTH/2-50, 180, 100, 40)
-#define SAMPLE_NAME_COLOR Colours::black
-#define SAMPLE_NAME_TEXT_X (WINDOW_WIDTH / 2)
-#define SAMPLE_NAME_TEXT_Y 120
-#define SAMPLE_NAME_FONT_SIZE 17.0f
-
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
+#include "TransportStateListener.h"
+#include "Settings.h"
 
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessorEditor  : public AudioProcessorEditor, private Button::Listener
+class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
+        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer
 {
 public:
-    SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
-    ~SoomplerAudioProcessorEditor();
+    explicit SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
+    ~SoomplerAudioProcessorEditor() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -39,7 +33,16 @@ private:
     void buttonClicked(Button*) override;
     void openFileButtonClicked();
     void playSampleButtonClicked();
+    void stopSampleButtonClicked();
     String getLoadedSampleNameOrPlaceholder();
+    void transportStateChanged(TransportState state) override;
+
+    void changeListenerCallback(ChangeBroadcaster* source) override ;
+    void thumbnailChanged(AudioThumbnail& thumbnail);
+    void drawThumbnail(Graphics& graphics);
+    void drawSampleNameOrMessage(Graphics& graphics);
+
+    void timerCallback() override;
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -47,6 +50,11 @@ private:
 
     TextButton openFileButton;
     TextButton playSampleButton;
+    TextButton stopSampleButton;
+
+    Image backgroundImage;
+
+    Font mainFont;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };

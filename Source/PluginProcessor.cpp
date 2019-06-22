@@ -16,7 +16,8 @@
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
-                                                   loadedSample(nullptr)
+                                                   thumbnailCache(5),
+                                                   thumbnail(512, formatManager, thumbnailCache)
 {
     synth.addVoice(new SamplerVoice());
     synth.setCurrentPlaybackSampleRate(44100);
@@ -30,7 +31,7 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
-    delete loadedSample;
+    transportSource.releaseResources();
 }
 
 //==============================================================================
@@ -76,7 +77,7 @@ void SoomplerAudioProcessor::setCurrentProgram (int index)
 
 const String SoomplerAudioProcessor::getProgramName (int index)
 {
-    return {};
+    return "Soompler";
 }
 
 void SoomplerAudioProcessor::changeProgramName (int index, const String& newName)
@@ -87,6 +88,7 @@ void SoomplerAudioProcessor::changeProgramName (int index, const String& newName
 void SoomplerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     transportSource.prepareToPlay(samplesPerBlock, sampleRate);
+    synth.setCurrentPlaybackSampleRate(sampleRate);
 }
 
 void SoomplerAudioProcessor::releaseResources()
@@ -98,22 +100,45 @@ bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 {
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
-        return false;
+  return !(layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
+      && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo());
+}
 
-    return true;
+MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
+{
+  MidiBuffer output;
+  int samplePosition;
+  MidiMessage msg;
+
+  for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
+  {
+    if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
+  }
+
+  return output;
 }
 
 void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    if (readerSource.get() == nullptr)
-    {
+    if (readerSource == nullptr) {
         buffer.clear();
         return;
     }
 
-    AudioSourceChannelInfo audioSource;
+    if (midiMessages.isEmpty() && !synth.getVoice(0)->isVoiceActive()) {
+        processTransport(buffer);
+        return;
+    }
+
+    auto midiChannelBuffer = filterMidiMessagesForChannel(midiMessages, 1);
+    auto audioBusBuffer = getBusBuffer(buffer, false, 0);
+
+    synth.renderNextBlock(audioBusBuffer, midiChannelBuffer, 0, audioBusBuffer.getNumSamples());
+}
+
+void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
+{
+    AudioSourceChannelInfo audioSource{};
     audioSource.buffer = &buffer;
     audioSource.startSample = 0;
     audioSource.numSamples = buffer.getNumSamples();
@@ -147,23 +172,21 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
 {
-    this->loadedSample = new File(sampleFile);
+    this->loadedSample = sampleFile;
 
-    synth.removeSound(0);
     SynthesiserSound::Ptr sound = getSampleData(loadedSample);
-//    if (sound != nullptr)
-//    {
-//        synth.addSound(sound);
-//    } else {
-//        loadedSample = nullptr;
-//    }
+    if (sound != nullptr)
+    {
+        synth.removeSound(0);
+        synth.addSound(sound);
+    }
 }
 
 void SoomplerAudioProcessor::playSample()
 {
-    if (loadedSample == nullptr)
+    if (!loadedSample.has_value())
     {
-        DBG("loaded sample in nullptr and cannot be played");
+        DBG("sample is not loaded and cannot be played");
         return;
     }
 
@@ -172,9 +195,24 @@ void SoomplerAudioProcessor::playSample()
     currentSample = 0;
 }
 
-SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
+void SoomplerAudioProcessor::stopSamplePlayback()
 {
-    auto* soundBuffer = sampleFile->createInputStream();
+    changeTransportState(Stopping);
+}
+
+void SoomplerAudioProcessor::setTransportStateListener(TransportStateListener* listener)
+{
+    this->transportStateListener = listener;
+}
+
+double SoomplerAudioProcessor::getCurrentAudioPosition() const
+{
+    return transportSource.getCurrentPosition();
+}
+
+SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> sampleFile)
+{
+    //auto* soundBuffer = sampleFile->createInputStream();
     AudioFormat* format = getFormatForFileOrNullptr(sampleFile);
     if (format == nullptr)
     {
@@ -184,14 +222,14 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(File* sampleFile)
     auto formatReader = formatManager.createReaderFor(*sampleFile);
 
     setTransportSource(formatReader);
+    thumbnail.setSource(new FileInputSource(*sampleFile));
 
-//    BigInteger midiNotes;
-//    midiNotes.setRange(0, 126, true);
-//    return new SamplerSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
-    return nullptr;
+    BigInteger midiNotes;
+    midiNotes.setRange(0, 126, true);
+    return new SamplerSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
 }
 
-AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File *sampleFile)
+AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)
 {
     AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile->getFileExtension());
 
@@ -199,25 +237,11 @@ AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File *sampleFile)
         DBG(sampleFile->getFileExtension());
         NativeMessageBox::showMessageBox(
                     AlertWindow::AlertIconType::WarningIcon,
-                    UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE,
-                    UNSUPPORTED_FILE_EXTENSION_ERROR_MESSAGE);
+                    Strings::UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE,
+                    Strings::UNSUPPORTED_FILE_EXTENSION_ERROR_MESSAGE);
     }
 
     return format;
-}
-
-MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
-{
-    MidiBuffer output;
-    int samplePosition;
-    MidiMessage msg;
-
-    for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
-    {
-        if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
-    }
-
-    return output;
 }
 
 void SoomplerAudioProcessor::changeListenerCallback(ChangeBroadcaster *source)
@@ -235,30 +259,41 @@ void SoomplerAudioProcessor::changeListenerCallback(ChangeBroadcaster *source)
 
 void SoomplerAudioProcessor::changeTransportState(TransportState newState)
 {
-    if (transportState != newState)
+    if (transportState == newState)
     {
-        transportState = newState;
-
-        switch (transportState)
-        {
-            case Playing:
-                break;
-            case Starting:
-                transportSource.start();
-                break;
-            default:
-                break;
-        }
+        return;
     }
+
+
+    transportState = newState;
+
+    if (transportStateListener != nullptr) {
+        transportStateListener->transportStateChanged(newState);
+    }
+
+    switch (transportState)
+    {
+        case Playing:
+            break;
+        case Starting:
+            transportSource.start();
+            break;
+        case Stopping:
+        case Stopped:
+            transportSource.stop();
+            transportSource.setNextReadPosition(0);
+            break;
+        default:
+            break;
+   }
 }
 
 void SoomplerAudioProcessor::setTransportSource(AudioFormatReader* reader)
 {
     auto newSource = std::make_unique<AudioFormatReaderSource>(reader, true);
     transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
-    readerSource.reset(newSource.release());
+    readerSource = std::move(newSource);
 }
-
 
 
 //==============================================================================

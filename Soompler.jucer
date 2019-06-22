@@ -5,9 +5,13 @@
               companyWebsite="abbysoft.ru" companyEmail="contact@abbysoft.ru"
               pluginFormats="buildAU,buildStandalone,buildVST,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginDesc="Easy to use sampler" pluginManufacturerCode="abby"
-              pluginCode="as1">
+              pluginCode="as1" cppLanguageStandard="latest">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="LqYQa3" name="Settings.h" compile="0" resource="0" file="Source/Settings.h"/>
+      <FILE id="PIRvl8" name="TransportStateListener.h" compile="0" resource="0"
+            file="Source/TransportStateListener.h"/>
+      <FILE id="EOiBjr" name="Strings.h" compile="0" resource="0" file="Source/Strings.h"/>
       <FILE id="S57gtU" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="tv9Gm3" name="PluginProcessor.h" compile="0" resource="0"
@@ -16,6 +20,7 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="xoPeua" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <FILE id="SJMWVx" name="background.png" compile="1" resource="1" file="Resources/background.png"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile">

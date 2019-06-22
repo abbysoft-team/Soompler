@@ -11,14 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-
-enum TransportState
-{
-    Stopped,
-    Starting,
-    Playing,
-    Stopping
-};
+#include "TransportStateListener.h"
 
 //==============================================================================
 /**
@@ -28,7 +21,7 @@ class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener
 public:
     //==============================================================================
     SoomplerAudioProcessor();
-    ~SoomplerAudioProcessor();
+    ~SoomplerAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -63,30 +56,46 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    File* getLoadedSample() const {
+    std::optional<File> getLoadedSample() const {
         return loadedSample;
     }
 
-    void loadSample(File sample);
+    AudioThumbnail& getThumbnail() {
+        return thumbnail;
+    }
+
+    void loadSample(File);
 
     void playSample();
+
+    void stopSamplePlayback();
+
+    void setTransportStateListener(TransportStateListener*);
+
+    double getCurrentAudioPosition() const;
+
+    void processTransport(AudioBuffer<float>& buffer);
 
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 
-    File* loadedSample;
+    std::optional<File> loadedSample;
     Synthesiser synth;
+    SynthesiserSound::Ptr synthSound;
     int currentSample;
 
     AudioFormatManager formatManager;
     std::unique_ptr<AudioFormatReaderSource> readerSource;
     AudioTransportSource transportSource;
     TransportState transportState;
+    TransportStateListener* transportStateListener;
 
-    SynthesiserSound::Ptr getSampleData(File* sampleFile);
-    AudioFormat* getFormatForFileOrNullptr(File* sampleFile);
-    MidiBuffer filterMidiMessagesForChannel(const MidiBuffer& input, int channel);
+    AudioThumbnailCache thumbnailCache;
+    AudioThumbnail thumbnail;
+
+    SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
+    AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);
