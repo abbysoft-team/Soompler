@@ -12,9 +12,17 @@
 #include "PluginEditor.h"
 #include "Strings.h"
 
+// private func
+
+void drawRangeLine(int xPos, Graphics& g);
+// draw faded regions before and after range lines
+void fadePreStartRegion(int startRangeBorderX, Graphics& g);
+void fadePostEndRegion(int endRangeBorderX, Graphics& g);
+
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), mainFont("DejaVu Sans", 12, Font::plain)
+    : AudioProcessorEditor (&p), processor (p), mainFont("DejaVu Sans", 12, Font::plain), startRangeX(Settings::THUMBNAIL_BOUNDS.getX()),
+      endRangeX(Settings::THUMBNAIL_BOUNDS.getRight())
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -89,11 +97,40 @@ void SoomplerAudioProcessorEditor::drawThumbnail(Graphics &g)
     // draw position line
     g.setColour(Settings::POSITION_LINE_COLOR);
 
+    // offset exist to ensure that line is visible even near start range line
+    int lineOffset = 2;
+
     auto audioPosition = processor.getCurrentAudioPosition();
     auto drawPosition = ((audioPosition / audioLength)
-                         * Settings::THUMBNAIL_BOUNDS.getWidth() + Settings::THUMBNAIL_BOUNDS.getX());
+                         * Settings::THUMBNAIL_BOUNDS.getWidth() + lineOffset + Settings::THUMBNAIL_BOUNDS.getX());
 
     g.drawLine(drawPosition, Settings::THUMBNAIL_BOUNDS.getY(), drawPosition, Settings::THUMBNAIL_BOUNDS.getBottom(), 3.0f);
+
+    // start range line with faded region
+    drawRangeLine(startRangeX, g);
+    fadePreStartRegion(startRangeX, g);
+    // end range line
+    drawRangeLine(endRangeX, g);
+    fadePostEndRegion(endRangeX, g);
+}
+
+void drawRangeLine(int xPos, Graphics& g) {
+    int rangeLineWidth = 5.0f;
+
+    g.setColour(Settings::RANGE_LINES_COLOR);
+    g.drawLine(xPos, Settings::THUMBNAIL_BOUNDS.getY(), xPos, Settings::THUMBNAIL_BOUNDS.getBottom(), rangeLineWidth);
+}
+
+void fadePreStartRegion(int startRangeBorderX, Graphics& g) {
+    g.setColour(Settings::NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR);
+    int preStartRegionWidth = startRangeBorderX - Settings::THUMBNAIL_BOUNDS.getX();
+    g.fillRect(Settings::THUMBNAIL_BOUNDS.getX(), Settings::THUMBNAIL_BOUNDS.getY(), preStartRegionWidth, Settings::THUMBNAIL_BOUNDS.getHeight());
+}
+
+void fadePostEndRegion(int endRangeBorderX, Graphics& g) {
+    g.setColour(Settings::NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR);
+    int postEndRegionX = Settings::THUMBNAIL_BOUNDS.getRight() - endRangeBorderX;
+    g.fillRect(Settings::THUMBNAIL_BOUNDS.getX(), Settings::THUMBNAIL_BOUNDS.getY(), postEndRegionX, Settings::THUMBNAIL_BOUNDS.getHeight());
 }
 
 void SoomplerAudioProcessorEditor::drawSampleNameOrMessage(Graphics &g)

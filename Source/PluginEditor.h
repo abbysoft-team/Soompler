@@ -58,5 +58,9 @@ private:
 
     Font mainFont;
 
+    // not active sample regions, before start line and after end lines
+    int startRangeX;
+    int endRangeX;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };
