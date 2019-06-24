@@ -115,10 +115,8 @@ void SoomplerAudioProcessorEditor::drawThumbnail(Graphics &g)
 }
 
 void drawRangeLine(int xPos, Graphics& g) {
-    int rangeLineWidth = 5.0f;
-
     g.setColour(Settings::RANGE_LINES_COLOR);
-    g.drawLine(xPos, Settings::THUMBNAIL_BOUNDS.getY(), xPos, Settings::THUMBNAIL_BOUNDS.getBottom(), rangeLineWidth);
+    g.drawLine(xPos, Settings::THUMBNAIL_BOUNDS.getY(), xPos, Settings::THUMBNAIL_BOUNDS.getBottom(), Settings::RANGE_LINES_WIDTH);
 }
 
 void fadePreStartRegion(int startRangeBorderX, Graphics& g) {
@@ -129,8 +127,8 @@ void fadePreStartRegion(int startRangeBorderX, Graphics& g) {
 
 void fadePostEndRegion(int endRangeBorderX, Graphics& g) {
     g.setColour(Settings::NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR);
-    int postEndRegionX = Settings::THUMBNAIL_BOUNDS.getRight() - endRangeBorderX;
-    g.fillRect(Settings::THUMBNAIL_BOUNDS.getX(), Settings::THUMBNAIL_BOUNDS.getY(), postEndRegionX, Settings::THUMBNAIL_BOUNDS.getHeight());
+    int postEndRegionWidth = jmax(0, Settings::THUMBNAIL_BOUNDS.getRight() - endRangeBorderX);
+    g.fillRect(endRangeBorderX, Settings::THUMBNAIL_BOUNDS.getY(), postEndRegionWidth, Settings::THUMBNAIL_BOUNDS.getHeight());
 }
 
 void SoomplerAudioProcessorEditor::drawSampleNameOrMessage(Graphics &g)
@@ -155,7 +153,74 @@ void SoomplerAudioProcessorEditor::drawSampleNameOrMessage(Graphics &g)
 
 void SoomplerAudioProcessorEditor::timerCallback()
 {
+    processor.updateTransportState();
     repaint();
+}
+
+void SoomplerAudioProcessorEditor::mouseDrag(const MouseEvent &event)
+{
+    if (isIntersectWithStartRangeLine(event.getPosition())) {
+
+        int rightBorderX = endRangeX - ((int) (Settings::RANGE_LINES_WIDTH*4));
+        int leftBorderX = Settings::THUMBNAIL_BOUNDS.getX();
+
+        if (event.getPosition().getX() < leftBorderX) {
+            startRangeX = leftBorderX;
+        } else if (event.getPosition().getX() > rightBorderX) {
+            startRangeX = rightBorderX;
+        } else {
+            startRangeX = event.getPosition().getX();
+        }
+
+        processor.setSampleStartPosition(calculateSampleByCoords(startRangeX));
+
+        repaint();
+    } else if (isIntersectWithEndRangeLine(event.getPosition())) {
+        int rightBorderX = Settings::THUMBNAIL_BOUNDS.getRight();
+        int leftBorderX = startRangeX + ((int) (Settings::RANGE_LINES_WIDTH*4));
+
+        if (event.getPosition().getX() < leftBorderX) {
+            endRangeX = leftBorderX;
+        } else if (event.getPosition().getX() > rightBorderX) {
+            endRangeX = rightBorderX;
+        } else {
+            endRangeX = event.getPosition().getX();
+        }
+
+        processor.setSampleEndPosition(calculateSampleByCoords(endRangeX));
+
+        repaint();
+    }
+
+}
+
+bool SoomplerAudioProcessorEditor::isIntersectWithStartRangeLine(Point<int> point)
+{
+    Rectangle<int> rangeLine;
+    rangeLine.setX(startRangeX - Settings::RANGE_LINES_WIDTH);
+    rangeLine.setY(Settings::THUMBNAIL_BOUNDS.getY());
+    rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
+    rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
+
+    return rangeLine.contains(point);
+}
+
+bool SoomplerAudioProcessorEditor::isIntersectWithEndRangeLine(Point<int> point)
+{
+    Rectangle<int> rangeLine;
+    rangeLine.setX(endRangeX - Settings::RANGE_LINES_WIDTH);
+    rangeLine.setY(Settings::THUMBNAIL_BOUNDS.getY());
+    rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
+    rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
+
+    return rangeLine.contains(point);
+}
+
+int64 SoomplerAudioProcessorEditor::calculateSampleByCoords(int coordOnThumbnail)
+{
+    double conversionsError = 0.025;
+    auto percentOfLength = coordOnThumbnail * 1.0 / Settings::THUMBNAIL_BOUNDS.getWidth() - conversionsError;
+    return ((int64) (percentOfLength * processor.getTotalLengthOfSample()));
 }
 
 void SoomplerAudioProcessorEditor::resized()

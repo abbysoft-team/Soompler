@@ -17,7 +17,9 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
                                                    thumbnailCache(5),
-                                                   thumbnail(512, formatManager, thumbnailCache)
+                                                   thumbnail(512, formatManager, thumbnailCache),
+                                                   startSample(0),
+                                                   endSample(0)
 {
     synth.addVoice(new SamplerVoice());
     synth.setCurrentPlaybackSampleRate(44100);
@@ -143,6 +145,17 @@ void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
     transportSource.getNextAudioBlock(audioSource);
 }
 
+void SoomplerAudioProcessor::setSampleStartPosition(int sample)
+{
+    startSample = sample;
+    transportSource.setNextReadPosition(startSample);
+}
+
+void SoomplerAudioProcessor::setSampleEndPosition(int sample)
+{
+    endSample = sample;
+}
+
 MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
 {
     MidiBuffer output;
@@ -192,6 +205,9 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
         synth.removeSound(0);
         synth.addSound(sound);
     }
+
+    setSampleStartPosition(0);
+    setSampleEndPosition(transportSource.getTotalLength());
 }
 
 void SoomplerAudioProcessor::playSample()
@@ -220,6 +236,14 @@ void SoomplerAudioProcessor::setTransportStateListener(TransportStateListener* l
 double SoomplerAudioProcessor::getCurrentAudioPosition() const
 {
     return transportSource.getCurrentPosition();
+}
+
+void SoomplerAudioProcessor::updateTransportState()
+{
+    if (transportSource.getNextReadPosition() >= endSample) {
+        // TODO handle when looping on
+        transportSource.stop();
+    }
 }
 
 SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> sampleFile)
@@ -293,7 +317,7 @@ void SoomplerAudioProcessor::changeTransportState(TransportState newState)
         case Stopping:
         case Stopped:
             transportSource.stop();
-            transportSource.setNextReadPosition(0);
+            transportSource.setNextReadPosition(startSample);
             break;
         default:
             break;

@@ -19,7 +19,7 @@
 /**
 */
 class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
-        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer
+        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer, private MouseListener
 {
 public:
     SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
@@ -45,6 +45,13 @@ private:
     String getCroppedNameIfNeeded(String fileName);
 
     void timerCallback();
+
+    void mouseDrag(const MouseEvent &event);
+
+    bool isIntersectWithStartRangeLine(Point<int> point);
+    bool isIntersectWithEndRangeLine(Point<int> point);
+
+    int64 calculateSampleByCoords(int coord);
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.

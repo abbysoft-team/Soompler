@@ -18,12 +18,13 @@ const auto THUMBNAIL_BOUNDS_COLOR = Colour(256, 128, 128);
 const auto SAMPLE_NAME_COLOR = THUMBNAIL_COLOR;
 const auto POSITION_LINE_COLOR = THUMBNAIL_HEADER_COLOR;
 const auto RANGE_LINES_COLOR = Colour((uint8) 246, (uint8) 66, (uint8) 66, (uint8) 200);
-const auto NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR = Colour((uint8) 0, (uint8) 0, (uint8) 0, (uint8) 50);
+const auto NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR = Colour((uint8) 0, (uint8) 0, (uint8) 0, (uint8) 156);
 
 constexpr auto SAMPLE_NAME_TEXT_X = (WINDOW_WIDTH / 2);
 constexpr auto SAMPLE_NAME_TEXT_Y = 95;
 constexpr auto SAMPLE_NAME_FONT_SIZE = 17.0f;
 constexpr auto MAX_SAMPLE_NAME_LENGTH = 60;
+constexpr auto RANGE_LINES_WIDTH = 5.0f;
 
 }
 

@@ -74,7 +74,17 @@ public:
 
     double getCurrentAudioPosition() const;
 
+    int64 getTotalLengthOfSample() const {
+        return transportSource.getTotalLength();
+    }
+
+    void updateTransportState();
+
     void processTransport(AudioBuffer<float>& buffer);
+
+    // percent of a sample length
+    void setSampleStartPosition(int sample);
+    void setSampleEndPosition(int sample);
 
 private:
     //==============================================================================
@@ -93,6 +103,9 @@ private:
 
     AudioThumbnailCache thumbnailCache;
     AudioThumbnail thumbnail;
+
+    int64 startSample;
+    int64 endSample;
 
     SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);
