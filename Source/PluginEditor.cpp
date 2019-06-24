@@ -39,9 +39,21 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     stopSampleButton.setButtonText(Strings::BUTTON_STOP_SAMPLE_TEXT);
     stopSampleButton.addListener(this);
 
+    volumeKnob.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
+    volumeKnob.addListener(this);
+    volumeKnob.setRange(0.0, 1.0, 0.01);
+    volumeKnob.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
+    volumeKnob.setName("Volume");
+    volumeKnob.setTooltip("Volume");
+
+    volumeLabel.setText("Volume", dontSendNotification);
+    volumeLabel.attachToComponent(&volumeKnob, true);
+
     addAndMakeVisible(openFileButton);
     addAndMakeVisible(playSampleButton);
     addAndMakeVisible(stopSampleButton);
+    addAndMakeVisible(volumeKnob);
+    addAndMakeVisible(volumeLabel);
 
     stopSampleButton.setVisible(false);
 
@@ -223,11 +235,19 @@ int64 SoomplerAudioProcessorEditor::calculateSampleByCoords(int coordOnThumbnail
     return ((int64) (percentOfLength * processor.getTotalLengthOfSample()));
 }
 
+void SoomplerAudioProcessorEditor::sliderValueChanged(Slider *slider)
+{
+    if (slider == &volumeKnob) {
+        processor.setVolume(slider->getValue());
+    }
+}
+
 void SoomplerAudioProcessorEditor::resized()
 {
     openFileButton.setBounds(Settings::BUTTON_OPEN_FILE_POSITION);
     playSampleButton.setBounds(Settings::BUTTON_PLAY_SAMPLE_POSITION);
     stopSampleButton.setBounds(Settings::BUTTON_PLAY_SAMPLE_POSITION);
+    volumeKnob.setBounds(Settings::VOLUME_KNOB_POSITION);
 }
 
 void SoomplerAudioProcessorEditor::buttonClicked(Button *button)

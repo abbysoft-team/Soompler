@@ -19,7 +19,8 @@
 /**
 */
 class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
-        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer, private MouseListener
+        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer, private MouseListener,
+        private Slider::Listener
 {
 public:
     SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
@@ -53,6 +54,8 @@ private:
 
     int64 calculateSampleByCoords(int coord);
 
+    void sliderValueChanged(Slider *slider);
+
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SoomplerAudioProcessor& processor;
@@ -60,6 +63,8 @@ private:
     TextButton openFileButton;
     TextButton playSampleButton;
     TextButton stopSampleButton;
+    Slider volumeKnob;
+    Label volumeLabel;
 
     Image backgroundImage;
 

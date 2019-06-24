@@ -86,6 +86,10 @@ public:
     void setSampleStartPosition(int sample);
     void setSampleEndPosition(int sample);
 
+    void setVolume(double volume) {
+        transportSource.setGain(volume);
+    }
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
