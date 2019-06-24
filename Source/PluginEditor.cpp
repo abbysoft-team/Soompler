@@ -45,6 +45,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     volumeKnob.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
     volumeKnob.setName("Volume");
     volumeKnob.setTooltip("Volume");
+    volumeKnob.setValue(0.5);
 
     volumeLabel.setText("Volume", dontSendNotification);
     volumeLabel.attachToComponent(&volumeKnob, true);
@@ -110,7 +111,7 @@ void SoomplerAudioProcessorEditor::drawThumbnail(Graphics &g)
     g.setColour(Settings::POSITION_LINE_COLOR);
 
     // offset exist to ensure that line is visible even near start range line
-    int lineOffset = 2;
+    constexpr auto lineOffset = 2;
 
     auto audioPosition = processor.getCurrentAudioPosition();
     auto drawPosition = ((audioPosition / audioLength)
@@ -171,32 +172,33 @@ void SoomplerAudioProcessorEditor::timerCallback()
 
 void SoomplerAudioProcessorEditor::mouseDrag(const MouseEvent &event)
 {
-    if (isIntersectWithStartRangeLine(event.getPosition())) {
+    auto position = event.getPosition();
+    if (isIntersectWithStartRangeLine(&position)) {
 
         int rightBorderX = endRangeX - ((int) (Settings::RANGE_LINES_WIDTH*4));
         int leftBorderX = Settings::THUMBNAIL_BOUNDS.getX();
 
-        if (event.getPosition().getX() < leftBorderX) {
+        if (position.getX() < leftBorderX) {
             startRangeX = leftBorderX;
-        } else if (event.getPosition().getX() > rightBorderX) {
+        } else if (position.getX() > rightBorderX) {
             startRangeX = rightBorderX;
         } else {
-            startRangeX = event.getPosition().getX();
+            startRangeX = position.getX();
         }
 
         processor.setSampleStartPosition(calculateSampleByCoords(startRangeX));
 
         repaint();
-    } else if (isIntersectWithEndRangeLine(event.getPosition())) {
+    } else if (isIntersectWithEndRangeLine(&position)) {
         int rightBorderX = Settings::THUMBNAIL_BOUNDS.getRight();
         int leftBorderX = startRangeX + ((int) (Settings::RANGE_LINES_WIDTH*4));
 
-        if (event.getPosition().getX() < leftBorderX) {
+        if (position.getX() < leftBorderX) {
             endRangeX = leftBorderX;
-        } else if (event.getPosition().getX() > rightBorderX) {
+        } else if (position.getX() > rightBorderX) {
             endRangeX = rightBorderX;
         } else {
-            endRangeX = event.getPosition().getX();
+            endRangeX = position.getX();
         }
 
         processor.setSampleEndPosition(calculateSampleByCoords(endRangeX));
@@ -206,26 +208,26 @@ void SoomplerAudioProcessorEditor::mouseDrag(const MouseEvent &event)
 
 }
 
-bool SoomplerAudioProcessorEditor::isIntersectWithStartRangeLine(Point<int> point)
+bool SoomplerAudioProcessorEditor::isIntersectWithStartRangeLine(Point<int>* point)
 {
-    Rectangle<int> rangeLine;
+    static Rectangle<int> rangeLine;
     rangeLine.setX(startRangeX - Settings::RANGE_LINES_WIDTH);
     rangeLine.setY(Settings::THUMBNAIL_BOUNDS.getY());
     rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
     rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
 
-    return rangeLine.contains(point);
+    return rangeLine.contains(*point);
 }
 
-bool SoomplerAudioProcessorEditor::isIntersectWithEndRangeLine(Point<int> point)
+bool SoomplerAudioProcessorEditor::isIntersectWithEndRangeLine(Point<int>* point)
 {
-    Rectangle<int> rangeLine;
+    static Rectangle<int> rangeLine;
     rangeLine.setX(endRangeX - Settings::RANGE_LINES_WIDTH);
     rangeLine.setY(Settings::THUMBNAIL_BOUNDS.getY());
     rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
     rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
 
-    return rangeLine.contains(point);
+    return rangeLine.contains(*point);
 }
 
 int64 SoomplerAudioProcessorEditor::calculateSampleByCoords(int coordOnThumbnail)
@@ -339,5 +341,7 @@ void SoomplerAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster *sou
 
 void SoomplerAudioProcessorEditor::thumbnailChanged(AudioThumbnail &thumbnail)
 {
+    // sample loaded
+    processor.setVolume(volumeKnob.getValue());
     repaint();
 }

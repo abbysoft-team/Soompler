@@ -49,8 +49,8 @@ private:
 
     void mouseDrag(const MouseEvent &event);
 
-    bool isIntersectWithStartRangeLine(Point<int> point);
-    bool isIntersectWithEndRangeLine(Point<int> point);
+    bool isIntersectWithStartRangeLine(Point<int>* point);
+    bool isIntersectWithEndRangeLine(Point<int>* point);
 
     int64 calculateSampleByCoords(int coord);
 
