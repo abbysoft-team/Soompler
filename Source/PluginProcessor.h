@@ -72,7 +72,7 @@ public:
 
     void setTransportStateListener(TransportStateListener*);
 
-    double getCurrentAudioPosition() const;
+    double getCurrentAudioPosition();
 
     int64 getTotalLengthOfSample() const {
         return transportSource.getTotalLength();
@@ -89,6 +89,8 @@ public:
     void setVolume(double volume) {
         transportSource.setGain(volume);
     }
+
+    void notifyTransportStateChanged(TransportState state);
 
 private:
     //==============================================================================
@@ -117,4 +119,5 @@ private:
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);
+    double getSynthCurrentPosition();
 };

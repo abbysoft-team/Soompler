@@ -22,7 +22,7 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    startSample(0),
                                                    endSample(0)
 {
-    synth.addVoice(new soompler::ExtendedVoice());
+    synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
 
     formatManager.registerBasicFormats();
@@ -163,6 +163,15 @@ void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
     voice->setEndSample(sample);
 }
 
+void SoomplerAudioProcessor::notifyTransportStateChanged(TransportState state)
+{
+    if (transportStateListener == nullptr) {
+        return;
+    }
+
+    transportStateListener->transportStateChanged(state);
+}
+
 MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
 {
     MidiBuffer output;
@@ -172,11 +181,6 @@ MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer
     for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
     {
         if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
-
-        // some note is turned on, reset current sample
-        if (!msg.isAllNotesOff()) {
-            currentSample = 0;
-        }
     }
 
     return output;
@@ -220,6 +224,7 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
 
     setSampleStartPosition(0);
     setSampleEndPosition(transportSource.getTotalLength());
+    notifyTransportStateChanged(TransportState::Ready);
 }
 
 void SoomplerAudioProcessor::playSample()
@@ -243,13 +248,21 @@ void SoomplerAudioProcessor::setTransportStateListener(TransportStateListener* l
     this->transportStateListener = listener;
 }
 
-double SoomplerAudioProcessor::getCurrentAudioPosition() const
+double SoomplerAudioProcessor::getCurrentAudioPosition()
 {
+    if (synth.getVoice(0)->isVoiceActive()) {
+        return getSynthCurrentPosition();
+    }
     return transportSource.getCurrentPosition();
 }
 
 void SoomplerAudioProcessor::updateTransportState()
 {
+    if (!transportSource.isPlaying()) {
+        // sample is not in listen mode
+        return;
+    }
+
     if (transportSource.getNextReadPosition() >= endSample) {
         // TODO handle when looping on
         transportSource.stop();
@@ -313,9 +326,7 @@ void SoomplerAudioProcessor::changeTransportState(TransportState newState)
 
     transportState = newState;
 
-    if (transportStateListener != nullptr) {
-        transportStateListener->transportStateChanged(newState);
-    }
+    notifyTransportStateChanged(newState);
 
     switch (transportState)
     {
@@ -339,6 +350,12 @@ void SoomplerAudioProcessor::setTransportSource(AudioFormatReader* reader)
     auto newSource = std::make_unique<AudioFormatReaderSource>(reader, true);
     transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
     readerSource.reset(newSource.release());
+}
+
+double SoomplerAudioProcessor::getSynthCurrentPosition()
+{
+    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+    return voice->getCurrentPosition();
 }
 
 

@@ -319,13 +319,14 @@ String SoomplerAudioProcessorEditor::getCroppedNameIfNeeded(String fileName)
 void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
 {
     switch (state) {
-    case Starting:
+    case Ready:
         startTimer(40);
+        break;
+    case Starting:
         break;
     case Stopped:
         stopSampleButton.setVisible(false);
         playSampleButton.setVisible(true);
-        stopTimer();
         break;
     default:
         break;

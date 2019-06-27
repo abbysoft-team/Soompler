@@ -81,7 +81,7 @@ class JUCE_API  ExtendedVoice    : public SynthesiserVoice
 {
 public:
     //==============================================================================
-    ExtendedVoice();
+    ExtendedVoice(ChangeListener* listener);
 
     /** Destructor. */
     ~ExtendedVoice() override;
@@ -100,6 +100,10 @@ public:
     void setStartSample(int64 sample);
     void setEndSample(int64 sample);
 
+    int64 getNextSample() const;
+
+    double getCurrentPosition() const;
+
 private:
     //==============================================================================
     double pitchRatio = 0;
@@ -108,6 +112,8 @@ private:
 
     int64 firstSampleToPlay = 0;
     int64 endSample = 0;
+
+    ChangeListener* eventListener;
 
     ADSR adsr;
 

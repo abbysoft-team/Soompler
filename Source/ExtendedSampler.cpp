@@ -53,7 +53,10 @@ bool ExtendedSound::appliesToChannel (int /*midiChannel*/)
 }
 
 //==============================================================================
-ExtendedVoice::ExtendedVoice() {}
+ExtendedVoice::ExtendedVoice(ChangeListener* listener) : eventListener(listener)
+{
+}
+
 ExtendedVoice::~ExtendedVoice() {}
 
 bool ExtendedVoice::canPlaySound (SynthesiserSound* sound)
@@ -160,6 +163,15 @@ void ExtendedVoice::setStartSample(int64 sample)
 void ExtendedVoice::setEndSample(int64 sample)
 {
     this->endSample = sample;
+}
+
+double ExtendedVoice::getCurrentPosition() const
+{
+    if (isPlayingButReleased()) {
+        return firstSampleToPlay / getSampleRate();
+    }
+
+    return (sourceSamplePosition + firstSampleToPlay) / getSampleRate();
 }
 
 }
