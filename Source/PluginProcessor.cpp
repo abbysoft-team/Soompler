@@ -11,6 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Strings.h"
+#include "ExtendedSampler.h"
 
 //==============================================================================
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
@@ -21,14 +22,14 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    startSample(0),
                                                    endSample(0)
 {
-    synth.addVoice(new SamplerVoice());
+    synth.addVoice(new soompler::ExtendedVoice());
     synth.setCurrentPlaybackSampleRate(44100);
 
     formatManager.registerBasicFormats();
 
     transportSource.addChangeListener(this);
 
-    currentSample = -1;                             // -1 means that it wont played until someone turn on note
+    currentSample = 0;                             // -1 means that it wont played until someone turn on note
 }
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
@@ -165,6 +166,11 @@ MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer
     for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
     {
         if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
+
+        // some note is turned on, reset current sample
+        if (!msg.isAllNotesOff()) {
+            currentSample = 0;
+        }
     }
 
     return output;
@@ -199,7 +205,7 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
 {
     this->loadedSample = sampleFile;
 
-    SynthesiserSound::Ptr sound = getSampleData(loadedSample);
+    auto sound = getSampleData(loadedSample);
     if (sound != nullptr)
     {
         synth.removeSound(0);
@@ -219,8 +225,6 @@ void SoomplerAudioProcessor::playSample()
     }
 
     changeTransportState(Starting);
-
-    currentSample = 0;
 }
 
 void SoomplerAudioProcessor::stopSamplePlayback()
@@ -262,7 +266,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
 
     BigInteger midiNotes;
     midiNotes.setRange(0, 126, true);
-    return new SamplerSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
+    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
 }
 
 AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)

@@ -96,7 +96,7 @@ private:
 
     std::optional<File> loadedSample;
     Synthesiser synth;
-    SynthesiserSound::Ptr synthSound;
+    std::unique_ptr<SynthesiserSound> synthSound;
     int currentSample;
 
     AudioFormatManager formatManager;
