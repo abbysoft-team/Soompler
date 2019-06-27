@@ -113,8 +113,8 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
 
         while (--numSamples >= 0)
         {
-            auto pos = (int) sourceSamplePosition;
-            auto alpha = (float) (sourceSamplePosition - pos);
+            auto pos = (int64) sourceSamplePosition + this->firstSampleToPlay;
+            auto alpha = (float) (sourceSamplePosition + this->firstSampleToPlay - pos);
             auto invAlpha = 1.0f - alpha;
 
             // just using a very simple linear interpolation here..
@@ -139,13 +139,27 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
 
             sourceSamplePosition += pitchRatio;
 
-            if (sourceSamplePosition > playingSound->length)
+            if (endSample == 0) {
+                endSample = playingSound->length;
+            }
+
+            if (sourceSamplePosition + firstSampleToPlay > endSample)
             {
                 stopNote (0.0f, false);
                 break;
             }
         }
     }
+}
+
+void ExtendedVoice::setStartSample(int64 sample)
+{
+    this->firstSampleToPlay = sample;
+}
+
+void ExtendedVoice::setEndSample(int64 sample)
+{
+    this->endSample = sample;
 }
 
 }

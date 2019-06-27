@@ -95,13 +95,19 @@ public:
     void pitchWheelMoved (int newValue) override;
     void controllerMoved (int controllerNumber, int newValue) override;
 
-    void renderNextBlock (AudioBuffer<float>&, int startSample, int numSamples) override;
+    void renderNextBlock (AudioBuffer<float>&, int firstSampleToPlay, int numSamples) override;
+
+    void setStartSample(int64 sample);
+    void setEndSample(int64 sample);
 
 private:
     //==============================================================================
     double pitchRatio = 0;
     double sourceSamplePosition = 0;
     float lgain = 0, rgain = 0;
+
+    int64 firstSampleToPlay = 0;
+    int64 endSample = 0;
 
     ADSR adsr;
 

@@ -83,8 +83,8 @@ public:
     void processTransport(AudioBuffer<float>& buffer);
 
     // percent of a sample length
-    void setSampleStartPosition(int sample);
-    void setSampleEndPosition(int sample);
+    void setSampleStartPosition(int64 sample);
+    void setSampleEndPosition(int64 sample);
 
     void setVolume(double volume) {
         transportSource.setGain(volume);

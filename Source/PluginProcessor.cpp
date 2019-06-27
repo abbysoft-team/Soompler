@@ -146,15 +146,21 @@ void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
     transportSource.getNextAudioBlock(audioSource);
 }
 
-void SoomplerAudioProcessor::setSampleStartPosition(int sample)
+void SoomplerAudioProcessor::setSampleStartPosition(int64 sample)
 {
     startSample = sample;
     transportSource.setNextReadPosition(startSample);
+
+    auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
+    voice->setStartSample(sample);
 }
 
-void SoomplerAudioProcessor::setSampleEndPosition(int sample)
+void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
 {
     endSample = sample;
+
+    auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
+    voice->setEndSample(sample);
 }
 
 MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
@@ -266,7 +272,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
 
     BigInteger midiNotes;
     midiNotes.setRange(0, 126, true);
-    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
+    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 400.0);
 }
 
 AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)
