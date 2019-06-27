@@ -55,6 +55,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     addAndMakeVisible(stopSampleButton);
     addAndMakeVisible(volumeKnob);
     addAndMakeVisible(volumeLabel);
+    addAndMakeVisible(pianoRoll);
 
     stopSampleButton.setVisible(false);
 
@@ -250,6 +251,7 @@ void SoomplerAudioProcessorEditor::resized()
     playSampleButton.setBounds(Settings::BUTTON_PLAY_SAMPLE_POSITION);
     stopSampleButton.setBounds(Settings::BUTTON_PLAY_SAMPLE_POSITION);
     volumeKnob.setBounds(Settings::VOLUME_KNOB_POSITION);
+    pianoRoll.setBounds(Settings::PIANO_ROLL_BOUNDS);
 }
 
 void SoomplerAudioProcessorEditor::buttonClicked(Button *button)

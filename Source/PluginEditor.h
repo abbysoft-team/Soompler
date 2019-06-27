@@ -14,6 +14,7 @@
 #include "PluginProcessor.h"
 #include "TransportStateListener.h"
 #include "Settings.h"
+#include "PianoRoll.h"
 
 //==============================================================================
 /**
@@ -65,6 +66,7 @@ private:
     TextButton stopSampleButton;
     Slider volumeKnob;
     Label volumeLabel;
+    PianoRoll pianoRoll;
 
     Image backgroundImage;
 
