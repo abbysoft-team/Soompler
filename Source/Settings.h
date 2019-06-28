@@ -35,6 +35,7 @@ const auto PIANO_ROLL_DELIMITER_COLOR = Colour(174, 176, 180);
 const auto PIANO_ROLL_BLACK_NOTE_COLOR = Colour(20, 20, 20);
 const auto PIANO_ROLL_BLACK_NOTE_TOP_COLOR = Colour((uint8) 174, (uint8) 176, (uint8) 180, (uint8) 60);
 const auto PIANO_ROLL_BLACK_NOTE_HIGHLIGHTS_COLOR = Colour((uint8) 230, (uint8) 230, (uint8) 230, (uint8) 128);
+const auto PIANO_ROLL_ACTIVE_KEY_MASK_COLOR = Colour((uint8) 220, (uint8) 128, (uint8) 128, (uint8) 150);
 const auto PIANO_ROLL_TIPS_FONT = Font(10);
 
 constexpr auto PIANO_ROLL_WIDTH = WINDOW_WIDTH;

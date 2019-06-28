@@ -4,10 +4,13 @@
 void drawNoteTips(Graphics& g);
 void drawNoteDelimiters(Graphics& g);
 void drawBlackNotes(Graphics& g);
+void drawActiveNotes(Graphics &g, std::vector<int> activeNotes);
+void drawActiveNoteMask(float keyCoordX, Graphics& g);
 void drawBlackNote(int coord, Graphics& g);
-void drawActiveNotes(Graphics& g);
 
-PianoRoll::PianoRoll ()
+static float getAverageKeyWidth();
+
+PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier) : midiSupplier(midiSupplier)
 {
     setSize (Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
 }
@@ -25,7 +28,7 @@ void PianoRoll::paint (Graphics& g)
 
     drawNoteDelimiters(g);
     drawBlackNotes(g);
-    drawActiveNotes(g);
+    drawActiveNotes(g, getActiveMidiNotes());
     drawNoteTips(g);
 }
 
@@ -101,9 +104,41 @@ void drawBlackNote(int coord, Graphics &g)
 
 }
 
-void drawActiveNotes(Graphics& g)
+void drawActiveNotes(Graphics& g, std::vector<int> activeNotes)
 {
+    // its first key, so it always the same
+    // C2
+    static auto minNoteNumber = 48;
 
+    // average width of key (black + white)
+    static auto avgKeyWidth = getAverageKeyWidth();
+
+    float keyCoordX = 0;
+    for (auto noteNumber : activeNotes) {
+        if (noteNumber < minNoteNumber) {
+            continue;
+        }
+
+        keyCoordX = (noteNumber - minNoteNumber) * Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
+        if (keyCoordX > Settings::PIANO_ROLL_WIDTH) {
+            continue;
+        }
+
+        drawActiveNoteMask(keyCoordX, g);
+    }
+}
+
+void drawActiveNoteMask(float keyCoordX, Graphics& g)
+{
+    // keyCoordX is right border of key, so in order to get all calc right we need
+    // to shift it back for few pixels
+    keyCoordX -= 5;
+
+    int nearestWhiteKey = keyCoordX / Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
+    int nearestWhiteKeyX = nearestWhiteKey * Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
+
+    g.setColour(Settings::PIANO_ROLL_ACTIVE_KEY_MASK_COLOR);
+    g.fillRect(nearestWhiteKeyX, 0, Settings::PIANO_ROLL_WHITE_NOTE_WIDTH, Settings::PIANO_ROLL_HEIGHT);
 }
 
 void drawNoteTips(Graphics& g)
@@ -113,7 +148,7 @@ void drawNoteTips(Graphics& g)
     g.setFont(Settings::PIANO_ROLL_TIPS_FONT);
     g.setColour(Settings::PIANO_ROLL_NOTE_TIPS_COLOR);
 
-    auto currentCNote = 0;
+    auto currentCNote = 2;
     auto currentCNoteCoord  = Settings::PIANO_ROLL_TIPS_OFFSET_X;
     String noteName = "";
     while (currentCNoteCoord < Settings::PIANO_ROLL_WIDTH) {
@@ -129,6 +164,11 @@ void drawNoteTips(Graphics& g)
 
 void PianoRoll::resized()
 {
+}
+
+std::vector<int> PianoRoll::getActiveMidiNotes()
+{
+    return midiSupplier.getActiveNotes();
 }
 
 #if 0

@@ -22,7 +22,7 @@ void fadePostEndRegion(int endRangeBorderX, Graphics& g);
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p), mainFont("DejaVu Sans", 12, Font::plain), startRangeX(Settings::THUMBNAIL_BOUNDS.getX()),
-      endRangeX(Settings::THUMBNAIL_BOUNDS.getRight())
+      endRangeX(Settings::THUMBNAIL_BOUNDS.getRight()), pianoRoll((MidiEventSupplier&) processor)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.

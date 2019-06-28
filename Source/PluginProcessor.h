@@ -12,11 +12,12 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "TransportStateListener.h"
+#include "MidiEventSupplier.h"
 
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener
+class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener, MidiEventSupplier
 {
 public:
     //==============================================================================
@@ -92,6 +93,8 @@ public:
 
     void notifyTransportStateChanged(TransportState state);
 
+    std::vector<int> getActiveNotes();
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
@@ -112,6 +115,8 @@ private:
 
     int64 startSample;
     int64 endSample;
+
+    MidiBuffer lastMidiEvents;
 
     SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);

@@ -131,10 +131,10 @@ void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
 //        synth.renderNextBlock();
 //    }
 
-    auto midiChannelBuffer = filterMidiMessagesForChannel(midiMessages, 1);
+    lastMidiEvents = filterMidiMessagesForChannel(midiMessages, 1);
     auto audioBusBuffer = getBusBuffer(buffer, false, 0);
 
-    synth.renderNextBlock(audioBusBuffer, midiChannelBuffer, 0, audioBusBuffer.getNumSamples());
+    synth.renderNextBlock(audioBusBuffer, lastMidiEvents, 0, audioBusBuffer.getNumSamples());
 }
 
 void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
@@ -170,6 +170,20 @@ void SoomplerAudioProcessor::notifyTransportStateChanged(TransportState state)
     }
 
     transportStateListener->transportStateChanged(state);
+}
+
+std::vector<int> SoomplerAudioProcessor::getActiveNotes()
+{
+    std::vector<int> result;
+
+    // TODO replace when multi-voice synth is realized
+    int noteNumber = synth.getVoice(0)->getCurrentlyPlayingNote();
+
+    if (noteNumber >= 0) {
+        result.push_back(noteNumber);
+    }
+
+    return result;
 }
 
 MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
