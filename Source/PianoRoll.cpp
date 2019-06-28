@@ -3,6 +3,9 @@
 
 void drawNoteTips(Graphics& g);
 void drawNoteDelimiters(Graphics& g);
+void drawBlackNotes(Graphics& g);
+void drawBlackNote(int coord, Graphics& g);
+void drawActiveNotes(Graphics& g);
 
 PianoRoll::PianoRoll ()
 {
@@ -21,6 +24,8 @@ void PianoRoll::paint (Graphics& g)
     g.fillRect(0, 0, Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
 
     drawNoteDelimiters(g);
+    drawBlackNotes(g);
+    drawActiveNotes(g);
     drawNoteTips(g);
 }
 
@@ -42,6 +47,63 @@ void drawNoteDelimiters(Graphics& g)
 
         currentDelimiterX += Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
     }
+}
+
+void drawBlackNotes(Graphics &g)
+{
+    // pattern from C#
+    int blackKeyPattern[] = { 2, 1, 2, 1, 1 };
+    static auto blackKeyOffset = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
+
+    //g.setGradientFill(Settings::PIANO_ROLL_BLACK_KEY_GRADIENT);
+
+    auto currentBlackKeyCoord = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH - Settings::PIANO_ROLL_BLACK_NOTE_WIDTH / 2;
+    auto currentPatternIndex = 0;
+    while (currentBlackKeyCoord < Settings::PIANO_ROLL_WIDTH) {
+        drawBlackNote(currentBlackKeyCoord, g);
+
+        if (currentPatternIndex == 4) {
+            currentPatternIndex = -1;
+        }
+
+        currentBlackKeyCoord += blackKeyOffset * blackKeyPattern[++currentPatternIndex];
+    }
+
+}
+
+void drawBlackNote(int coord, Graphics &g)
+{
+    static auto shapeOffsetX = Settings::PIANO_ROLL_BLACK_NOTE_WIDTH * 0.13;
+    static auto shapeOffsetWidth = Settings::PIANO_ROLL_BLACK_NOTE_WIDTH - shapeOffsetX * 2;
+    static auto shapeOffsetY = Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT * 0.08;
+    static auto shapeOffsetHeight = Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT - shapeOffsetY;
+
+    g.setColour(Settings::PIANO_ROLL_BLACK_NOTE_COLOR);
+    g.fillRect(coord, 0, Settings::PIANO_ROLL_BLACK_NOTE_WIDTH, Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT);
+    g.setColour(Settings::PIANO_ROLL_DELIMITER_COLOR);
+
+    // small spaces between black and white keys
+    g.drawLine(coord - 1, 0, coord -1, Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT + 1);
+    g.drawLine(coord + Settings::PIANO_ROLL_BLACK_NOTE_WIDTH + 1, 0,
+               coord + Settings::PIANO_ROLL_BLACK_NOTE_WIDTH + 1, Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT + 1);
+
+    // 3d shape of black keys
+    g.setColour(Settings::PIANO_ROLL_BLACK_NOTE_TOP_COLOR);
+    g.fillRect((float) coord + shapeOffsetX, (float) 0, (float) shapeOffsetWidth, (float) shapeOffsetHeight);
+
+    g.setColour(Settings::PIANO_ROLL_BLACK_NOTE_HIGHLIGHTS_COLOR);
+    auto shapeLineX = coord + Settings::PIANO_ROLL_BLACK_NOTE_WIDTH - shapeOffsetX;
+
+    g.drawLine(shapeLineX, 0, shapeLineX, Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT - shapeOffsetY);
+    g.drawLine(coord + shapeOffsetX, Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT - shapeOffsetY,
+               coord + shapeOffsetX + shapeOffsetWidth, Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT - shapeOffsetY);
+
+
+}
+
+void drawActiveNotes(Graphics& g)
+{
+
 }
 
 void drawNoteTips(Graphics& g)

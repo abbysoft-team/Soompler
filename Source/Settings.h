@@ -32,11 +32,16 @@ const auto PIANO_ROLL_WHITE_COLOR = Colour(255, 255, 255);
 const auto PIANO_ROLL_GRADIENT_COLOR = Colour(200, 200, 200);
 const auto PIANO_ROLL_NOTE_TIPS_COLOR = Colour(104, 118, 130);
 const auto PIANO_ROLL_DELIMITER_COLOR = Colour(174, 176, 180);
+const auto PIANO_ROLL_BLACK_NOTE_COLOR = Colour(20, 20, 20);
+const auto PIANO_ROLL_BLACK_NOTE_TOP_COLOR = Colour((uint8) 174, (uint8) 176, (uint8) 180, (uint8) 60);
+const auto PIANO_ROLL_BLACK_NOTE_HIGHLIGHTS_COLOR = Colour((uint8) 230, (uint8) 230, (uint8) 230, (uint8) 128);
 const auto PIANO_ROLL_TIPS_FONT = Font(10);
 
 constexpr auto PIANO_ROLL_WIDTH = WINDOW_WIDTH;
 constexpr auto PIANO_ROLL_HEIGHT = 65;
 constexpr auto PIANO_ROLL_WHITE_NOTE_WIDTH = 30;
+constexpr auto PIANO_ROLL_BLACK_NOTE_WIDTH = 20;
+constexpr auto PIANO_ROLL_BLACK_NOTE_HEIGHT = PIANO_ROLL_HEIGHT * 0.6;
 constexpr auto PIANO_ROLL_NOTE_COUNT = PIANO_ROLL_WIDTH / PIANO_ROLL_WHITE_NOTE_WIDTH;
 constexpr auto PIANO_ROLL_TIPS_OFFSET_X = 5;
 constexpr auto PIANO_ROLL_TIPS_OFFSET_Y = PIANO_ROLL_HEIGHT - 10;
