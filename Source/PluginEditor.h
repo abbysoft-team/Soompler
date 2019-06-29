@@ -24,8 +24,8 @@ class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
         private Slider::Listener
 {
 public:
-    SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
-    ~SoomplerAudioProcessorEditor();
+    explicit SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
+    ~SoomplerAudioProcessorEditor() override;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -37,16 +37,14 @@ private:
     void playSampleButtonClicked();
     void stopSampleButtonClicked();
     String getLoadedSampleNameOrPlaceholder();
-    void transportStateChanged(TransportState state);
+    void transportStateChanged(TransportState state) override;
 
-    void changeListenerCallback(ChangeBroadcaster* source);
+    void changeListenerCallback(ChangeBroadcaster* source) override ;
     void thumbnailChanged(AudioThumbnail& thumbnail);
     void drawThumbnail(Graphics& graphics);
     void drawSampleNameOrMessage(Graphics& graphics);
 
-    String getCroppedNameIfNeeded(String fileName);
-
-    void timerCallback();
+    void timerCallback() override;
 
     void mouseDrag(const MouseEvent &event);
 
