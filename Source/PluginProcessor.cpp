@@ -20,7 +20,8 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    thumbnailCache(5),
                                                    thumbnail(512, formatManager, thumbnailCache),
                                                    startSample(0),
-                                                   endSample(0)
+                                                   endSample(0),
+                                                   volume(0.5)
 {
     synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
@@ -184,6 +185,16 @@ std::vector<int> SoomplerAudioProcessor::getActiveNotes()
     }
 
     return result;
+}
+
+void SoomplerAudioProcessor::noteOn(int noteNumber)
+{
+    synth.noteOn(0, noteNumber, volume);
+}
+
+void SoomplerAudioProcessor::noteOff(int noteNumber)
+{
+    synth.noteOff(0, noteNumber, volume, true);
 }
 
 MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)

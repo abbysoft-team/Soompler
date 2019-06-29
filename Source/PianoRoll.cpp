@@ -9,7 +9,8 @@ void drawBlackNote(int coord, Graphics& g);
 
 static float getAverageKeyWidth();
 
-PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier) : midiSupplier(midiSupplier)
+PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer)
+    : midiSupplier(midiSupplier), midiConsumer(midiConsumer)
 {
     setSize (Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
 
@@ -152,7 +153,7 @@ void PianoRoll::drawActiveNotes(Graphics& g, std::vector<int> activeNotes)
 {
     // its first key, so it always the same
     // C2
-    static auto minNoteNumber = 48;
+    static auto minNoteNumber = FIRST_VISIBLE_KEY;
 
     float keyCoordX = 0;
     for (auto noteNumber : activeNotes) {
@@ -166,6 +167,29 @@ void PianoRoll::drawActiveNotes(Graphics& g, std::vector<int> activeNotes)
         }
 
         drawActiveNoteMask(keysInfo[noteNumber], g);
+    }
+}
+
+void PianoRoll::mouseDown(const MouseEvent &event)
+{
+    auto position = event.getPosition();
+    auto keyNumber = getKeyClicked(position);
+    midiConsumer.noteOn(keyNumber);
+}
+
+void PianoRoll::mouseUp(const MouseEvent &event)
+{
+    auto position = event.getPosition();
+    auto keyNumber = getKeyClicked(position);
+    midiConsumer.noteOff(keyNumber);
+}
+
+int PianoRoll::getKeyClicked(Point<int> point)
+{
+    for (int i = FIRST_VISIBLE_KEY; i < MAX_KEYS; i++) {
+        if (keysInfo[i].contains(point)) {
+            return keysInfo[i].number;
+        }
     }
 }
 

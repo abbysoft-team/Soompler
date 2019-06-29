@@ -13,11 +13,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "TransportStateListener.h"
 #include "MidiEventSupplier.h"
+#include "MidiEventConsumer.h"
 
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener, MidiEventSupplier
+class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener, MidiEventSupplier, MidiEventConsumer
 {
 public:
     //==============================================================================
@@ -88,12 +89,16 @@ public:
     void setSampleEndPosition(int64 sample);
 
     void setVolume(double volume) {
+        this->volume = volume;
         transportSource.setGain(volume);
     }
 
     void notifyTransportStateChanged(TransportState state);
 
     std::vector<int> getActiveNotes();
+
+    void noteOn(int noteNumber);
+    void noteOff(int noteNumber);
 
 private:
     //==============================================================================
@@ -117,6 +122,8 @@ private:
     int64 endSample;
 
     MidiBuffer lastMidiEvents;
+
+    double volume;
 
     SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);
