@@ -19,8 +19,8 @@ PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiCo
 
 void PianoRoll::calculateKeysInfo()
 {
-    auto blackKeyOffset = Settings::PIANO_ROLL_BLACK_NOTE_WIDTH / 2.0;
-    auto whiteKeyOffset = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
+    constexpr auto blackKeyOffset = Settings::PIANO_ROLL_BLACK_NOTE_WIDTH / 2.0;
+    constexpr auto whiteKeyOffset = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
 
     // structure of keys 0 - white key 1 - black
     bool blackKeyPattern[] = {0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0};
@@ -29,6 +29,7 @@ void PianoRoll::calculateKeysInfo()
     auto nextWhiteKeyX = 0;
     // init only keys after 48 (C2), cos it's first on the screen
     for (int i = 48; i < MAX_KEYS; i++) {
+        // cycling through pattern array
         if (currentIndex == 12) {
             currentIndex = 0;
         }
@@ -110,6 +111,8 @@ void drawBlackNotes(Graphics &g)
     while (currentBlackKeyCoord < Settings::PIANO_ROLL_WIDTH) {
         drawBlackNote(currentBlackKeyCoord, g);
 
+        // cycling through pattern array
+        // currentIndex+1 used, so index 4 is out of bounds
         if (currentPatternIndex == 4) {
             currentPatternIndex = -1;
         }
