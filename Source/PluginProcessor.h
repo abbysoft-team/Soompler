@@ -23,7 +23,7 @@ class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener, MidiEvent
 public:
     //==============================================================================
     SoomplerAudioProcessor();
-    ~SoomplerAudioProcessor();
+    ~SoomplerAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -127,7 +127,6 @@ private:
 
     SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);
-    MidiBuffer filterMidiMessagesForChannel(const MidiBuffer& input, int channel);
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);
