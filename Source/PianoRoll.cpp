@@ -201,7 +201,7 @@ void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g)
 
 void drawNoteTips(Graphics& g)
 {
-    static auto spaceBetweenCNotes = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH * 7;
+    static constexpr auto spaceBetweenCNotes = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH * 7;
 
     g.setFont(Settings::PIANO_ROLL_TIPS_FONT);
     g.setColour(Settings::PIANO_ROLL_NOTE_TIPS_COLOR);
