@@ -4,8 +4,7 @@
 void drawNoteTips(Graphics& g);
 void drawNoteDelimiters(Graphics& g);
 void drawBlackNotes(Graphics& g);
-void drawActiveNotes(Graphics &g, std::vector<int> activeNotes);
-void drawActiveNoteMask(float keyCoordX, Graphics& g);
+void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g);
 void drawBlackNote(int coord, Graphics& g);
 
 static float getAverageKeyWidth();
@@ -13,6 +12,51 @@ static float getAverageKeyWidth();
 PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier) : midiSupplier(midiSupplier)
 {
     setSize (Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
+
+    calculateKeysInfo();
+}
+
+void PianoRoll::calculateKeysInfo()
+{
+    auto blackKeyOffset = Settings::PIANO_ROLL_BLACK_NOTE_WIDTH / 2.0;
+    auto whiteKeyOffset = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
+
+    // structure of keys 0 - white key 1 - black
+    bool blackKeyPattern[] = {0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0};
+
+    auto currentIndex = 0;
+    auto nextWhiteKeyX = 0;
+    // init only keys after 48 (C2), cos it's first on the screen
+    for (int i = 48; i < MAX_KEYS; i++) {
+        if (currentIndex == 12) {
+            currentIndex = 0;
+        }
+
+
+        if (blackKeyPattern[currentIndex]) {
+            KeyInfo nextKey;
+            nextKey.height = Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT;
+            nextKey.width = Settings::PIANO_ROLL_BLACK_NOTE_WIDTH;
+            nextKey.x = nextWhiteKeyX - blackKeyOffset;
+            nextKey.isWhite = false;
+            nextKey.number = i;
+
+            keysInfo[i] = nextKey;
+        } else {
+            KeyInfo nextKey;
+            nextKey.height = Settings::PIANO_ROLL_HEIGHT;
+            nextKey.width = whiteKeyOffset;
+            nextKey.isWhite = true;
+            nextKey.number = i;
+            nextKey.x = nextWhiteKeyX;
+
+            keysInfo[i] = nextKey;
+
+            nextWhiteKeyX += whiteKeyOffset;
+        }
+
+        currentIndex++;
+    }
 }
 
 PianoRoll::~PianoRoll()
@@ -76,7 +120,7 @@ void drawBlackNotes(Graphics &g)
 
 void drawBlackNote(int coord, Graphics &g)
 {
-    static auto shapeOffsetX = Settings::PIANO_ROLL_BLACK_NOTE_WIDTH * 0.13;
+    static auto shapeOffsetX = Settings::PIANO_ROLL_BLACK_NOTE_WIDTH * 0.12;
     static auto shapeOffsetWidth = Settings::PIANO_ROLL_BLACK_NOTE_WIDTH - shapeOffsetX * 2;
     static auto shapeOffsetY = Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT * 0.08;
     static auto shapeOffsetHeight = Settings::PIANO_ROLL_BLACK_NOTE_HEIGHT - shapeOffsetY;
@@ -104,14 +148,11 @@ void drawBlackNote(int coord, Graphics &g)
 
 }
 
-void drawActiveNotes(Graphics& g, std::vector<int> activeNotes)
+void PianoRoll::drawActiveNotes(Graphics& g, std::vector<int> activeNotes)
 {
     // its first key, so it always the same
     // C2
     static auto minNoteNumber = 48;
-
-    // average width of key (black + white)
-    static auto avgKeyWidth = getAverageKeyWidth();
 
     float keyCoordX = 0;
     for (auto noteNumber : activeNotes) {
@@ -119,26 +160,19 @@ void drawActiveNotes(Graphics& g, std::vector<int> activeNotes)
             continue;
         }
 
-        keyCoordX = (noteNumber - minNoteNumber) * Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
+        keyCoordX = keysInfo[noteNumber].x;
         if (keyCoordX > Settings::PIANO_ROLL_WIDTH) {
             continue;
         }
 
-        drawActiveNoteMask(keyCoordX, g);
+        drawActiveNoteMask(keysInfo[noteNumber], g);
     }
 }
 
-void drawActiveNoteMask(float keyCoordX, Graphics& g)
+void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g)
 {
-    // keyCoordX is right border of key, so in order to get all calc right we need
-    // to shift it back for few pixels
-    keyCoordX -= 5;
-
-    int nearestWhiteKey = keyCoordX / Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
-    int nearestWhiteKeyX = nearestWhiteKey * Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
-
     g.setColour(Settings::PIANO_ROLL_ACTIVE_KEY_MASK_COLOR);
-    g.fillRect(nearestWhiteKeyX, 0, Settings::PIANO_ROLL_WHITE_NOTE_WIDTH, Settings::PIANO_ROLL_HEIGHT);
+    g.fillRect((float) keyInfo.x, (float) 0, (float) keyInfo.width, (float) keyInfo.height);
 }
 
 void drawNoteTips(Graphics& g)
