@@ -131,4 +131,6 @@ private:
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);
     double getSynthCurrentPosition();
+    MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel);
+
 };
