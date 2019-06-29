@@ -140,7 +140,7 @@ void drawBlackNote(int coord, Graphics &g)
 
     // 3d shape of black keys
     g.setColour(Settings::PIANO_ROLL_BLACK_NOTE_TOP_COLOR);
-    g.fillRect((float) coord + shapeOffsetX, (float) 0, (float) shapeOffsetWidth, (float) shapeOffsetHeight);
+    g.fillRect((float) coord + shapeOffsetX, 0.f, (float) shapeOffsetWidth, (float) shapeOffsetHeight);
 
     g.setColour(Settings::PIANO_ROLL_BLACK_NOTE_HIGHLIGHTS_COLOR);
     auto shapeLineX = coord + Settings::PIANO_ROLL_BLACK_NOTE_WIDTH - shapeOffsetX;
