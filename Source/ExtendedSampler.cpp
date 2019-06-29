@@ -53,7 +53,7 @@ bool ExtendedSound::appliesToChannel (int /*midiChannel*/)
 }
 
 //==============================================================================
-ExtendedVoice::ExtendedVoice(ChangeListener* listener) : eventListener(listener)
+ExtendedVoice::ExtendedVoice(std::shared_ptr<ChangeListener>listener) : eventListener(listener)
 {
 }
 

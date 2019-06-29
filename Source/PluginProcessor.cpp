@@ -23,7 +23,8 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    endSample(0),
                                                    volume(0.5)
 {
-    synth.addVoice(new soompler::ExtendedVoice(this));
+    auto listener = std::shared_ptr<ChangeListener>((ChangeListener*) this);
+    synth.addVoice(new soompler::ExtendedVoice(listener));
     synth.setCurrentPlaybackSampleRate(44100);
 
     formatManager.registerBasicFormats();
