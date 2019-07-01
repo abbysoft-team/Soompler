@@ -55,6 +55,8 @@ private:
 
     void sliderValueChanged(Slider *slider);
 
+    void calculateEndRangeX();
+
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SoomplerAudioProcessor& processor;
@@ -73,6 +75,9 @@ private:
     // not active sample regions, before start line and after end lines
     int startRangeX;
     int endRangeX;
+
+    // max range x value according to max sample length value
+    int maxRangeX;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };

@@ -26,6 +26,7 @@ constexpr auto SAMPLE_NAME_TEXT_Y = 95;
 constexpr auto SAMPLE_NAME_FONT_SIZE = 17.0f;
 constexpr auto MAX_SAMPLE_NAME_LENGTH = 60;
 constexpr auto RANGE_LINES_WIDTH = 5.0f;
+constexpr int MAX_SAMPLE_LENGTH = 30.0f; // in sec
 
 // piano roll constants
 const auto PIANO_ROLL_WHITE_COLOR = Colour(255, 255, 255);

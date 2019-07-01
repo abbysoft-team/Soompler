@@ -320,7 +320,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
 
     BigInteger midiNotes;
     midiNotes.setRange(0, 126, true);
-    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 400.0);
+    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x48, 0.0, 0.0, Settings::MAX_SAMPLE_LENGTH);
 }
 
 AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)
