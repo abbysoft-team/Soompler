@@ -39,7 +39,7 @@ const auto PIANO_ROLL_ACTIVE_KEY_MASK_COLOR = Colour((uint8) 220, (uint8) 128, (
 const auto PIANO_ROLL_TIPS_FONT = Font(10);
 
 constexpr auto PIANO_ROLL_WIDTH = WINDOW_WIDTH;
-constexpr auto PIANO_ROLL_HEIGHT = 65;
+constexpr auto PIANO_ROLL_HEIGHT = 64;
 constexpr auto PIANO_ROLL_WHITE_NOTE_WIDTH = 30;
 constexpr auto PIANO_ROLL_BLACK_NOTE_WIDTH = 20;
 constexpr auto PIANO_ROLL_BLACK_NOTE_HEIGHT = PIANO_ROLL_HEIGHT * 0.6;

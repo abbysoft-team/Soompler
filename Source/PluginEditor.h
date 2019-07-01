@@ -20,7 +20,7 @@
 /**
 */
 class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
-        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer, private MouseListener,
+        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer,
         private Slider::Listener
 {
 public:
