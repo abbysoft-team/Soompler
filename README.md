@@ -1,6 +1,8 @@
-<img src="http://img.shields.io/liberapay/receives/abbysoft.svg?logo=liberapay">
+
 
 # Soompler
+![donation rate](http://img.shields.io/liberapay/receives/abbysoft.svg?logo=liberapay)
+
 Soompler is JUCE based sampler VST and Standalone plugin for Linux, MacOS, Windows.
 
 ![alt Screenshot](https://i.imgur.com/xgWU7Ad.png)
