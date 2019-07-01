@@ -368,6 +368,7 @@ void SoomplerAudioProcessor::changeTransportState(TransportState newState)
         case Playing:
             break;
         case Starting:
+            synth.getVoice(0)->stopNote(0, false);
             transportSource.start();
             break;
         case Stopping:
