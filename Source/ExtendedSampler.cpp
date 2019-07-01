@@ -53,7 +53,7 @@ bool ExtendedSound::appliesToChannel (int /*midiChannel*/)
 }
 
 //==============================================================================
-ExtendedVoice::ExtendedVoice(std::shared_ptr<ChangeListener>listener) : eventListener(listener)
+ExtendedVoice::ExtendedVoice(std::shared_ptr<ChangeListener>listener) : eventListener(listener), volume(0)
 {
 }
 
@@ -72,8 +72,8 @@ void ExtendedVoice::startNote (int midiNoteNumber, float velocity, SynthesiserSo
                         * sound->sourceSampleRate / getSampleRate();
 
         sourceSamplePosition = 0.0;
-        lgain = velocity;
-        rgain = velocity;
+        lgain = velocity * volume;
+        rgain = velocity * volume;
 
         adsr.setSampleRate (sound->sourceSampleRate);
         adsr.setParameters (sound->params);
@@ -172,6 +172,12 @@ double ExtendedVoice::getCurrentPosition() const
     }
 
     return (sourceSamplePosition + firstSampleToPlay) / getSampleRate();
+}
+
+void ExtendedVoice::setVolume(float volume)
+{
+    jassert(volume <= 1.0f && volume >= .0f);
+    this->volume = volume;
 }
 
 }

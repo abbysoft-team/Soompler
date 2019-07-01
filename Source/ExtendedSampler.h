@@ -104,11 +104,15 @@ public:
 
     double getCurrentPosition() const;
 
+    // volume from 0.0f to 1.0f
+    void setVolume(float volume);
+
 private:
     //==============================================================================
     double pitchRatio = 0;
     double sourceSamplePosition = 0;
     float lgain = 0, rgain = 0;
+    float volume;
 
     int64 firstSampleToPlay = 0;
     int64 endSample = 0;

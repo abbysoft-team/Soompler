@@ -88,10 +88,7 @@ public:
     void setSampleStartPosition(int64 sample);
     void setSampleEndPosition(int64 sample);
 
-    void setVolume(double volume) {
-        this->volume = volume;
-        transportSource.setGain(volume);
-    }
+    void setVolume(double volume);
 
     void notifyTransportStateChanged(TransportState state);
 

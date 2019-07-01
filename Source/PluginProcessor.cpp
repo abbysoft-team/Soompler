@@ -165,6 +165,15 @@ void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
     voice->setEndSample(sample);
 }
 
+void SoomplerAudioProcessor::setVolume(double volume)
+{
+    this->volume = volume;
+    transportSource.setGain(volume);
+
+    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+    voice->setVolume(volume);
+}
+
 void SoomplerAudioProcessor::notifyTransportStateChanged(TransportState state)
 {
     if (transportStateListener == nullptr) {
