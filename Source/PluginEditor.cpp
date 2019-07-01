@@ -29,6 +29,9 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // editor's size to whatever you need it to be.
     setSize (Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
 
+    // set OpenGL renderer
+    this->glContext.attachTo(*this);
+
     // init components state
     openFileButton.setButtonText(Strings::BUTTON_OPEN_FILE_TEXT);
     openFileButton.addListener(this);

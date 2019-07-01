@@ -18,7 +18,7 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
                                                    thumbnailCache(5),
-                                                   thumbnail(512, formatManager, thumbnailCache),
+                                                   thumbnail(256, formatManager, thumbnailCache),
                                                    startSample(0),
                                                    endSample(0),
                                                    volume(0.5)

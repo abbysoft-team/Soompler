@@ -79,5 +79,8 @@ private:
     // max range x value according to max sample length value
     int maxRangeX;
 
+    // OpenGL context to speed up UI rendering
+    OpenGLContext glContext;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };
