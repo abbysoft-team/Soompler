@@ -43,7 +43,7 @@ public:
     /** Returns the audio sample data.
         This could return nullptr if there was a problem loading the data.
     */
-    AudioBuffer<float>* getAudioData() const noexcept       { return data.get(); }
+    const AudioBuffer<float>& getAudioData() const noexcept       { return *data.get(); }
 
     //==============================================================================
     /** Changes the parameters of the ADSR envelope which will be applied to the sample. */
