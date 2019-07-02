@@ -49,7 +49,7 @@ bool ExtendedSound::appliesToChannel (int /*midiChannel*/)
 }
 
 //==============================================================================
-ExtendedVoice::ExtendedVoice(std::shared_ptr<ChangeListener>listener) : eventListener(listener), volume(0)
+ExtendedVoice::ExtendedVoice(std::shared_ptr<ChangeListener>listener) : eventListener(std::move(listener)), volume(0)
 {
 }
 
@@ -60,9 +60,12 @@ bool ExtendedVoice::canPlaySound (SynthesiserSound* sound)
 
 void ExtendedVoice::startNote (int midiNoteNumber, float velocity, SynthesiserSound* s, int /*currentPitchWheelPosition*/)
 {
+    static constexpr auto notesInOctave = 12.0;
+
     if (auto* sound = dynamic_cast<const ExtendedSound*> (s))
     {
-        pitchRatio = std::pow (2.0, (midiNoteNumber - sound->midiRootNote) / 12.0)
+        // each octave make freq two times bigger
+        pitchRatio = std::pow (2.0, (midiNoteNumber - sound->midiRootNote) / notesInOctave)
                         * sound->sourceSampleRate / getSampleRate();
 
         sourceSamplePosition = 0.0;
@@ -101,15 +104,23 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
 {
     if (auto* playingSound = static_cast<ExtendedSound*> (getCurrentlyPlayingSound().get()))
     {
+        // raw audio data
         auto& data = *playingSound->data;
+        // pointers for left and right channels
         const float* const inL = data.getReadPointer (0);
         const float* const inR = data.getNumChannels() > 1 ? data.getReadPointer (1) : nullptr;
 
+        // output buffer pointers for channels
         float* outL = outputBuffer.getWritePointer (0, startSample);
         float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
 
+        // whiling through of block of samples that need to be rendered
+        // block is (128, 256, 512 etc) samples
         while (--numSamples >= 0)
         {
+            // position (sample number) in sound raw data that going to be added to output buffer
+            // firstSampleToPlay is just offset that set by user by moving start line in sampleview
+            // alpha and invAlpha is interpolation things
             auto pos = (int64) sourceSamplePosition + this->firstSampleToPlay;
             auto alpha = (float) (sourceSamplePosition + this->firstSampleToPlay - pos);
             auto invAlpha = 1.0f - alpha;
@@ -119,11 +130,14 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
             float r = (inR != nullptr) ? (inR[pos] * invAlpha + inR[pos + 1] * alpha)
                                        : l;
 
+            // to l and r samples for both channels
+            // mix envelopeValue, google ADSR envelope for more info
             auto envelopeValue = adsr.getNextSample();
 
             l *= lgain * envelopeValue;
             r *= rgain * envelopeValue;
 
+            // if stereo
             if (outR != nullptr)
             {
                 *outL++ += l;
@@ -131,15 +145,23 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
             }
             else
             {
+                // mono is avg of l and r
                 *outL++ += (l + r) * 0.5f;
             }
 
+            // TODO what's that, why pitchratio being added
             sourceSamplePosition += pitchRatio;
 
+            // endSample is just sample where end line is placed
+            // user can drag that line in gui to change this parameter
+
+            // endSample is not set
             if (endSample == 0) {
+                // play full length sound
                 endSample = playingSound->length;
             }
 
+            // if current position is bigger than endSample
             if (sourceSamplePosition + firstSampleToPlay > endSample)
             {
                 stopNote (0.0f, false);
