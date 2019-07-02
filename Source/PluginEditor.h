@@ -46,14 +46,14 @@ private:
 
     void timerCallback() override;
 
-    void mouseDrag(const MouseEvent &event);
+    void mouseDrag(const MouseEvent &event) override;
 
-    bool isIntersectWithStartRangeLine(Point<int>* point);
-    bool isIntersectWithEndRangeLine(Point<int>* point);
+    bool isIntersectWithStartRangeLine(Point<int>& point);
+    bool isIntersectWithEndRangeLine(Point<int>& point);
 
     int64 calculateSampleByCoords(int coord);
 
-    void sliderValueChanged(Slider *slider);
+    void sliderValueChanged(Slider *slider) override;
 
     void calculateEndRangeX();
 

@@ -92,7 +92,7 @@ public:
 
     void notifyTransportStateChanged(TransportState state);
 
-    std::vector<int> getActiveNotes();
+    std::vector<int> getActiveNotes() override;
 
     void noteOn(int noteNumber);
     void noteOff(int noteNumber);

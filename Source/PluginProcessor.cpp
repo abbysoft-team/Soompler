@@ -21,7 +21,8 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    thumbnail(256, formatManager, thumbnailCache),
                                                    startSample(0),
                                                    endSample(0),
-                                                   volume(0.5)
+                                                   volume(0.5),
+                                                   currentSample(0)
 {
     auto listener = std::shared_ptr<ChangeListener>((ChangeListener*) this);
     synth.addVoice(new soompler::ExtendedVoice(listener));
@@ -30,8 +31,6 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
     formatManager.registerBasicFormats();
 
     transportSource.addChangeListener(this);
-
-    currentSample = 0;                             // -1 means that it wont played until someone turn on note
 }
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()

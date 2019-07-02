@@ -89,8 +89,10 @@ void drawNoteDelimiters(Graphics& g)
     while (currentDelimiterX < Settings::PIANO_ROLL_WIDTH) {
         g.setColour(Settings::PIANO_ROLL_DELIMITER_COLOR);
         g.drawLine(currentDelimiterX, 0, currentDelimiterX, Settings::PIANO_ROLL_HEIGHT-1, 1);
+        // piano shadow line color 1
         g.setColour(Colour(230, 230, 230));
         g.drawLine(currentDelimiterX - 1, 0, currentDelimiterX - 1, Settings::PIANO_ROLL_HEIGHT - 1, 1);
+        // piano shadow line color 2
         g.setColour(Colour(215, 215, 215));
         g.drawLine(currentDelimiterX + 1, 0, currentDelimiterX + 1, Settings::PIANO_ROLL_HEIGHT - 1, 1);
 
@@ -102,7 +104,7 @@ void drawBlackNotes(Graphics &g)
 {
     // pattern from C#
     int blackKeyPattern[] = { 2, 1, 2, 1, 1 };
-    static auto blackKeyOffset = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
+    static constexpr auto blackKeyOffset = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH;
 
     //g.setGradientFill(Settings::PIANO_ROLL_BLACK_KEY_GRADIENT);
 

@@ -176,7 +176,7 @@ void SoomplerAudioProcessorEditor::timerCallback()
 void SoomplerAudioProcessorEditor::mouseDrag(const MouseEvent &event)
 {
     auto position = event.getPosition();
-    if (isIntersectWithStartRangeLine(&position)) {
+    if (isIntersectWithStartRangeLine(position)) {
 
         int rightBorderX = endRangeX - ((int) (Settings::RANGE_LINES_WIDTH*4));
         int leftBorderX = Settings::THUMBNAIL_BOUNDS.getX();
@@ -192,7 +192,7 @@ void SoomplerAudioProcessorEditor::mouseDrag(const MouseEvent &event)
         processor.setSampleStartPosition(calculateSampleByCoords(startRangeX));
 
         repaint();
-    } else if (isIntersectWithEndRangeLine(&position)) {
+    } else if (isIntersectWithEndRangeLine(position)) {
         int leftBorderX = startRangeX + ((int) (Settings::RANGE_LINES_WIDTH*4));
 
         if (position.getX() < leftBorderX) {
@@ -210,7 +210,7 @@ void SoomplerAudioProcessorEditor::mouseDrag(const MouseEvent &event)
 
 }
 
-bool SoomplerAudioProcessorEditor::isIntersectWithStartRangeLine(Point<int>* point)
+bool SoomplerAudioProcessorEditor::isIntersectWithStartRangeLine(Point<int>& point)
 {
     static Rectangle<int> rangeLine;
     rangeLine.setX(startRangeX - Settings::RANGE_LINES_WIDTH);
@@ -218,10 +218,10 @@ bool SoomplerAudioProcessorEditor::isIntersectWithStartRangeLine(Point<int>* poi
     rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
     rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
 
-    return rangeLine.contains(*point);
+    return rangeLine.contains(point);
 }
 
-bool SoomplerAudioProcessorEditor::isIntersectWithEndRangeLine(Point<int>* point)
+bool SoomplerAudioProcessorEditor::isIntersectWithEndRangeLine(Point<int>& point)
 {
     static Rectangle<int> rangeLine;
     rangeLine.setX(endRangeX - Settings::RANGE_LINES_WIDTH);
@@ -229,7 +229,7 @@ bool SoomplerAudioProcessorEditor::isIntersectWithEndRangeLine(Point<int>* point
     rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
     rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
 
-    return rangeLine.contains(*point);
+    return rangeLine.contains(point);
 }
 
 int64 SoomplerAudioProcessorEditor::calculateSampleByCoords(int coordOnThumbnail)
