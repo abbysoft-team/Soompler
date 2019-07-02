@@ -313,10 +313,10 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
         return nullptr;
     }
 
-    auto formatReader = formatManager.createReaderFor(*sampleFile);
+    auto formatReader = formatManager.createReaderFor(sampleFile.value());
 
     setTransportSource(formatReader);
-    thumbnail.setSource(new FileInputSource(*sampleFile));
+    thumbnail.setSource(new FileInputSource(sampleFile.value()));
 
     BigInteger midiNotes;
     midiNotes.setRange(0, 126, true);

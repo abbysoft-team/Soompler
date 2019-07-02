@@ -38,10 +38,6 @@ ExtendedSound::ExtendedSound (const String& soundName,
     }
 }
 
-ExtendedSound::~ExtendedSound()
-{
-}
-
 bool ExtendedSound::appliesToNote (int midiNoteNumber)
 {
     return midiNotes[midiNoteNumber];
@@ -56,8 +52,6 @@ bool ExtendedSound::appliesToChannel (int /*midiChannel*/)
 ExtendedVoice::ExtendedVoice(std::shared_ptr<ChangeListener>listener) : eventListener(listener), volume(0)
 {
 }
-
-ExtendedVoice::~ExtendedVoice() {}
 
 bool ExtendedVoice::canPlaySound (SynthesiserSound* sound)
 {

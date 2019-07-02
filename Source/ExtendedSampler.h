@@ -34,7 +34,7 @@ public:
                   double maxSampleLengthSeconds);
 
     /** Destructor. */
-    ~ExtendedSound() override;
+    ~ExtendedSound() override = default;
 
     //==============================================================================
     /** Returns the sample's name */
@@ -84,7 +84,7 @@ public:
     ExtendedVoice(std::shared_ptr<ChangeListener> listener);
 
     /** Destructor. */
-    ~ExtendedVoice() override;
+    ~ExtendedVoice() override = default;
 
     //==============================================================================
     bool canPlaySound (SynthesiserSound*) override;
