@@ -12,11 +12,13 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "TransportStateListener.h"
+#include "MidiEventSupplier.h"
+#include "MidiEventConsumer.h"
 
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener
+class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener, MidiEventSupplier, MidiEventConsumer
 {
 public:
     //==============================================================================
@@ -72,9 +74,31 @@ public:
 
     void setTransportStateListener(TransportStateListener*);
 
-    double getCurrentAudioPosition() const;
+    double getCurrentAudioPosition();
+
+    int64 getTotalLengthOfSample() const {
+        return transportSource.getTotalLength();
+    }
+
+    void updateTransportState();
 
     void processTransport(AudioBuffer<float>& buffer);
+
+    // percent of a sample length
+    void setSampleStartPosition(int64 sample);
+    void setSampleEndPosition(int64 sample);
+
+    void setVolume(double volume) {
+        this->volume = volume;
+        transportSource.setGain(volume);
+    }
+
+    void notifyTransportStateChanged(TransportState state);
+
+    std::vector<int> getActiveNotes();
+
+    void noteOn(int noteNumber);
+    void noteOff(int noteNumber);
 
 private:
     //==============================================================================
@@ -82,7 +106,7 @@ private:
 
     std::optional<File> loadedSample;
     Synthesiser synth;
-    SynthesiserSound::Ptr synthSound;
+    std::unique_ptr<SynthesiserSound> synthSound;
     int currentSample;
 
     AudioFormatManager formatManager;
@@ -94,9 +118,19 @@ private:
     AudioThumbnailCache thumbnailCache;
     AudioThumbnail thumbnail;
 
+    int64 startSample;
+    int64 endSample;
+
+    MidiBuffer lastMidiEvents;
+
+    double volume;
+
     SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);
+    double getSynthCurrentPosition();
+    MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel);
+
 };

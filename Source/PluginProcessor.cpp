@@ -11,22 +11,27 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Strings.h"
+#include "ExtendedSampler.h"
 
 //==============================================================================
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
                                                    thumbnailCache(5),
-                                                   thumbnail(512, formatManager, thumbnailCache)
+                                                   thumbnail(512, formatManager, thumbnailCache),
+                                                   startSample(0),
+                                                   endSample(0),
+                                                   volume(0.5)
 {
-    synth.addVoice(new SamplerVoice());
+    auto listener = std::shared_ptr<ChangeListener>((ChangeListener*) this);
+    synth.addVoice(new soompler::ExtendedVoice(listener));
     synth.setCurrentPlaybackSampleRate(44100);
 
     formatManager.registerBasicFormats();
 
     transportSource.addChangeListener(this);
 
-    currentSample = -1;                             // -1 means that it wont played until someone turn on note
+    currentSample = 0;                             // -1 means that it wont played until someone turn on note
 }
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
@@ -77,7 +82,7 @@ void SoomplerAudioProcessor::setCurrentProgram (int index)
 
 const String SoomplerAudioProcessor::getProgramName (int index)
 {
-    return "Soompler";
+    return {};
 }
 
 void SoomplerAudioProcessor::changeProgramName (int index, const String& newName)
@@ -100,27 +105,16 @@ bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 {
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
-  return !(layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-      && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo());
-}
+    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
+     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
+        return false;
 
-MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
-{
-  MidiBuffer output;
-  int samplePosition;
-  MidiMessage msg;
-
-  for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
-  {
-    if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
-  }
-
-  return output;
+    return true;
 }
 
 void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    if (readerSource == nullptr) {
+    if (readerSource.get() == nullptr) {
         buffer.clear();
         return;
     }
@@ -130,19 +124,92 @@ void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
         return;
     }
 
-    auto midiChannelBuffer = filterMidiMessagesForChannel(midiMessages, 1);
+    // TODO maybe this all multi-bus thing is unnesesary?
+//    auto busCount = getBusCount(false);
+//    for (auto busNr = 0; busNr < busCount; ++busNr) {
+//        auto midiChannelBuffer = filterMidiMessagesForChannel(MidiBuffer, busNr + 1);
+//        auto audioBusBuffer = getBusBuffer(buffer, false, busNr);
+
+//        synth.renderNextBlock();
+//    }
+
+    lastMidiEvents = filterMidiMessagesForChannel(midiMessages, 1);
     auto audioBusBuffer = getBusBuffer(buffer, false, 0);
 
-    synth.renderNextBlock(audioBusBuffer, midiChannelBuffer, 0, audioBusBuffer.getNumSamples());
+    synth.renderNextBlock(audioBusBuffer, lastMidiEvents, 0, audioBusBuffer.getNumSamples());
 }
 
 void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
 {
-    AudioSourceChannelInfo audioSource{};
+    AudioSourceChannelInfo audioSource;
     audioSource.buffer = &buffer;
     audioSource.startSample = 0;
     audioSource.numSamples = buffer.getNumSamples();
     transportSource.getNextAudioBlock(audioSource);
+}
+
+void SoomplerAudioProcessor::setSampleStartPosition(int64 sample)
+{
+    startSample = sample;
+    transportSource.setNextReadPosition(startSample);
+
+    auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
+    voice->setStartSample(sample);
+}
+
+void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
+{
+    endSample = sample;
+
+    auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
+    voice->setEndSample(sample);
+}
+
+void SoomplerAudioProcessor::notifyTransportStateChanged(TransportState state)
+{
+    if (transportStateListener == nullptr) {
+        return;
+    }
+
+    transportStateListener->transportStateChanged(state);
+}
+
+std::vector<int> SoomplerAudioProcessor::getActiveNotes()
+{
+    std::vector<int> result;
+
+    // TODO replace when multi-voice synth is realized
+    int noteNumber = synth.getVoice(0)->getCurrentlyPlayingNote();
+
+    if (noteNumber >= 0) {
+        result.push_back(noteNumber);
+    }
+
+    return result;
+}
+
+void SoomplerAudioProcessor::noteOn(int noteNumber)
+{
+    synth.noteOn(0, noteNumber, volume);
+}
+
+void SoomplerAudioProcessor::noteOff(int noteNumber)
+{
+    synth.noteOff(0, noteNumber, volume, true);
+}
+
+MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
+{
+    MidiBuffer output;
+    int samplePosition;
+    MidiMessage msg;
+
+    for (MidiBuffer::Iterator it(input); it.getNextEvent(msg, samplePosition);)
+    {
+        if (msg.getChannel() == channel) output.addEvent(msg, samplePosition);
+    }
+
+    return output;
 }
 
 //==============================================================================
@@ -174,12 +241,16 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
 {
     this->loadedSample = sampleFile;
 
-    SynthesiserSound::Ptr sound = getSampleData(loadedSample);
+    auto sound = getSampleData(loadedSample);
     if (sound != nullptr)
     {
         synth.removeSound(0);
         synth.addSound(sound);
     }
+
+    setSampleStartPosition(0);
+    setSampleEndPosition(transportSource.getTotalLength());
+    notifyTransportStateChanged(TransportState::Ready);
 }
 
 void SoomplerAudioProcessor::playSample()
@@ -191,8 +262,6 @@ void SoomplerAudioProcessor::playSample()
     }
 
     changeTransportState(Starting);
-
-    currentSample = 0;
 }
 
 void SoomplerAudioProcessor::stopSamplePlayback()
@@ -205,9 +274,25 @@ void SoomplerAudioProcessor::setTransportStateListener(TransportStateListener* l
     this->transportStateListener = listener;
 }
 
-double SoomplerAudioProcessor::getCurrentAudioPosition() const
+double SoomplerAudioProcessor::getCurrentAudioPosition()
 {
+    if (synth.getVoice(0)->isVoiceActive()) {
+        return getSynthCurrentPosition();
+    }
     return transportSource.getCurrentPosition();
+}
+
+void SoomplerAudioProcessor::updateTransportState()
+{
+    if (!transportSource.isPlaying()) {
+        // sample is not in listen mode
+        return;
+    }
+
+    if (transportSource.getNextReadPosition() >= endSample) {
+        // TODO handle when looping on
+        transportSource.stop();
+    }
 }
 
 SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> sampleFile)
@@ -226,7 +311,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
 
     BigInteger midiNotes;
     midiNotes.setRange(0, 126, true);
-    return new SamplerSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 10.0);
+    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 400.0);
 }
 
 AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)
@@ -267,9 +352,7 @@ void SoomplerAudioProcessor::changeTransportState(TransportState newState)
 
     transportState = newState;
 
-    if (transportStateListener != nullptr) {
-        transportStateListener->transportStateChanged(newState);
-    }
+    notifyTransportStateChanged(newState);
 
     switch (transportState)
     {
@@ -281,7 +364,7 @@ void SoomplerAudioProcessor::changeTransportState(TransportState newState)
         case Stopping:
         case Stopped:
             transportSource.stop();
-            transportSource.setNextReadPosition(0);
+            transportSource.setNextReadPosition(startSample);
             break;
         default:
             break;
@@ -292,7 +375,13 @@ void SoomplerAudioProcessor::setTransportSource(AudioFormatReader* reader)
 {
     auto newSource = std::make_unique<AudioFormatReaderSource>(reader, true);
     transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
-    readerSource = std::move(newSource);
+    readerSource.reset(newSource.release());
+}
+
+double SoomplerAudioProcessor::getSynthCurrentPosition()
+{
+    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+    return voice->getCurrentPosition();
 }
 
 

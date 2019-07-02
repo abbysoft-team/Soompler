@@ -5,7 +5,8 @@ enum TransportState
     Stopped,
     Starting,
     Playing,
-    Stopping
+    Stopping,
+    Ready
 };
 
 class TransportStateListener {
