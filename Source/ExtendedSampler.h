@@ -81,7 +81,7 @@ class JUCE_API  ExtendedVoice    : public SynthesiserVoice
 {
 public:
     //==============================================================================
-    ExtendedVoice(std::shared_ptr<ChangeListener> listener);
+    ExtendedVoice(ChangeListener* listener);
 
     /** Destructor. */
     ~ExtendedVoice() override = default;
@@ -107,6 +107,8 @@ public:
     // volume from 0.0f to 1.0f
     void setVolume(float volume);
 
+    void removeListener();
+
 private:
     //==============================================================================
     double pitchRatio = 0;
@@ -117,7 +119,7 @@ private:
     int64 firstSampleToPlay = 0;
     int64 endSample = 0;
 
-    std::shared_ptr<ChangeListener> eventListener;
+    ChangeListener* eventListener;
 
     ADSR adsr;
 

@@ -49,7 +49,7 @@ bool ExtendedSound::appliesToChannel (int /*midiChannel*/)
 }
 
 //==============================================================================
-ExtendedVoice::ExtendedVoice(std::shared_ptr<ChangeListener>listener) : eventListener(std::move(listener)), volume(0)
+ExtendedVoice::ExtendedVoice(ChangeListener* listener) : eventListener(listener), volume(0)
 {
 }
 
@@ -194,6 +194,11 @@ void ExtendedVoice::setVolume(float volume)
 {
     jassert(volume <= 1.0f && volume >= .0f);
     this->volume = volume;
+}
+
+void ExtendedVoice::removeListener()
+{
+    this->eventListener = nullptr;
 }
 
 }

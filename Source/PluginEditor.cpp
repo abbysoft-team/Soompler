@@ -74,7 +74,10 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypefaceName(mainFont.getTypefaceName());
 }
 
-SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor() {}
+SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
+{
+
+}
 
 //==============================================================================
 void SoomplerAudioProcessorEditor::paint (Graphics& g)
