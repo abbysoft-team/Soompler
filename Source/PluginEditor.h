@@ -55,15 +55,6 @@ private:
     // access the processor object that created it.
     SoomplerAudioProcessor& processor;
 
-//    ImageButton openFileButton;
-//    TextButton playSampleButton;
-//    TextButton stopSampleButton;
-//    Slider volumeKnob;
-//    Label volumeLabel;
-//    PianoRoll pianoRoll;
-
-//    Image backgroundImage;
-
     MainPanel mainPanel;
 
     Font mainFont;

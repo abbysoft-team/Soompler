@@ -37,7 +37,8 @@ SampleViewer::SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& trans
     : thumbnail(thumbnail), transportInfoOwner(transportInfoOwner),
     startRangeX(Settings::THUMBNAIL_BOUNDS.getX()),
     endRangeX(Settings::THUMBNAIL_BOUNDS.getRight()),
-    maxRangeX(Settings::THUMBNAIL_BOUNDS.getRight())
+    maxRangeX(Settings::THUMBNAIL_BOUNDS.getRight()),
+    currentSample(new SampleInfo(0, 44100))
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]

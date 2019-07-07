@@ -19,8 +19,12 @@
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener, MidiEventSupplier,
-        MidiEventConsumer, public TransportInfoOwner
+class SoomplerAudioProcessor  :
+        public AudioProcessor,
+        ChangeListener,
+        public MidiEventSupplier,
+        public MidiEventConsumer,
+        public TransportInfoOwner
 {
 public:
     //==============================================================================
