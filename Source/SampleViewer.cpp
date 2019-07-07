@@ -35,9 +35,9 @@ bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos);
 //==============================================================================
 SampleViewer::SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner)
     : thumbnail(thumbnail), transportInfoOwner(transportInfoOwner),
-    startRangeX(Settings::THUMBNAIL_BOUNDS.getX()),
-    endRangeX(Settings::THUMBNAIL_BOUNDS.getRight()),
-    maxRangeX(Settings::THUMBNAIL_BOUNDS.getRight()),
+    startRangeX(0),
+    endRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
+    maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
     currentSample(new SampleInfo(0, 44100))
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -46,9 +46,6 @@ SampleViewer::SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& trans
 
     //[UserPreSize]
     //[/UserPreSize]
-
-    setSize (600, 400);
-
 
     //[Constructor] You can add your own custom stuff here..
     //[/Constructor]
@@ -125,28 +122,26 @@ void SampleViewer::drawPositionLine(Graphics &g)
 
     auto audioPosition = transportInfoOwner.getTransportInfo()->getAudioPositionInSec();
     auto drawPosition = ((audioPosition / currentSample->lengthInSeconds)
-                         * Settings::THUMBNAIL_BOUNDS.getWidth() + lineOffset + Settings::THUMBNAIL_BOUNDS.getX());
+                         * Settings::THUMBNAIL_BOUNDS.getWidth() + lineOffset);
 
-    g.drawLine(drawPosition, Settings::THUMBNAIL_BOUNDS.getY(), drawPosition, Settings::THUMBNAIL_BOUNDS.getBottom(), 3.0f);
+    g.drawLine(drawPosition, 0, drawPosition, Settings::THUMBNAIL_BOUNDS.getHeight(), 3.0f);
 }
 
 void drawRangeLine(int xPos, Graphics& g) {
     g.setColour(Settings::RANGE_LINES_COLOR);
-    g.drawLine(xPos, Settings::THUMBNAIL_BOUNDS.getY(), xPos, Settings::THUMBNAIL_BOUNDS.getBottom(), Settings::RANGE_LINES_WIDTH);
+    g.drawLine(xPos, 0, xPos, Settings::THUMBNAIL_BOUNDS.getHeight(), Settings::RANGE_LINES_WIDTH);
 }
 
 void fadePreStartRegion(int startRangeBorderX, Graphics& g) {
     g.setColour(Settings::NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR);
-    int preStartRegionWidth = startRangeBorderX - Settings::THUMBNAIL_BOUNDS.getX();
-    g.fillRect(Settings::THUMBNAIL_BOUNDS.getX(), Settings::THUMBNAIL_BOUNDS.getY(), preStartRegionWidth, Settings::THUMBNAIL_BOUNDS.getHeight());
+    g.fillRect(0, 0, startRangeBorderX, Settings::THUMBNAIL_BOUNDS.getHeight());
 }
 
 void fadePostEndRegion(int endRangeBorderX, Graphics& g) {
     g.setColour(Settings::NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR);
-    int postEndRegionWidth = jmax(0, Settings::THUMBNAIL_BOUNDS.getRight() - endRangeBorderX);
-    g.fillRect(endRangeBorderX, Settings::THUMBNAIL_BOUNDS.getY(), postEndRegionWidth, Settings::THUMBNAIL_BOUNDS.getHeight());
+    int postEndRegionWidth = jmax(0, Settings::THUMBNAIL_BOUNDS.getWidth() - endRangeBorderX);
+    g.fillRect(endRangeBorderX, 0, postEndRegionWidth, Settings::THUMBNAIL_BOUNDS.getHeight());
 }
-
 
 void SampleViewer::mouseDrag(const MouseEvent &event)
 {

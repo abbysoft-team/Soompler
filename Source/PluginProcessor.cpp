@@ -12,7 +12,6 @@
 #include "PluginEditor.h"
 #include "Strings.h"
 #include "ExtendedSampler.h"
-#include "SampleInfo.h"
 
 //==============================================================================
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
@@ -23,7 +22,9 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    startSample(0),
                                                    endSample(0),
                                                    volume(0.5),
-                                                   currentSample(0)
+                                                   currentSample(0),
+                                                   sampleInfo(0, 44100),
+                                                   sampleInfoListener(nullptr)
 {
     synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
@@ -164,6 +165,12 @@ void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
     voice->setEndSample(sample);
 }
 
+void SoomplerAudioProcessor::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
+{
+    setSampleStartPosition(info->startSample);
+    setSampleEndPosition(info->endSample);
+}
+
 void SoomplerAudioProcessor::setVolume(double volume)
 {
     this->volume = volume;
@@ -260,8 +267,16 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
     setSampleEndPosition(transportSource.getTotalLength());
     notifyTransportStateChanged(TransportState::Ready);
 
-    // TODO notifySampleLoadListeners
-    // SampleInfo creation
+    sampleInfo = SampleInfo(transportSource.getTotalLength(), getSampleRate());
+
+    notifySampleInfoListeners();
+}
+
+void SoomplerAudioProcessor::notifySampleInfoListeners()
+{
+    if (sampleInfoListener != nullptr) {
+        sampleInfoListener.get()->newSampleInfoRecieved(std::shared_ptr<SampleInfo>(&sampleInfo));
+    }
 }
 
 void SoomplerAudioProcessor::playSample()

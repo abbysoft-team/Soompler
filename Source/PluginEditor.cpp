@@ -25,45 +25,6 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
 
     addAndMakeVisible(mainPanel);
 
-    // init components state
-//    auto openButtonImage = ImageCache::getFromMemory(BinaryData::openFile_png, BinaryData::background_pngSize);
-//    openFileButton.setImages(true, true, true,
-//                             openButtonImage, 1.f, Settings::BUTTON_OPAQUE_COLOR,
-//                             openButtonImage, .0f, Settings::BUTTON_OVER_COLOR, openButtonImage,
-//                             .0f, Settings::BUTTON_DOWN_COLOR);
-
-//    openFileButton.addListener(this);
-
-//    playSampleButton.setButtonText(Strings::BUTTON_PLAY_SAMPLE_TEXT);
-//    playSampleButton.addListener(this);
-//    playSampleButton.setEnabled(false);                         // make enabled when sample is loaded
-
-//    stopSampleButton.setButtonText(Strings::BUTTON_STOP_SAMPLE_TEXT);
-//    stopSampleButton.addListener(this);
-
-//    volumeKnob.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-//    volumeKnob.addListener(this);
-//    volumeKnob.setRange(0.0, 1.0, 0.01);
-//    volumeKnob.setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
-//    volumeKnob.setName("Volume");
-//    volumeKnob.setTooltip("Volume");
-//    volumeKnob.setValue(0.5);
-
-//    volumeLabel.setText("Volume", dontSendNotification);
-//    volumeLabel.attachToComponent(&volumeKnob, true);
-
-//    addAndMakeVisible(openFileButton);
-//    addAndMakeVisible(playSampleButton);
-//    addAndMakeVisible(stopSampleButton);
-//    addAndMakeVisible(volumeKnob);
-//    addAndMakeVisible(volumeLabel);
-//    addAndMakeVisible(pianoRoll);
-
-//    stopSampleButton.setVisible(false);
-
-//    // load background image
-//    backgroundImage = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
-
     // subscribe to all transport events from processor
     processor.setTransportStateListener(this);
     // subscribe to thumbnail events, to catch thumbnail fully loaded time
@@ -85,22 +46,7 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
 
 void SoomplerAudioProcessorEditor::drawSampleNameOrMessage(Graphics &g)
 {
-    int y;
-    if (processor.getLoadedSample().has_value()) {
-        g.setColour(Settings::SAMPLE_NAME_COLOR);
-        y = Settings::SAMPLE_NAME_TEXT_Y;
-    } else {
-        g.setColour(Colours::black);
 
-        // this is not actuall name of sample, but message to load sample
-        y = Settings::SAMPLE_NAME_TEXT_Y + 20;
-    }
-
-    g.setFont(Settings::SAMPLE_NAME_FONT_SIZE);
-    g.drawSingleLineText(getLoadedSampleNameOrPlaceholder(),
-                         Settings::SAMPLE_NAME_TEXT_X,
-                         Settings::SAMPLE_NAME_TEXT_Y,
-                         Justification::horizontallyCentred);
 }
 
 void SoomplerAudioProcessorEditor::timerCallback()
@@ -118,11 +64,6 @@ void SoomplerAudioProcessorEditor::sliderValueChanged(Slider *slider)
 
 void SoomplerAudioProcessorEditor::resized()
 {
-//    openFileButton.setBounds(Settings::BUTTON_OPEN_FILE_POSITION);
-//    playSampleButton.setBounds(Settings::BUTTON_PLAY_SAMPLE_POSITION);
-//    stopSampleButton.setBounds(Settings::BUTTON_PLAY_SAMPLE_POSITION);
-//    volumeKnob.setBounds(Settings::VOLUME_KNOB_POSITION);
-//    pianoRoll.setBounds(Settings::PIANO_ROLL_BOUNDS);
 }
 
 void SoomplerAudioProcessorEditor::buttonClicked(Button *button)
@@ -138,20 +79,7 @@ void SoomplerAudioProcessorEditor::buttonClicked(Button *button)
 
 void SoomplerAudioProcessorEditor::openFileButtonClicked()
 {
-    FileChooser chooser(Strings::OPEN_FILE_DIALOG_TEXT,
-                        File::getSpecialLocation(File::userHomeDirectory),
-                        "*.mp3;*.wav;*.ogg", false);
 
-    if (chooser.browseForFileToOpen())
-    {
-        File sampleFile (chooser.getResult());
-
-        processor.loadSample(sampleFile);
-
-        //playSampleButton.setEnabled(true);
-
-        repaint();
-    }
 }
 
 void SoomplerAudioProcessorEditor::playSampleButtonClicked()
@@ -216,6 +144,6 @@ void SoomplerAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster *sou
 void SoomplerAudioProcessorEditor::thumbnailChanged(AudioThumbnail &thumbnail)
 {
     // sample loaded
-    //processor.setVolume(volumeKnob.getValue());
+    processor.setVolume(mainPanel.getVolume());
     repaint();
 }

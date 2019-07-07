@@ -55,6 +55,15 @@ const auto PIANO_ROLL_GRADIENT = ColourGradient(PIANO_ROLL_WHITE_COLOR, Point<fl
                                                 PIANO_ROLL_GRADIENT_COLOR, Point<float>(PIANO_ROLL_WIDTH / 2, 0),
                                                 false);
 
+// Main Panel
+
+constexpr auto MAIN_PANEL_HEIGHT = 40;
+const auto MAIN_PANEL_GRADIENT = ColourGradient(Colour((uint8) 255, (uint8) 255, (uint8) 255, (uint8) 100),
+                                                Point<float>(WINDOW_WIDTH / 2, 0),
+                                                Colour((uint8) 150, (uint8) 170, (uint8) 150, (uint8) 100),
+                                                Point<float>(WINDOW_WIDTH / 2, MAIN_PANEL_HEIGHT),
+                                                false);
+
 // Buttons
 const auto BUTTON_OPAQUE_COLOR = Colour((uint8) 0, (uint8) 0, (uint8) 0, (uint8) 0);
 const auto BUTTON_OVER_COLOR = Colour((uint8) 255, (uint8) 255, (uint8) 255, (uint8) 65);

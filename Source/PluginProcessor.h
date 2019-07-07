@@ -15,6 +15,7 @@
 #include "MidiEventSupplier.h"
 #include "MidiEventConsumer.h"
 #include "TransportInfo.h"
+#include "SampleInfo.h"
 
 //==============================================================================
 /**
@@ -24,7 +25,8 @@ class SoomplerAudioProcessor  :
         ChangeListener,
         public MidiEventSupplier,
         public MidiEventConsumer,
-        public TransportInfoOwner
+        public TransportInfoOwner,
+        public SampleInfoListener
 {
 public:
     //==============================================================================
@@ -93,6 +95,7 @@ public:
     // percent of a sample length
     void setSampleStartPosition(int64 sample);
     void setSampleEndPosition(int64 sample);
+    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info);
 
     void setVolume(double volume);
 
@@ -130,6 +133,9 @@ private:
 
     double volume;
 
+    SampleInfo sampleInfo;
+    std::shared_ptr<SampleInfoListener> sampleInfoListener;
+
     SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
@@ -137,4 +143,5 @@ private:
     void setTransportSource(AudioFormatReader*);
     double getSynthCurrentPosition();
     MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel);
+    void notifySampleInfoListeners();
 };
