@@ -8,6 +8,13 @@
               pluginCode="as1" cppLanguageStandard="latest">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="HE5JfF" name="TransportInfo.h" compile="0" resource="0" file="Source/TransportInfo.h"/>
+      <FILE id="XWwcUI" name="SampleInfo.h" compile="0" resource="0" file="Source/SampleInfo.h"/>
+      <FILE id="m8JTaG" name="SampleViewer.cpp" compile="1" resource="0"
+            file="Source/SampleViewer.cpp"/>
+      <FILE id="FN51EI" name="SampleViewer.h" compile="0" resource="0" file="Source/SampleViewer.h"/>
+      <FILE id="SSO38O" name="MainPanel.cpp" compile="1" resource="0" file="Source/MainPanel.cpp"/>
+      <FILE id="VEWxzN" name="MainPanel.h" compile="0" resource="0" file="Source/MainPanel.h"/>
       <FILE id="zomdcA" name="MidiEventConsumer.h" compile="0" resource="0"
             file="Source/MidiEventConsumer.h"/>
       <FILE id="JAhtnA" name="MidiEventSupplier.h" compile="0" resource="1"
@@ -33,6 +40,7 @@
       <FILE id="xoPeua" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <FILE id="SJMWVx" name="background.png" compile="1" resource="1" file="Resources/background.png"/>
+    <FILE id="EOspvu" name="openFile.png" compile="0" resource="1" file="../../../Pictures/openFile.png"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile">

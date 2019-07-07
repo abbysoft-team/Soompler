@@ -12,6 +12,7 @@
 #include "PluginEditor.h"
 #include "Strings.h"
 #include "ExtendedSampler.h"
+#include "SampleInfo.h"
 
 //==============================================================================
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
@@ -258,6 +259,9 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
     setSampleStartPosition(0);
     setSampleEndPosition(transportSource.getTotalLength());
     notifyTransportStateChanged(TransportState::Ready);
+
+    // TODO notifySampleLoadListeners
+    // SampleInfo creation
 }
 
 void SoomplerAudioProcessor::playSample()
@@ -392,6 +396,13 @@ double SoomplerAudioProcessor::getSynthCurrentPosition()
     return voice->getCurrentPosition();
 }
 
+std::shared_ptr<TransportInfo> SoomplerAudioProcessor::getTransportInfo()
+{
+    auto info = std::make_shared<TransportInfo>(this->getSampleRate());
+    info->setAudioPosition(transportSource.getCurrentPosition());
+
+    return info;
+}
 
 //==============================================================================
 // This creates new instances of the plugin..

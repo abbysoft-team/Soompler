@@ -7,11 +7,11 @@ namespace Settings {
 
 constexpr int WINDOW_WIDTH = 500;
 constexpr int WINDOW_HEIGHT = 340;
-const auto BUTTON_OPEN_FILE_POSITION = Rectangle<int>(WINDOW_WIDTH/2-100, 210, 100, 40);
+const auto BUTTON_OPEN_FILE_POSITION = Rectangle<int>(10, 10, 100, 40);
 const auto BUTTON_PLAY_SAMPLE_POSITION = Rectangle<int>(WINDOW_WIDTH/2 + 5, BUTTON_OPEN_FILE_POSITION.getY(), 100, 40);
 const auto THUMBNAIL_BOUNDS = Rectangle<int>(10, 100, WINDOW_WIDTH - 20, 100);
 const auto THUMBNAIL_HEADER_BOUNDS = Rectangle<int>(10, 80, WINDOW_WIDTH - 20, 20);
-const auto VOLUME_KNOB_POSITION = Rectangle<int>(70, BUTTON_OPEN_FILE_POSITION.getY(), 50, 50);
+const auto VOLUME_KNOB_POSITION = Rectangle<int>(70, 210, 50, 50);
 
 const auto THUMBNAIL_COLOR = Colour(23, 54, 38);
 const auto THUMBNAIL_HEADER_COLOR = Colour((uint8) 255, 128, 128, 0.7f);
@@ -54,6 +54,11 @@ const auto PIANO_ROLL_BOUNDS = Rectangle<int>(0, WINDOW_HEIGHT - PIANO_ROLL_HEIG
 const auto PIANO_ROLL_GRADIENT = ColourGradient(PIANO_ROLL_WHITE_COLOR, Point<float>(PIANO_ROLL_WIDTH / 2, PIANO_ROLL_HEIGHT - 1),
                                                 PIANO_ROLL_GRADIENT_COLOR, Point<float>(PIANO_ROLL_WIDTH / 2, 0),
                                                 false);
+
+// Buttons
+const auto BUTTON_OPAQUE_COLOR = Colour((uint8) 0, (uint8) 0, (uint8) 0, (uint8) 0);
+const auto BUTTON_OVER_COLOR = Colour((uint8) 255, (uint8) 255, (uint8) 255, (uint8) 65);
+const auto BUTTON_DOWN_COLOR = Colour((uint8) 255, (uint8) 255, (uint8) 255, (uint8) 120);
 
 
 }

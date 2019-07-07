@@ -14,11 +14,13 @@
 #include "TransportStateListener.h"
 #include "MidiEventSupplier.h"
 #include "MidiEventConsumer.h"
+#include "TransportInfo.h"
 
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener, MidiEventSupplier, MidiEventConsumer
+class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener, MidiEventSupplier,
+        MidiEventConsumer, public TransportInfoOwner
 {
 public:
     //==============================================================================
@@ -97,6 +99,8 @@ public:
     void noteOn(int noteNumber);
     void noteOff(int noteNumber);
 
+    std::shared_ptr<TransportInfo> getTransportInfo() override;
+
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
@@ -129,5 +133,4 @@ private:
     void setTransportSource(AudioFormatReader*);
     double getSynthCurrentPosition();
     MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel);
-
 };

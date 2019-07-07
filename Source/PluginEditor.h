@@ -14,7 +14,7 @@
 #include "PluginProcessor.h"
 #include "TransportStateListener.h"
 #include "Settings.h"
-#include "PianoRoll.h"
+#include "MainPanel.h"
 
 //==============================================================================
 /**
@@ -25,7 +25,7 @@ class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
 {
 public:
     explicit SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
-    ~SoomplerAudioProcessorEditor() override;
+    ~SoomplerAudioProcessorEditor() override = default;
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -41,15 +41,9 @@ private:
 
     void changeListenerCallback(ChangeBroadcaster* source) override ;
     void thumbnailChanged(AudioThumbnail& thumbnail);
-    void drawThumbnail(Graphics& graphics);
     void drawSampleNameOrMessage(Graphics& graphics);
 
     void timerCallback() override;
-
-    void mouseDrag(const MouseEvent &event) override;
-
-    bool isIntersectWithStartRangeLine(Point<int>& point);
-    bool isIntersectWithEndRangeLine(Point<int>& point);
 
     int64 calculateSampleByCoords(int coord);
 
@@ -61,23 +55,18 @@ private:
     // access the processor object that created it.
     SoomplerAudioProcessor& processor;
 
-    TextButton openFileButton;
-    TextButton playSampleButton;
-    TextButton stopSampleButton;
-    Slider volumeKnob;
-    Label volumeLabel;
-    PianoRoll pianoRoll;
+//    ImageButton openFileButton;
+//    TextButton playSampleButton;
+//    TextButton stopSampleButton;
+//    Slider volumeKnob;
+//    Label volumeLabel;
+//    PianoRoll pianoRoll;
 
-    Image backgroundImage;
+//    Image backgroundImage;
+
+    MainPanel mainPanel;
 
     Font mainFont;
-
-    // not active sample regions, before start line and after end lines
-    int startRangeX;
-    int endRangeX;
-
-    // max range x value according to max sample length value
-    int maxRangeX;
 
     // OpenGL context to speed up UI rendering
     OpenGLContext glContext;
