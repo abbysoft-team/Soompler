@@ -108,9 +108,10 @@ public:
 
     std::shared_ptr<TransportInfo> getTransportInfo() override;
 
+    void setSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener);
+
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 
     std::optional<File> loadedSample;
     Synthesiser synth;
@@ -144,4 +145,6 @@ private:
     double getSynthCurrentPosition();
     MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel);
     void notifySampleInfoListeners();
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 };

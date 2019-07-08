@@ -22,13 +22,16 @@ class SampleInfo
 {
 public:
 
-    SampleInfo(float lengthInSeconds, float sampleRate)
+    SampleInfo(float lengthInSeconds, float sampleRate, String sampleName)
     {
+        DBG("New file: ");
+        DBG(sampleName);
         this->lengthInSeconds = lengthInSeconds;
         this->sampleRate = sampleRate;
         this->lengthInSamples = lengthInSeconds * sampleRate;
         this->startSample = 0;
         this->endSample = lengthInSamples;
+        this->sampleName = sampleName;
     }
 
     ~SampleInfo() = default;
@@ -41,6 +44,8 @@ public:
     // played
     int64 startSample;
     int64 endSample;
+
+    String sampleName;
 };
 
 /**

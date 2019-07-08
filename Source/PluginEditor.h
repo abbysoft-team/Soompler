@@ -36,7 +36,6 @@ private:
     void openFileButtonClicked();
     void playSampleButtonClicked();
     void stopSampleButtonClicked();
-    String getLoadedSampleNameOrPlaceholder();
     void transportStateChanged(TransportState state) override;
 
     void changeListenerCallback(ChangeBroadcaster* source) override ;

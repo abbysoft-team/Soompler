@@ -19,6 +19,7 @@ public:
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
+    void transportStateChanged(TransportState state);
 
     float getVolume() const;
 
@@ -27,7 +28,7 @@ private:
     std::unique_ptr<Label> volumeKnobLabel;
     std::unique_ptr<ImageButton> openFileButton;
     std::unique_ptr<ImageButton> aboutButton;
-    std::unique_ptr<SampleViewer> sampleViewer;
+    std::shared_ptr<SampleViewer> sampleViewer;
     std::unique_ptr<Label> loadSampleTip;
     std::unique_ptr<PianoRoll> pianoRoll;
 
@@ -37,8 +38,6 @@ private:
 
     void openFileButtonClicked();
     void aboutButtonClicked();
-
-    void transportStateChanged(TransportState state);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPanel)
 };

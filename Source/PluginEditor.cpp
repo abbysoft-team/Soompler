@@ -38,14 +38,6 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-//    g.drawImage(backgroundImage, Rectangle<float>(Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT));
-//    g.setFont(mainFont);
-
-    drawSampleNameOrMessage(g);
-}
-
-void SoomplerAudioProcessorEditor::drawSampleNameOrMessage(Graphics &g)
-{
 
 }
 
@@ -94,29 +86,6 @@ void SoomplerAudioProcessorEditor::stopSampleButtonClicked()
     processor.stopSamplePlayback();
 }
 
-String getCroppedNameIfNeeded(String fileName)
-{
-  if (fileName.length() <= Settings::MAX_SAMPLE_NAME_LENGTH) {
-    return fileName;
-  }
-
-  String result =  fileName.substring(0, Settings::MAX_SAMPLE_NAME_LENGTH - 4);
-  result.append("...", 3);
-
-  return result;
-}
-
-String SoomplerAudioProcessorEditor::getLoadedSampleNameOrPlaceholder()
-{
-    std::optional<File> loadedSample = processor.getLoadedSample();
-
-    if (!loadedSample.has_value()) {
-        return Strings::NO_SAMPLE_LOADED_TEXT;
-    } else {
-        return getCroppedNameIfNeeded(loadedSample->getFileName());
-    }
-}
-
 void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
 {
     switch (state) {
@@ -126,12 +95,13 @@ void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
     case Starting:
         break;
     case Stopped:
-//        stopSampleButton.setVisible(false);
-//        playSampleButton.setVisible(true);
         break;
     default:
         break;
     }
+
+    // pass state to current active panel
+    mainPanel.transportStateChanged(state);
 }
 
 void SoomplerAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster *source)

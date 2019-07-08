@@ -38,7 +38,7 @@ SampleViewer::SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& trans
     startRangeX(0),
     endRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
     maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
-    currentSample(new SampleInfo(0, 44100))
+    currentSample(new SampleInfo(0, 44100, ""))
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -70,13 +70,6 @@ void SampleViewer::setSampleInfoListener(std::shared_ptr<SampleInfoListener> lis
 //==============================================================================
 void SampleViewer::paint (Graphics& g)
 {
-    //[UserPrePaint] Add your own custom painting code here..
-    //[/UserPrePaint]
-
-    g.fillAll (Colour (0xff323e44));
-
-    //[UserPaint] Add your own custom painting code here..
-
     drawThumbnail(g);
     drawPositionLine(g);
 
@@ -98,20 +91,47 @@ void SampleViewer::drawThumbnail(Graphics &g)
     }
 
     g.setColour(Settings::THUMBNAIL_BOUNDS_COLOR);
-    g.drawRect(Settings::THUMBNAIL_BOUNDS);
+    g.drawRect(0, Settings::THUMBNAIL_HEADER_HEIGHT,
+               Settings::THUMBNAIL_BOUNDS.getWidth(),
+               Settings::THUMBNAIL_BOUNDS.getHeight());
+
     g.setColour(Settings::THUMBNAIL_COLOR);
 
     auto audioLength = thumbnail.getTotalLength();
+    auto thumbnailRect = Rectangle<int>(0, Settings::THUMBNAIL_HEADER_HEIGHT,
+                                        Settings::THUMBNAIL_BOUNDS.getWidth(),
+                                        Settings::THUMBNAIL_BOUNDS.getHeight());
+
     thumbnail.drawChannels(g,
-                           Settings::THUMBNAIL_BOUNDS,
+                           thumbnailRect,
                            0.0,
                            audioLength,
                            1.0f);
 
     g.setColour(Settings::THUMBNAIL_HEADER_COLOR);
-    g.fillRect(Settings::THUMBNAIL_HEADER_BOUNDS);
+    g.fillRect(0, 0, Settings::THUMBNAIL_BOUNDS.getWidth(), Settings::THUMBNAIL_HEADER_HEIGHT);
+
+    g.setColour(Settings::SAMPLE_NAME_COLOR);
+    g.setFont(Settings::SAMPLE_NAME_FONT_SIZE);
+    g.drawSingleLineText(getCroppedNameIfNeeded(),
+                             Settings::SAMPLE_NAME_TEXT_X,
+                             Settings::SAMPLE_NAME_TEXT_Y,
+                             Justification::horizontallyCentred);
 }
 
+
+String SampleViewer::getCroppedNameIfNeeded()
+{
+  auto fileName = currentSample->sampleName;
+  if (fileName.length() <= Settings::MAX_SAMPLE_NAME_LENGTH) {
+    return fileName;
+  }
+
+  String result =  fileName.substring(0, Settings::MAX_SAMPLE_NAME_LENGTH - 4);
+  result.append("...", 3);
+
+  return result;
+}
 
 void SampleViewer::drawPositionLine(Graphics &g)
 {
@@ -124,23 +144,24 @@ void SampleViewer::drawPositionLine(Graphics &g)
     auto drawPosition = ((audioPosition / currentSample->lengthInSeconds)
                          * Settings::THUMBNAIL_BOUNDS.getWidth() + lineOffset);
 
-    g.drawLine(drawPosition, 0, drawPosition, Settings::THUMBNAIL_BOUNDS.getHeight(), 3.0f);
+    g.drawLine(drawPosition, Settings::THUMBNAIL_HEADER_HEIGHT, drawPosition, Settings::SAMPLE_VIEWER_BOUNDS.getHeight(), 3.0f);
 }
 
 void drawRangeLine(int xPos, Graphics& g) {
     g.setColour(Settings::RANGE_LINES_COLOR);
-    g.drawLine(xPos, 0, xPos, Settings::THUMBNAIL_BOUNDS.getHeight(), Settings::RANGE_LINES_WIDTH);
+    g.drawLine(xPos, Settings::THUMBNAIL_HEADER_HEIGHT, xPos,
+               Settings::SAMPLE_VIEWER_BOUNDS.getHeight(), Settings::RANGE_LINES_WIDTH);
 }
 
 void fadePreStartRegion(int startRangeBorderX, Graphics& g) {
     g.setColour(Settings::NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR);
-    g.fillRect(0, 0, startRangeBorderX, Settings::THUMBNAIL_BOUNDS.getHeight());
+    g.fillRect(0, Settings::THUMBNAIL_HEADER_HEIGHT, startRangeBorderX, Settings::THUMBNAIL_BOUNDS.getHeight());
 }
 
 void fadePostEndRegion(int endRangeBorderX, Graphics& g) {
     g.setColour(Settings::NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR);
     int postEndRegionWidth = jmax(0, Settings::THUMBNAIL_BOUNDS.getWidth() - endRangeBorderX);
-    g.fillRect(endRangeBorderX, 0, postEndRegionWidth, Settings::THUMBNAIL_BOUNDS.getHeight());
+    g.fillRect(endRangeBorderX, Settings::THUMBNAIL_HEADER_HEIGHT, postEndRegionWidth, Settings::THUMBNAIL_BOUNDS.getHeight());
 }
 
 void SampleViewer::mouseDrag(const MouseEvent &event)
@@ -149,7 +170,7 @@ void SampleViewer::mouseDrag(const MouseEvent &event)
     if (isIntersectWithRangeLine(position, startRangeX)) {
 
         int rightBorderX = endRangeX - ((int) (Settings::RANGE_LINES_WIDTH*4));
-        int leftBorderX = Settings::THUMBNAIL_BOUNDS.getX();
+        int leftBorderX = 0;
 
         if (position.getX() < leftBorderX) {
             startRangeX = leftBorderX;
@@ -181,6 +202,17 @@ void SampleViewer::mouseDrag(const MouseEvent &event)
     }
 }
 
+bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos)
+{
+    static Rectangle<int> rangeLine;
+    rangeLine.setX(rangeLinePos - Settings::RANGE_LINES_WIDTH);
+    rangeLine.setY(Settings::THUMBNAIL_HEADER_HEIGHT);
+    rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
+    rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
+
+    return rangeLine.contains(point);
+}
+
 void SampleViewer::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
 {
     this->currentSample = info;
@@ -204,8 +236,7 @@ void SampleViewer::calculateEndRangeX()
 
     notifySampleInfoListeners();
 
-    endRangeX = Settings::THUMBNAIL_BOUNDS.getX() +
-            (partOfSampleAllowed * Settings::THUMBNAIL_BOUNDS.getWidth());
+    endRangeX = (partOfSampleAllowed * Settings::THUMBNAIL_BOUNDS.getWidth());
     maxRangeX = endRangeX;
 }
 
@@ -218,20 +249,9 @@ void SampleViewer::notifySampleInfoListeners()
     this->sampleInfoListener->newSampleInfoRecieved(currentSample);
 }
 
-bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos)
-{
-    static Rectangle<int> rangeLine;
-    rangeLine.setX(rangeLinePos - Settings::RANGE_LINES_WIDTH);
-    rangeLine.setY(Settings::THUMBNAIL_BOUNDS.getY());
-    rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
-    rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
-
-    return rangeLine.contains(point);
-}
-
 int64 SampleViewer::calculateSampleByCoords(int coordOnThumbnail)
 {
-    double conversionsError = 0.025;
+    double conversionsError = 0;
     auto percentOfLength = coordOnThumbnail * 1.0 / Settings::THUMBNAIL_BOUNDS.getWidth() - conversionsError;
     return ((int64) (percentOfLength * currentSample->lengthInSamples));
 }

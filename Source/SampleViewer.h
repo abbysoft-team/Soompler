@@ -29,7 +29,7 @@
   Dont forget to set SampleInfoListener to be able to send updated sample start and end
   positions to some controller class.
 */
-class SampleViewer  : public Component, private SampleInfoListener
+class SampleViewer  : public Component, public SampleInfoListener
 {
 public:
     //==============================================================================
@@ -69,6 +69,7 @@ private:
     int64 calculateSampleByCoords(int coordOnThumbnail);
     void calculateEndRangeX();
     void notifySampleInfoListeners();
+    String getCroppedNameIfNeeded();
 
     void mouseDrag(const MouseEvent &event) override;
     void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;

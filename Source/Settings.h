@@ -10,7 +10,8 @@ constexpr int WINDOW_HEIGHT = 340;
 const auto BUTTON_OPEN_FILE_POSITION = Rectangle<int>(10, 10, 100, 40);
 const auto BUTTON_PLAY_SAMPLE_POSITION = Rectangle<int>(WINDOW_WIDTH/2 + 5, BUTTON_OPEN_FILE_POSITION.getY(), 100, 40);
 const auto THUMBNAIL_BOUNDS = Rectangle<int>(10, 100, WINDOW_WIDTH - 20, 100);
-const auto THUMBNAIL_HEADER_BOUNDS = Rectangle<int>(10, 80, WINDOW_WIDTH - 20, 20);
+constexpr auto THUMBNAIL_HEADER_HEIGHT = 20;
+const auto SAMPLE_VIEWER_BOUNDS = Rectangle<int>(10, 100, THUMBNAIL_BOUNDS.getWidth(), THUMBNAIL_BOUNDS.getHeight() + THUMBNAIL_HEADER_HEIGHT);
 const auto VOLUME_KNOB_POSITION = Rectangle<int>(70, 210, 50, 50);
 
 const auto THUMBNAIL_COLOR = Colour(23, 54, 38);
@@ -21,8 +22,10 @@ const auto POSITION_LINE_COLOR = THUMBNAIL_HEADER_COLOR;
 const auto RANGE_LINES_COLOR = Colour((uint8) 246, (uint8) 66, (uint8) 66, (uint8) 200);
 const auto NOT_ACTIVE_SAMPLE_REGION_MASK_COLOR = Colour((uint8) 0, (uint8) 0, (uint8) 0, (uint8) 156);
 
-constexpr auto SAMPLE_NAME_TEXT_X = (WINDOW_WIDTH / 2);
-constexpr auto SAMPLE_NAME_TEXT_Y = 95;
+// relative to SampleViewer widget
+const auto SAMPLE_NAME_TEXT_X = (THUMBNAIL_BOUNDS.getWidth() / 2);
+constexpr auto SAMPLE_NAME_TEXT_Y = (THUMBNAIL_HEADER_HEIGHT / 2) + 4;
+
 constexpr auto SAMPLE_NAME_FONT_SIZE = 17.0f;
 constexpr auto MAX_SAMPLE_NAME_LENGTH = 60;
 constexpr auto RANGE_LINES_WIDTH = 5.0f;

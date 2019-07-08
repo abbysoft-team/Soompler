@@ -23,7 +23,7 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    endSample(0),
                                                    volume(0.5),
                                                    currentSample(0),
-                                                   sampleInfo(0, 44100),
+                                                   sampleInfo(0, 44100, ""),
                                                    sampleInfoListener(nullptr)
 {
     synth.addVoice(new soompler::ExtendedVoice(this));
@@ -123,15 +123,6 @@ void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
         processTransport(buffer);
         return;
     }
-
-    // TODO maybe this all multi-bus thing is unnesesary?
-//    auto busCount = getBusCount(false);
-//    for (auto busNr = 0; busNr < busCount; ++busNr) {
-//        auto midiChannelBuffer = filterMidiMessagesForChannel(MidiBuffer, busNr + 1);
-//        auto audioBusBuffer = getBusBuffer(buffer, false, busNr);
-
-//        synth.renderNextBlock();
-//    }
 
     lastMidiEvents = filterMidiMessagesForChannel(midiMessages, 1);
     auto audioBusBuffer = getBusBuffer(buffer, false, 0);
@@ -267,7 +258,7 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
     setSampleEndPosition(transportSource.getTotalLength());
     notifyTransportStateChanged(TransportState::Ready);
 
-    sampleInfo = SampleInfo(transportSource.getTotalLength(), getSampleRate());
+    sampleInfo = SampleInfo(transportSource.getLengthInSeconds(), getSampleRate(), sampleFile.getFileName());
 
     notifySampleInfoListeners();
 }
@@ -275,6 +266,8 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
 void SoomplerAudioProcessor::notifySampleInfoListeners()
 {
     if (sampleInfoListener != nullptr) {
+        DBG("new sample received");
+        DBG(sampleInfo.sampleName);
         sampleInfoListener.get()->newSampleInfoRecieved(std::shared_ptr<SampleInfo>(&sampleInfo));
     }
 }
@@ -414,9 +407,14 @@ double SoomplerAudioProcessor::getSynthCurrentPosition()
 std::shared_ptr<TransportInfo> SoomplerAudioProcessor::getTransportInfo()
 {
     auto info = std::make_shared<TransportInfo>(this->getSampleRate());
-    info->setAudioPosition(transportSource.getCurrentPosition());
+    info->setAudioPosition(getCurrentAudioPosition());
 
     return info;
+}
+
+void SoomplerAudioProcessor::setSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener)
+{
+    this->sampleInfoListener = sampleInfoListener;
 }
 
 //==============================================================================

@@ -18,7 +18,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
     volumeKnob->setSliderStyle (Slider::Rotary);
     volumeKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
     volumeKnob->addListener (this);
-    volumeKnob->setBounds (68, 210, 50, 50);
+    volumeKnob->setBounds (68, 230, 50, 50);
 
     volumeKnobLabel.reset (new Label ("volume knob label",
                                       TRANS("volume\n")));
@@ -28,7 +28,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
     volumeKnobLabel->setEditable (false, false, false);
     volumeKnobLabel->setColour (TextEditor::textColourId, Colours::black);
     volumeKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    volumeKnobLabel->setBounds (64, 192, 64, 24);
+    volumeKnobLabel->setBounds (64, 218, 64, 24);
 
     openFileButton.reset (new ImageButton ("open file button"));
     addAndMakeVisible (openFileButton.get());
@@ -57,11 +57,14 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
     sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor));
     addAndMakeVisible (sampleViewer.get());
     sampleViewer->setName ("SampleViewer");
-    sampleViewer->setBounds(Settings::THUMBNAIL_BOUNDS);
+    sampleViewer->setBounds(Settings::SAMPLE_VIEWER_BOUNDS);
     // not visible until sample is loaded
     sampleViewer->setVisible(false);
+
+    // link processor with sampleViewer
     auto sampleInfoListener = static_cast<SampleInfoListener*> (&processor);
     sampleViewer->setSampleInfoListener(std::shared_ptr<SampleInfoListener>(sampleInfoListener));
+    processor.setSampleInfoListener(sampleViewer);
 
     loadSampleTip.reset (new Label ("new label",
                             TRANS("Load sample by clicking load sample button in the upper left corner\n")));
@@ -100,25 +103,6 @@ void MainPanel::paint (Graphics& g)
     // draw menu panel
     g.setGradientFill(Settings::MAIN_PANEL_GRADIENT);
     g.fillRect(0, 0, this->getWidth(), Settings::MAIN_PANEL_HEIGHT);
-
-//    // sample name or "please load sample" message
-//    int y;
-//    if (processor.getLoadedSample().has_value()) {
-//        g.setColour(Settings::SAMPLE_NAME_COLOR);
-//        y = Settings::SAMPLE_NAME_TEXT_Y;
-//    } else {
-//        g.setColour(Colours::black);
-
-//        // this is not actuall name of sample, but message to load sample
-//        y = Settings::SAMPLE_NAME_TEXT_Y + 20;
-//    }
-
-//    g.drawSingleLineText(getLoadedSampleNameOrPlaceholder(),
-//                         Settings::SAMPLE_NAME_TEXT_X,
-//                         Settings::SAMPLE_NAME_TEXT_Y,
-//                         Justification::horizontallyCentred);
-
-
 }
 
 void MainPanel::resized()
