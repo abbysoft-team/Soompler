@@ -3,7 +3,7 @@
 #include "Strings.h"
 
 //==============================================================================
-MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
+MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor), editor(this)
 {
     setSize(Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
     setName("mainPanel");
@@ -11,7 +11,8 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
     backgroundImage = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
 
     volumeKnob.reset (new Slider ("volume knob"));
-    addAndMakeVisible (volumeKnob.get());
+    addAndMakeVisible(volumeKnob.get());
+    editor.addToGuiEditor(volumeKnob.get());
     volumeKnob->setTooltip (TRANS("volume"));
     volumeKnob->setRange (0.0, 1.0, 0.01);
     volumeKnob->setValue(0.5);
@@ -22,7 +23,8 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
 
     volumeKnobLabel.reset (new Label ("volume knob label",
                                       TRANS("volume\n")));
-    addAndMakeVisible (volumeKnobLabel.get());
+    addAndMakeVisible(volumeKnobLabel.get());
+    editor.addToGuiEditor(volumeKnobLabel.get());
     volumeKnobLabel->setFont (Font (15.00f, Font::plain));
     volumeKnobLabel->setJustificationType (Justification::centredLeft);
     volumeKnobLabel->setEditable (false, false, false);
@@ -32,6 +34,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
 
     openFileButton.reset (new ImageButton ("open file button"));
     addAndMakeVisible (openFileButton.get());
+    editor.addToGuiEditor (openFileButton.get());
     openFileButton->setTooltip (TRANS("Open Sample\n"));
     openFileButton->setButtonText (TRANS("new button"));
     openFileButton->addListener (this);
@@ -44,6 +47,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
 
     aboutButton.reset (new ImageButton ("about button"));
     addAndMakeVisible (aboutButton.get());
+    editor.addToGuiEditor (aboutButton.get());
     aboutButton->setTooltip (TRANS("About Program\n"));
     aboutButton->setButtonText (TRANS("About program"));
     aboutButton->addListener (this);
@@ -56,6 +60,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
 
     sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor));
     addAndMakeVisible (sampleViewer.get());
+    editor.addToGuiEditor (sampleViewer.get());
     sampleViewer->setName ("SampleViewer");
     sampleViewer->setBounds(Settings::SAMPLE_VIEWER_BOUNDS);
     // not visible until sample is loaded
@@ -69,6 +74,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
     loadSampleTip.reset (new Label ("new label",
                             TRANS("Load sample by clicking load sample button in the upper left corner\n")));
     addAndMakeVisible (loadSampleTip.get());
+    editor.addToGuiEditor (loadSampleTip.get());
     loadSampleTip->setFont (Font (27.90f, Font::plain));
     loadSampleTip->setJustificationType (Justification::centred);
     loadSampleTip->setEditable (false, false, false);
@@ -81,6 +87,12 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor)
     pianoRoll->setName ("piano roll component");
 
     addAndMakeVisible (pianoRoll.get());
+    editor.addToGuiEditor (pianoRoll.get());
+
+    // add GUI editor last
+    // it ensures that gui overlay will work properly
+    addAndMakeVisible(editor);
+    editor.initOverlay();
 }
 
 MainPanel::~MainPanel()
@@ -100,9 +112,12 @@ void MainPanel::paint (Graphics& g)
     g.fillAll (Colour (0xff323e44));
     g.drawImage(backgroundImage, Rectangle<float>(0, 0, this->getWidth(), this->getHeight()));
 
+    editor.paintBackOverlay(g);
+
     // draw menu panel
     g.setGradientFill(Settings::MAIN_PANEL_GRADIENT);
     g.fillRect(0, 0, this->getWidth(), Settings::MAIN_PANEL_HEIGHT);
+
 }
 
 void MainPanel::resized()

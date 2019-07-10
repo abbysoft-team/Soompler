@@ -72,6 +72,9 @@ const auto BUTTON_OPAQUE_COLOR = Colour((uint8) 0, (uint8) 0, (uint8) 0, (uint8)
 const auto BUTTON_OVER_COLOR = Colour((uint8) 255, (uint8) 255, (uint8) 255, (uint8) 65);
 const auto BUTTON_DOWN_COLOR = Colour((uint8) 255, (uint8) 255, (uint8) 255, (uint8) 120);
 
+// GUI Editor
+const auto GUI_EDITOR_COLOR = THUMBNAIL_COLOR;
+const auto GUI_EDITOR_SELECTION_COLOR = Colours::yellow;
 
 }
 

@@ -4,6 +4,7 @@
 #include "SampleViewer.h"
 #include "PluginProcessor.h"
 #include "PianoRoll.h"
+#include "GuiEditor.h"
 
 class MainPanel  : public Component,
                    public Slider::Listener,
@@ -35,6 +36,9 @@ private:
     Image backgroundImage;
 
     SoomplerAudioProcessor& processor;
+
+    // ability to edit components for this panel
+    GuiEditor editor;
 
     void openFileButtonClicked();
     void aboutButtonClicked();
