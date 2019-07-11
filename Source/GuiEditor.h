@@ -28,8 +28,10 @@ private:
     void mouseMove(const MouseEvent &event) override;
     void mouseDrag(const MouseEvent &event) override;
     Component* findComponentAt(Point<int> position);
+    Point<int> getPositionWithRespectToGrid(Point<int> position, Rectangle<int> componentBounds);
 
     Component* selectedComponent;
     Component* editableComponent;
     std::vector<Component*> components;
+    int currentGridSize;
 };

@@ -75,6 +75,7 @@ const auto BUTTON_DOWN_COLOR = Colour((uint8) 255, (uint8) 255, (uint8) 255, (ui
 // GUI Editor
 const auto GUI_EDITOR_COLOR = THUMBNAIL_COLOR;
 const auto GUI_EDITOR_SELECTION_COLOR = Colours::yellow;
+const auto GUI_EDITOR_GRID_SIZE = 10;
 
 }
 
