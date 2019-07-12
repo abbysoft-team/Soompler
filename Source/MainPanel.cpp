@@ -91,7 +91,6 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
 
     // add GUI editor last
     // it ensures that gui overlay will work properly
-    addAndMakeVisible(editor);
     editor.initOverlay();
 }
 

@@ -31,6 +31,7 @@ private:
     Point<int> getPositionWithRespectToGrid(Point<int> position, Rectangle<int> componentBounds);
     bool keyPressed(const KeyPress &key, Component *originatingComponent);
     void enableEditor(bool enabled);
+    void printNewComponentPositions();
 
     Component* selectedComponent;
     Component* editableComponent;

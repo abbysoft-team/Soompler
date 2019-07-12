@@ -10,7 +10,7 @@ GuiEditor::GuiEditor(juce::Component *component) :
     editableComponent(component),
     selectedComponent(nullptr),
     currentGridSize(Settings::GUI_EDITOR_GRID_SIZE),
-    isEnabled(true)
+    isEnabled(false)
 {
     //editableComponent->addMouseListener(this, true);
     editableComponent->addKeyListener(this);
@@ -157,6 +157,8 @@ bool GuiEditor::keyPressed(const KeyPress &key, Component *originatingComponent)
 {
     if (key == KeyPress::F5Key) {
         enableEditor(!isEnabled);
+    } else if (key == KeyPress::F2Key) {
+        printNewComponentPositions();
     }
 }
 
@@ -169,4 +171,18 @@ void GuiEditor::enableEditor(bool enabled)
     } else {
         editableComponent->addAndMakeVisible(this);
     }
+}
+
+void GuiEditor::printNewComponentPositions()
+{
+    DBG("=====================================");
+    DBG("");
+
+    for (auto component : components) {
+        DBG(component->getName());
+        DBG(component->getX());
+        DBG(component->getY());
+    }
+
+    DBG("=====================================");
 }
