@@ -2,7 +2,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-class GuiEditor : public Component
+class GuiEditor : public Component, private KeyListener
 {
 public:
 
@@ -29,9 +29,12 @@ private:
     void mouseDrag(const MouseEvent &event) override;
     Component* findComponentAt(Point<int> position);
     Point<int> getPositionWithRespectToGrid(Point<int> position, Rectangle<int> componentBounds);
+    bool keyPressed(const KeyPress &key, Component *originatingComponent);
+    void enableEditor(bool enabled);
 
     Component* selectedComponent;
     Component* editableComponent;
     std::vector<Component*> components;
     int currentGridSize;
+    bool isEnabled;
 };

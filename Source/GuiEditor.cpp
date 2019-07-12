@@ -6,13 +6,21 @@
  * @brief GuiEditor::GuiEditor
  * @param component
  */
-GuiEditor::GuiEditor(juce::Component *component) : editableComponent(component), selectedComponent(nullptr), currentGridSize(Settings::GUI_EDITOR_GRID_SIZE)
+GuiEditor::GuiEditor(juce::Component *component) :
+    editableComponent(component),
+    selectedComponent(nullptr),
+    currentGridSize(Settings::GUI_EDITOR_GRID_SIZE),
+    isEnabled(true)
 {
-    editableComponent->addMouseListener(this, true);
+    //editableComponent->addMouseListener(this, true);
 }
 
 void GuiEditor::paintBackOverlay(Graphics &g)
 {
+    if (!isEnabled) {
+        return;
+    }
+
     static constexpr auto netThickness = 2;
     static constexpr auto selectionThickness = 4;
 
@@ -51,6 +59,10 @@ void GuiEditor::initOverlay()
 
 void GuiEditor::mouseDown(const MouseEvent &event)
 {
+    if (!isEnabled) {
+        return;
+    }
+
     auto position = event.getPosition();
     auto component = findComponentAt(position);
 
@@ -69,21 +81,37 @@ void GuiEditor::mouseMove(const MouseEvent &event)
 
 void GuiEditor::mouseDrag(const MouseEvent &event)
 {
+    if (!isEnabled) {
+        return;
+    }
+
     auto position = event.getPosition();
     if (selectedComponent == nullptr) {
         return;
     }
 
+    // some components have wrong width and height
+    if (selectedComponent->getWidth() > editableComponent->getWidth()) {
+        selectedComponent = nullptr;
+        return;
+    }
+    if (selectedComponent->getHeight() > editableComponent->getHeight()) {
+        selectedComponent = nullptr;
+        return;
+    }
+
     // set bounds of center of component, not of upper left corner
-    auto newXOffset = selectedComponent->getWidth() / 2;
-    auto newYOffset = selectedComponent->getHeight() / 2;
+    auto width = selectedComponent->getWidth();
+    auto height = selectedComponent->getHeight();
+
+    auto newXOffset = width / 2;
+    auto newYOffset = height / 2;
     auto newX = position.x - newXOffset;
     auto newY = position.y - newYOffset;
 
     auto newPosition = getPositionWithRespectToGrid(Point<int>(newX, newY), selectedComponent->getBounds());
-    selectedComponent->setBounds(newPosition.x, newPosition.y,
-                                 selectedComponent->getWidth(), selectedComponent->getHeight());
 
+    selectedComponent->setBounds(newPosition.x, newPosition.y, width, height);
     editableComponent->repaint();
 }
 
@@ -122,4 +150,22 @@ Point<int> GuiEditor::getPositionWithRespectToGrid(Point<int> position, Rectangl
     }
 
     return Point<int>(newX, newY);
+}
+
+bool GuiEditor::keyPressed(const KeyPress &key, Component *originatingComponent)
+{
+    if (key == KeyPress::F5Key) {
+        enableEditor(!isEnabled);
+    }
+}
+
+void GuiEditor::enableEditor(bool enabled)
+{
+    isEnabled = enabled;
+
+    if (!enabled) {
+        editableComponent->removeChildComponent(this);
+    } else {
+        editableComponent->addAndMakeVisible(this);
+    }
 }
