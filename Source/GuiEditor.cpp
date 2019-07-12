@@ -13,6 +13,7 @@ GuiEditor::GuiEditor(juce::Component *component) :
     isEnabled(true)
 {
     //editableComponent->addMouseListener(this, true);
+    editableComponent->addKeyListener(this);
 }
 
 void GuiEditor::paintBackOverlay(Graphics &g)
