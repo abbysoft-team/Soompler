@@ -89,6 +89,35 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     addAndMakeVisible (pianoRoll.get());
     editor.addToGuiEditor (pianoRoll.get());
 
+    // transport control buttons
+    playButton.reset (new ImageButton ("Preview sample button"));
+    addAndMakeVisible (playButton.get());
+    editor.addToGuiEditor (playButton.get());
+    playButton->setTooltip (TRANS("Preview sample\n"));
+    playButton->setButtonText (TRANS("Preview sample"));
+    playButton->addListener (this);
+    playButton->setImages (false, true, true,
+                               ImageCache::getFromMemory (BinaryData::play_png, BinaryData::play_pngSize),
+                               1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000));
+    playButton->setBounds (450, 60, 32, 32);
+    playButton->setVisible(false);
+
+    stopButton.reset (new ImageButton ("Stop preview button"));
+    addAndMakeVisible (stopButton.get());
+    editor.addToGuiEditor (stopButton.get());
+    stopButton->setTooltip (TRANS("Stop preview\n"));
+    stopButton->setButtonText (TRANS("Stop preview"));
+    stopButton->addListener (this);
+    stopButton->setImages (false, true, true,
+                               ImageCache::getFromMemory (BinaryData::stop_png, BinaryData::stop_pngSize),
+                               1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000));
+    stopButton->setBounds (450, 60, 32, 32);
+    stopButton->setVisible(false);
+
     // add GUI editor last
     // it ensures that gui overlay will work properly
     editor.initOverlay();
@@ -127,6 +156,7 @@ void MainPanel::sliderValueChanged (Slider* sliderThatWasMoved)
 {
     if (sliderThatWasMoved == volumeKnob.get())
     {
+        processor.setVolume(volumeKnob.get()->getValue());
     }
 }
 
@@ -139,6 +169,14 @@ void MainPanel::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == aboutButton.get())
     {
         aboutButtonClicked();
+    }
+    else if (buttonThatWasClicked == playButton.get())
+    {
+        playSampleButtonClicked();
+    }
+    else if (buttonThatWasClicked == stopButton.get())
+    {
+        stopSampleButtonClicked();
     }
 }
 
@@ -159,7 +197,7 @@ void MainPanel::openFileButtonClicked()
 
         processor.loadSample(sampleFile);
 
-        //playSampleButton.setEnabled(true);
+        playButton->setEnabled(true);
 
         repaint();
     }
@@ -170,16 +208,32 @@ void MainPanel::aboutButtonClicked()
     // show about dialog
 }
 
+void MainPanel::playSampleButtonClicked()
+{
+    processor.playSample();
+    playButton->setVisible(false);
+    stopButton->setVisible(true);
+}
+
+void MainPanel::stopSampleButtonClicked()
+{
+    processor.stopSamplePlayback();
+}
+
+
 void MainPanel::transportStateChanged(TransportState state)
 {
     switch (state) {
     case Ready:
         loadSampleTip->setVisible(false);
         sampleViewer->setVisible(true);
+        playButton->setVisible(true);
         break;
     case Starting:
         break;
     case Stopped:
+        stopButton->setVisible(false);
+        playButton->setVisible(true);
         break;
     default:
         break;

@@ -47,43 +47,8 @@ void SoomplerAudioProcessorEditor::timerCallback()
     repaint();
 }
 
-void SoomplerAudioProcessorEditor::sliderValueChanged(Slider *slider)
-{
-//    if (slider == &volumeKnob) {
-//        processor.setVolume(slider->getValue());
-//    }
-}
-
 void SoomplerAudioProcessorEditor::resized()
 {
-}
-
-void SoomplerAudioProcessorEditor::buttonClicked(Button *button)
-{
-    if (button->getButtonText().equalsIgnoreCase(Strings::BUTTON_OPEN_FILE_TEXT)) {
-        openFileButtonClicked();
-    } else if (button->getButtonText().equalsIgnoreCase(Strings::BUTTON_PLAY_SAMPLE_TEXT)) {
-        playSampleButtonClicked();
-    } else if (button->getButtonText().equalsIgnoreCase(Strings::BUTTON_STOP_SAMPLE_TEXT)) {
-        stopSampleButtonClicked();
-    }
-}
-
-void SoomplerAudioProcessorEditor::openFileButtonClicked()
-{
-
-}
-
-void SoomplerAudioProcessorEditor::playSampleButtonClicked()
-{
-    processor.playSample();
-//    playSampleButton.setVisible(false);
-//    stopSampleButton.setVisible(true);
-}
-
-void SoomplerAudioProcessorEditor::stopSampleButtonClicked()
-{
-    processor.stopSamplePlayback();
 }
 
 void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)

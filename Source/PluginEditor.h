@@ -19,9 +19,11 @@
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
-        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer,
-        private Slider::Listener
+class SoomplerAudioProcessorEditor  :
+        public AudioProcessorEditor,
+        private TransportStateListener,
+        private ChangeListener,
+        private Timer
 {
 public:
     explicit SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
@@ -32,10 +34,6 @@ public:
     void resized() override;
 
 private:
-    void buttonClicked(Button*) override;
-    void openFileButtonClicked();
-    void playSampleButtonClicked();
-    void stopSampleButtonClicked();
     void transportStateChanged(TransportState state) override;
 
     void changeListenerCallback(ChangeBroadcaster* source) override ;
@@ -45,8 +43,6 @@ private:
     void timerCallback() override;
 
     int64 calculateSampleByCoords(int coord);
-
-    void sliderValueChanged(Slider *slider) override;
 
     void calculateEndRangeX();
 

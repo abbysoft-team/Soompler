@@ -32,6 +32,8 @@ private:
     std::shared_ptr<SampleViewer> sampleViewer;
     std::unique_ptr<Label> loadSampleTip;
     std::unique_ptr<PianoRoll> pianoRoll;
+    std::unique_ptr<ImageButton> playButton;
+    std::unique_ptr<ImageButton> stopButton;
 
     Image backgroundImage;
 
@@ -42,6 +44,8 @@ private:
 
     void openFileButtonClicked();
     void aboutButtonClicked();
+    void playSampleButtonClicked();
+    void stopSampleButtonClicked();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPanel)
 };
