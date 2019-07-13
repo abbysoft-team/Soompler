@@ -30,7 +30,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     volumeKnobLabel->setEditable (false, false, false);
     volumeKnobLabel->setColour (TextEditor::textColourId, Colours::black);
     volumeKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    volumeKnobLabel->setBounds (60, 210, 64, 24);
+    volumeKnobLabel->setBounds (60, 215, 64, 24);
 
     openFileButton.reset (new ImageButton ("open file button"));
     addAndMakeVisible (openFileButton.get());
@@ -139,7 +139,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     attackKnobLabel->setEditable (false, false, false);
     attackKnobLabel->setColour (TextEditor::textColourId, Colours::black);
     attackKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    attackKnobLabel->setBounds (150, 210, 64, 24);
+    attackKnobLabel->setBounds (150, 215, 64, 24);
 
     decayKnob.reset (new Slider ("decay knob"));
     addAndMakeVisible(decayKnob.get());
@@ -161,7 +161,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     decayKnobLabel->setEditable (false, false, false);
     decayKnobLabel->setColour (TextEditor::textColourId, Colours::black);
     decayKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    decayKnobLabel->setBounds (200, 210, 64, 24);
+    decayKnobLabel->setBounds (200, 215, 64, 24);
 
     sustainKnob.reset (new Slider ("sustain knob"));
     addAndMakeVisible(sustainKnob.get());
@@ -183,7 +183,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     sustainKnobLabel->setEditable (false, false, false);
     sustainKnobLabel->setColour (TextEditor::textColourId, Colours::black);
     sustainKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    sustainKnobLabel->setBounds (250, 210, 64, 24);
+    sustainKnobLabel->setBounds (250, 215, 64, 24);
 
     releaseKnob.reset (new Slider ("release knob"));
     addAndMakeVisible(releaseKnob.get());
@@ -205,7 +205,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     releaseKnobLabel->setEditable (false, false, false);
     releaseKnobLabel->setColour (TextEditor::textColourId, Colours::black);
     releaseKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    releaseKnobLabel->setBounds (300, 210, 64, 24);
+    releaseKnobLabel->setBounds (300, 215, 64, 24);
 
     attackKnob->setEnabled(false);
     decayKnob->setEnabled(false);
