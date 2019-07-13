@@ -48,6 +48,11 @@ bool ExtendedSound::appliesToChannel (int /*midiChannel*/)
     return true;
 }
 
+void ExtendedSound::setAdsrParams(ADSR::Parameters adsr)
+{
+    this->params = adsr;
+}
+
 //==============================================================================
 ExtendedVoice::ExtendedVoice(ChangeListener* listener) : eventListener(listener), volume(0)
 {

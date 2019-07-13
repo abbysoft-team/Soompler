@@ -53,6 +53,8 @@ public:
     bool appliesToNote (int midiNoteNumber) override;
     bool appliesToChannel (int midiChannel) override;
 
+    void setAdsrParams(ADSR::Parameters adrs);
+
 private:
     //==============================================================================
     friend class ExtendedVoice;

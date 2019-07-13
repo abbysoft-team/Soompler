@@ -110,12 +110,13 @@ public:
 
     void setSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener);
 
+    void setAdsrParams(ADSR::Parameters params);
+
 private:
     //==============================================================================
 
     std::optional<File> loadedSample;
     Synthesiser synth;
-    std::unique_ptr<SynthesiserSound> synthSound;
     int currentSample;
 
     AudioFormatManager formatManager;

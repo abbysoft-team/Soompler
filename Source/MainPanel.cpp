@@ -19,10 +19,10 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     volumeKnob->setSliderStyle (Slider::Rotary);
     volumeKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
     volumeKnob->addListener (this);
-    volumeKnob->setBounds (68, 230, 50, 50);
+    volumeKnob->setBounds (60, 230, 50, 50);
 
     volumeKnobLabel.reset (new Label ("volume knob label",
-                                      TRANS("volume\n")));
+                                      TRANS("Volume\n")));
     addAndMakeVisible(volumeKnobLabel.get());
     editor.addToGuiEditor(volumeKnobLabel.get());
     volumeKnobLabel->setFont (Font (15.00f, Font::plain));
@@ -30,7 +30,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     volumeKnobLabel->setEditable (false, false, false);
     volumeKnobLabel->setColour (TextEditor::textColourId, Colours::black);
     volumeKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    volumeKnobLabel->setBounds (64, 218, 64, 24);
+    volumeKnobLabel->setBounds (60, 210, 64, 24);
 
     openFileButton.reset (new ImageButton ("open file button"));
     addAndMakeVisible (openFileButton.get());
@@ -118,6 +118,100 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     stopButton->setBounds (450, 60, 32, 32);
     stopButton->setVisible(false);
 
+    // ADSR controls
+    attackKnob.reset (new Slider ("attack knob"));
+    addAndMakeVisible(attackKnob.get());
+    editor.addToGuiEditor(attackKnob.get());
+    attackKnob->setTooltip (TRANS("Attack"));
+    attackKnob->setRange (0.0, Settings::MAX_ATTACK_TIME, 0.01);
+    attackKnob->setValue(Settings::DEFAULT_ATTACK_TIME);
+    attackKnob->setSliderStyle (Slider::Rotary);
+    attackKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
+    attackKnob->addListener (this);
+    attackKnob->setBounds (150, 230, 50, 50);
+
+    attackKnobLabel.reset (new Label ("attack knob label",
+                                      TRANS("Attack\n")));
+    addAndMakeVisible(attackKnobLabel.get());
+    editor.addToGuiEditor(attackKnobLabel.get());
+    attackKnobLabel->setFont (Font (15.00f, Font::plain));
+    attackKnobLabel->setJustificationType (Justification::centredLeft);
+    attackKnobLabel->setEditable (false, false, false);
+    attackKnobLabel->setColour (TextEditor::textColourId, Colours::black);
+    attackKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    attackKnobLabel->setBounds (150, 210, 64, 24);
+
+    decayKnob.reset (new Slider ("decay knob"));
+    addAndMakeVisible(decayKnob.get());
+    editor.addToGuiEditor(decayKnob.get());
+    decayKnob->setTooltip (TRANS("Decay"));
+    decayKnob->setRange (0.0, Settings::MAX_DECAY_TIME, 0.01);
+    decayKnob->setValue(Settings::DEFAULT_DECAY_TIME);
+    decayKnob->setSliderStyle (Slider::Rotary);
+    decayKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
+    decayKnob->addListener (this);
+    decayKnob->setBounds (200, 230, 50, 50);
+
+    decayKnobLabel.reset (new Label ("decay knob label",
+                                      TRANS("Decay\n")));
+    addAndMakeVisible(decayKnobLabel.get());
+    editor.addToGuiEditor(decayKnobLabel.get());
+    decayKnobLabel->setFont (Font (15.00f, Font::plain));
+    decayKnobLabel->setJustificationType (Justification::centredLeft);
+    decayKnobLabel->setEditable (false, false, false);
+    decayKnobLabel->setColour (TextEditor::textColourId, Colours::black);
+    decayKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    decayKnobLabel->setBounds (200, 210, 64, 24);
+
+    sustainKnob.reset (new Slider ("sustain knob"));
+    addAndMakeVisible(sustainKnob.get());
+    editor.addToGuiEditor(sustainKnob.get());
+    sustainKnob->setTooltip (TRANS("Sustain"));
+    sustainKnob->setRange (0.0, 1.0, 0.01);
+    sustainKnob->setValue(Settings::DEFAULT_SUSTAIN_LEVEL);
+    sustainKnob->setSliderStyle (Slider::Rotary);
+    sustainKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
+    sustainKnob->addListener (this);
+    sustainKnob->setBounds (250, 230, 50, 50);
+
+    sustainKnobLabel.reset (new Label ("sustain knob label",
+                                      TRANS("Sustain\n")));
+    addAndMakeVisible(sustainKnobLabel.get());
+    editor.addToGuiEditor(sustainKnobLabel.get());
+    sustainKnobLabel->setFont (Font (15.00f, Font::plain));
+    sustainKnobLabel->setJustificationType (Justification::centredLeft);
+    sustainKnobLabel->setEditable (false, false, false);
+    sustainKnobLabel->setColour (TextEditor::textColourId, Colours::black);
+    sustainKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    sustainKnobLabel->setBounds (250, 210, 64, 24);
+
+    releaseKnob.reset (new Slider ("release knob"));
+    addAndMakeVisible(releaseKnob.get());
+    editor.addToGuiEditor(releaseKnob.get());
+    releaseKnob->setTooltip (TRANS("Release"));
+    releaseKnob->setRange (0.0, Settings::MAX_RELEASE_TIME, 0.01);
+    releaseKnob->setValue(Settings::DEFAULT_RELEASE_TIME);
+    releaseKnob->setSliderStyle (Slider::Rotary);
+    releaseKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
+    releaseKnob->addListener (this);
+    releaseKnob->setBounds (300, 230, 50, 50);
+
+    releaseKnobLabel.reset (new Label ("release knob label",
+                                      TRANS("Release\n")));
+    addAndMakeVisible(releaseKnobLabel.get());
+    editor.addToGuiEditor(releaseKnobLabel.get());
+    releaseKnobLabel->setFont (Font (15.00f, Font::plain));
+    releaseKnobLabel->setJustificationType (Justification::centredLeft);
+    releaseKnobLabel->setEditable (false, false, false);
+    releaseKnobLabel->setColour (TextEditor::textColourId, Colours::black);
+    releaseKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    releaseKnobLabel->setBounds (300, 210, 64, 24);
+
+    attackKnob->setEnabled(false);
+    decayKnob->setEnabled(false);
+    sustainKnob->setEnabled(false);
+    releaseKnob->setEnabled(false);
+
     // add GUI editor last
     // it ensures that gui overlay will work properly
     editor.initOverlay();
@@ -158,6 +252,24 @@ void MainPanel::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         processor.setVolume(volumeKnob.get()->getValue());
     }
+    else if (sliderThatWasMoved == attackKnob.get())
+    {
+        adsrParams.attack = attackKnob->getValue();
+    }
+    else if (sliderThatWasMoved == decayKnob.get())
+    {
+        adsrParams.decay = decayKnob->getValue();
+    }
+    else if (sliderThatWasMoved == sustainKnob.get())
+    {
+        adsrParams.sustain = sustainKnob->getValue();
+    }
+    else if (sliderThatWasMoved == releaseKnob.get())
+    {
+        adsrParams.release = releaseKnob->getValue();
+    }
+
+    processor.setAdsrParams(adsrParams);
 }
 
 void MainPanel::buttonClicked (Button* buttonThatWasClicked)
@@ -228,6 +340,11 @@ void MainPanel::transportStateChanged(TransportState state)
         loadSampleTip->setVisible(false);
         sampleViewer->setVisible(true);
         playButton->setVisible(true);
+
+        attackKnob->setEnabled(true);
+        decayKnob->setEnabled(true);
+        sustainKnob->setEnabled(true);
+        releaseKnob->setEnabled(true);
         break;
     case Starting:
         break;

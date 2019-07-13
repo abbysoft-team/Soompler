@@ -330,7 +330,8 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
 
     BigInteger midiNotes;
     midiNotes.setRange(0, 126, true);
-    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x48, 0.0, 0.0, Settings::MAX_SAMPLE_LENGTH);
+    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x48,
+                                       Settings::DEFAULT_ATTACK_TIME, Settings::DEFAULT_RELEASE_TIME, Settings::MAX_SAMPLE_LENGTH);
 }
 
 AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)
@@ -415,6 +416,16 @@ std::shared_ptr<TransportInfo> SoomplerAudioProcessor::getTransportInfo()
 void SoomplerAudioProcessor::setSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener)
 {
     this->sampleInfoListener = sampleInfoListener;
+}
+
+void SoomplerAudioProcessor::setAdsrParams(ADSR::Parameters params)
+{
+    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
+    if (sound == nullptr) {
+        return;
+    }
+
+    sound->setAdsrParams(params);
 }
 
 //==============================================================================

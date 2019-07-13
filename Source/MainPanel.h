@@ -26,14 +26,28 @@ public:
 
 private:
     std::unique_ptr<Slider> volumeKnob;
+    std::unique_ptr<Slider> attackKnob;
+    std::unique_ptr<Slider> decayKnob;
+    std::unique_ptr<Slider> sustainKnob;
+    std::unique_ptr<Slider> releaseKnob;
+
     std::unique_ptr<Label> volumeKnobLabel;
-    std::unique_ptr<ImageButton> openFileButton;
-    std::unique_ptr<ImageButton> aboutButton;
-    std::shared_ptr<SampleViewer> sampleViewer;
+    std::unique_ptr<Label> attackKnobLabel;
+    std::unique_ptr<Label> decayKnobLabel;
+    std::unique_ptr<Label> sustainKnobLabel;
+    std::unique_ptr<Label> releaseKnobLabel;
+
     std::unique_ptr<Label> loadSampleTip;
+
+    std::shared_ptr<SampleViewer> sampleViewer;
     std::unique_ptr<PianoRoll> pianoRoll;
+
     std::unique_ptr<ImageButton> playButton;
     std::unique_ptr<ImageButton> stopButton;
+    std::unique_ptr<ImageButton> openFileButton;
+    std::unique_ptr<ImageButton> aboutButton;
+
+    ADSR::Parameters adsrParams;
 
     Image backgroundImage;
 
