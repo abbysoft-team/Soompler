@@ -32,6 +32,8 @@ private:
     bool keyPressed(const KeyPress &key, Component *originatingComponent);
     void enableEditor(bool enabled);
     void printNewComponentPositions();
+    void increaseSelectedComponentSize();
+    void decreaseSelectedComponentSize();
 
     Component* selectedComponent;
     Component* editableComponent;

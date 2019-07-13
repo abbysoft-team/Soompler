@@ -73,6 +73,7 @@ void GuiEditor::mouseDown(const MouseEvent &event)
 void GuiEditor::mouseUp(const MouseEvent &event)
 {
     selectedComponent = nullptr;
+    editableComponent->repaint();
 }
 
 void GuiEditor::mouseMove(const MouseEvent &event)
@@ -159,6 +160,12 @@ bool GuiEditor::keyPressed(const KeyPress &key, Component *originatingComponent)
         enableEditor(!isEnabled);
     } else if (key == KeyPress::F2Key) {
         printNewComponentPositions();
+    } else if (key == KeyPress::upKey) {
+        increaseSelectedComponentSize();
+        editableComponent->repaint();
+    } else if (key == KeyPress::downKey) {
+        decreaseSelectedComponentSize();
+        editableComponent->repaint();
     }
 }
 
@@ -180,9 +187,52 @@ void GuiEditor::printNewComponentPositions()
 
     for (auto component : components) {
         DBG(component->getName());
+        DBG("position");
         DBG(component->getX());
         DBG(component->getY());
+        DBG("size");
+        DBG(component->getWidth());
+        DBG(component->getHeight());
     }
 
     DBG("=====================================");
+}
+
+void GuiEditor::increaseSelectedComponentSize()
+{
+    if (selectedComponent == nullptr) {
+        return;
+    }
+
+    auto newWidth = selectedComponent->getWidth() * Settings::GUI_EDITOR_SIZE_STEP_COEFF_INCR;
+    auto newHeight = selectedComponent->getHeight() * Settings::GUI_EDITOR_SIZE_STEP_COEFF_INCR;
+
+    // check for out of bounds situation
+    Rectangle<int> newRect = Rectangle<int>(selectedComponent->getX(), selectedComponent->getY(), newWidth, newHeight);
+    if (!editableComponent->contains(newRect.getTopLeft())) {
+        // out of bounds
+        return;
+    }
+    if (!editableComponent->contains(newRect.getBottomRight())) {
+        // out of bounds
+        return;
+    }
+
+    selectedComponent->setSize(newWidth, newHeight);
+}
+
+void GuiEditor::decreaseSelectedComponentSize()
+{
+    if (selectedComponent == nullptr) {
+        return;
+    }
+
+    auto newWidth = selectedComponent->getWidth() * Settings::GUI_EDITOR_SIZE_STEP_COEFF_DECR;
+    auto newHeight = selectedComponent->getHeight() * Settings::GUI_EDITOR_SIZE_STEP_COEFF_DECR;
+
+    if (newWidth <= 0 && newHeight <= 0) {
+        return;
+    }
+
+    selectedComponent->setSize(newWidth, newHeight);
 }
