@@ -136,6 +136,13 @@ void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
     audioSource.buffer = &buffer;
     audioSource.startSample = 0;
     audioSource.numSamples = buffer.getNumSamples();
+
+//    // ADSR
+//    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+//    auto adsr = voice->getAdsr();
+
+//    auto adsrValue = adsr.getNextSample();
+
     transportSource.getNextAudioBlock(audioSource);
 }
 
