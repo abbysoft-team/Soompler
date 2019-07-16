@@ -5,7 +5,7 @@
 
 Soompler is JUCE based sampler VST and Standalone plugin for Linux, MacOS, Windows.
 
-![alt Screenshot](https://i.imgur.com/FNHSiEu.png)
+![alt Screenshot](https://i.ibb.co/bK4MLvD/2019-07-16-5-38-24.png)
 
 Notice. At this point license is proprietary, thus any commercial usage of this code or its parts prohibited. All code is property of AbbySoft team and all its members.
 
