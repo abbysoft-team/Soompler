@@ -57,6 +57,21 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
                                Image(), 1.000f, Colour (0x00000000),
                                Image(), 1.000f, Colour (0x00000000));
     aboutButton->setBounds (52, 8, 39, 32);
+    
+    loopButton.reset (new ToggledImageButton ("loop button"));
+    addAndMakeVisible (loopButton.get());
+    editor.addToGuiEditor (loopButton.get());
+    loopButton->setTooltip (TRANS("Loop sample playback"));
+    loopButton->setButtonText (TRANS("Loop"));
+    loopButton->addListener (this);
+    loopButton->setImages (false, true, true,
+                            ImageCache::getFromMemory (BinaryData::loop_png, BinaryData::loop_pngSize),
+                            1.000f, Colour (0x00000000),
+                            Image(), 1.000f, Colour (0x00000000),
+                            Image(), 1.000f, Colour (0x00000000));
+    loopButton->setBounds (450, 60, 30, 30);
+    loopButton->setEnabled(false);
+    
 
     sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor));
     addAndMakeVisible (sampleViewer.get());
@@ -282,6 +297,10 @@ void MainPanel::buttonClicked (Button* buttonThatWasClicked)
     {
         aboutButtonClicked();
     }
+    else if (buttonThatWasClicked == loopButton.get())
+    {
+        loopButtonClicked();
+    }
 //    else if (buttonThatWasClicked == playButton.get())
 //    {
 //        playSampleButtonClicked();
@@ -345,6 +364,8 @@ void MainPanel::transportStateChanged(TransportState state)
         decayKnob->setEnabled(true);
         sustainKnob->setEnabled(true);
         releaseKnob->setEnabled(true);
+        
+        loopButton->setEnabled(true);
         break;
     case Starting:
         break;
@@ -356,3 +377,8 @@ void MainPanel::transportStateChanged(TransportState state)
         break;
     }
 }
+
+void MainPanel::loopButtonClicked() {
+    processor.setLoopEnabled(loopButton->isToggled());
+}
+

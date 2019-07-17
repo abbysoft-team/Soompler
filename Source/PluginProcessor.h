@@ -109,6 +109,8 @@ public:
     void setSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener);
 
     void setAdsrParams(ADSR::Parameters params);
+    
+    void setLoopEnabled(bool loopEnable);
 
 private:
     //==============================================================================

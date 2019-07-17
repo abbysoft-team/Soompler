@@ -110,6 +110,8 @@ public:
     void setVolume(float volume);
 
     void removeListener();
+    
+    void enableLooping(bool enable);
 
 private:
     //==============================================================================
@@ -117,6 +119,7 @@ private:
     double sourceSamplePosition = 0;
     float lgain = 0, rgain = 0;
     float volume;
+    bool loopingEnabled;
 
     int64 firstSampleToPlay = 0;
     int64 endSample = 0;

@@ -88,7 +88,10 @@ constexpr auto DEFAULT_ATTACK_TIME = 0.0f;
 constexpr auto DEFAULT_DECAY_TIME = 0.1f;
 constexpr auto DEFAULT_RELEASE_TIME = 0.0f;
 constexpr auto DEFAULT_SUSTAIN_LEVEL = 1.0f;
+    
+// TOGGLE BUTTON
+const auto TOGGLED_BUTTON_MASK_COLOR = Colour((uint8) 255, (uint8) 128, (uint8) 128, (uint8) 128);
 
-}
+};
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H

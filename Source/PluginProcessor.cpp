@@ -443,6 +443,11 @@ void SoomplerAudioProcessor::setAdsrParams(ADSR::Parameters params)
     sound->setAdsrParams(params);
 }
 
+void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
+    auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
+    voice->enableLooping(loopEnable);
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()

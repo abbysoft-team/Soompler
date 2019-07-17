@@ -5,6 +5,7 @@
 #include "PluginProcessor.h"
 #include "PianoRoll.h"
 #include "GuiEditor.h"
+#include "ToggledImageButton.h"
 
 class MainPanel  : public Component,
                    public Slider::Listener,
@@ -46,6 +47,7 @@ private:
 //    std::unique_ptr<ImageButton> stopButton;
     std::unique_ptr<ImageButton> openFileButton;
     std::unique_ptr<ImageButton> aboutButton;
+    std::unique_ptr<ToggledImageButton> loopButton;
 
     ADSR::Parameters adsrParams;
 
@@ -60,6 +62,7 @@ private:
     void aboutButtonClicked();
     void playSampleButtonClicked();
     void stopSampleButtonClicked();
+    void loopButtonClicked();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPanel)
 };

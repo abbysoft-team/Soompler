@@ -20,9 +20,9 @@ ExtendedSound::ExtendedSound (const String& soundName,
                             double releaseTimeSecs,
                             double maxSampleLengthSeconds)
     : name (soundName),
-      sourceSampleRate (source.sampleRate),
-      midiNotes (notes),
-      midiRootNote (midiNoteForNormalPitch)
+    sourceSampleRate (source.sampleRate),
+    midiNotes (notes),
+    midiRootNote (midiNoteForNormalPitch)
 {
     if (sourceSampleRate > 0 && source.lengthInSamples > 0)
     {
@@ -54,7 +54,7 @@ void ExtendedSound::setAdsrParams(ADSR::Parameters adsr)
 }
 
 //==============================================================================
-ExtendedVoice::ExtendedVoice(ChangeListener* listener) : eventListener(listener), volume(0)
+    ExtendedVoice::ExtendedVoice(ChangeListener* listener) : eventListener(listener), volume(0), loopingEnabled(false)
 {
 }
 
@@ -169,8 +169,12 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
             // if current position is bigger than endSample
             if (sourceSamplePosition + firstSampleToPlay > endSample)
             {
-                stopNote (0.0f, false);
-                break;
+                if (loopingEnabled) {
+                    sourceSamplePosition = 0.0;
+                } else {
+                    stopNote (0.0f, false);
+                    break;
+                }
             }
         }
     }
@@ -205,5 +209,9 @@ void ExtendedVoice::removeListener()
 {
     this->eventListener = nullptr;
 }
+    
+    void ExtendedVoice::enableLooping(bool enable) {
+        this->loopingEnabled = enable;
+    }
 
 }

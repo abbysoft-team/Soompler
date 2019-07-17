@@ -9,6 +9,10 @@
               pluginCode="as1" cppLanguageStandard="14">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="hlDDr3" name="ToggledImageButton.cpp" compile="1" resource="0"
+            file="Source/ToggledImageButton.cpp"/>
+      <FILE id="WE99ZN" name="ToggledImageButton.h" compile="0" resource="0"
+            file="Source/ToggledImageButton.h"/>
       <FILE id="gupJ6Y" name="GuiEditor.h" compile="0" resource="0" file="Source/GuiEditor.h"/>
       <FILE id="xF0vjE" name="GuiEditor.cpp" compile="1" resource="0" file="Source/GuiEditor.cpp"/>
       <FILE id="HE5JfF" name="TransportInfo.h" compile="0" resource="0" file="Source/TransportInfo.h"/>
