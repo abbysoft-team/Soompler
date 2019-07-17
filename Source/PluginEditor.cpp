@@ -30,7 +30,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // subscribe to thumbnail events, to catch thumbnail fully loaded time
     processor.getThumbnail().addChangeListener(this);
 
-    LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypefaceName(mainFont.getTypefaceName());
+    //LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypefaceName(mainFont.getTypefaceName());
 }
 
 //==============================================================================
