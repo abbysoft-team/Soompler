@@ -3,6 +3,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MidiEventSupplier.h"
 #include "MidiEventConsumer.h"
+#include <array>
 
 class KeyInfo
 {

@@ -6,7 +6,7 @@
               pluginFormats="buildAUv3,buildStandalone,buildVST,buildVST3"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginDesc="Easy to use sampler" pluginManufacturerCode="abby"
-              pluginCode="as1" cppLanguageStandard="latest">
+              pluginCode="as1" cppLanguageStandard="14">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
       <FILE id="gupJ6Y" name="GuiEditor.h" compile="0" resource="0" file="Source/GuiEditor.h"/>

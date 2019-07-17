@@ -66,9 +66,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    std::optional<File> getLoadedSample() const {
-        return loadedSample;
-    }
+    std::shared_ptr<File> getLoadedSample() const;
 
     AudioThumbnail& getThumbnail() {
         return thumbnail;
@@ -115,7 +113,7 @@ public:
 private:
     //==============================================================================
 
-    std::optional<File> loadedSample;
+    std::shared_ptr<File> loadedSample;
     Synthesiser synth;
     int currentSample;
 
@@ -138,8 +136,8 @@ private:
     SampleInfo sampleInfo;
     std::shared_ptr<SampleInfoListener> sampleInfoListener;
 
-    SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
-    AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);
+    SynthesiserSound::Ptr getSampleData(std::shared_ptr<File> sampleFile);
+    AudioFormat* getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);

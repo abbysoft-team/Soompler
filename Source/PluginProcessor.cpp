@@ -146,6 +146,10 @@ void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
     transportSource.getNextAudioBlock(audioSource);
 }
 
+std::shared_ptr<File> SoomplerAudioProcessor::getLoadedSample() const {
+    return loadedSample;
+}
+
 void SoomplerAudioProcessor::setSampleStartPosition(int64 sample)
 {
     startSample = sample;
@@ -252,7 +256,7 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
 {
-    this->loadedSample = sampleFile;
+    this->loadedSample = std::make_shared<File>(sampleFile);
 
     auto sound = getSampleData(loadedSample);
     if (sound != nullptr)
@@ -281,7 +285,7 @@ void SoomplerAudioProcessor::notifySampleInfoListeners()
 
 void SoomplerAudioProcessor::playSample()
 {
-    if (!loadedSample.has_value())
+    if (loadedSample == nullptr)
     {
         DBG("sample is not loaded and cannot be played");
         return;
@@ -321,8 +325,12 @@ void SoomplerAudioProcessor::updateTransportState()
     }
 }
 
-SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> sampleFile)
+SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File> sampleFile)
 {
+    if (sampleFile == nullptr) {
+        return nullptr;
+    }
+    
     //auto* soundBuffer = sampleFile->createInputStream();
     AudioFormat* format = getFormatForFileOrNullptr(sampleFile);
     if (format == nullptr)
@@ -330,10 +338,10 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
         return nullptr;
     }
 
-    auto formatReader = formatManager.createReaderFor(sampleFile.value());
+    auto formatReader = formatManager.createReaderFor(*sampleFile);
 
     setTransportSource(formatReader);
-    thumbnail.setSource(new FileInputSource(sampleFile.value()));
+    thumbnail.setSource(new FileInputSource(*sampleFile));
 
     BigInteger midiNotes;
     midiNotes.setRange(0, 126, true);
@@ -341,7 +349,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
                                        Settings::DEFAULT_ATTACK_TIME, Settings::DEFAULT_RELEASE_TIME, Settings::MAX_SAMPLE_LENGTH);
 }
 
-AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)
+AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile)
 {
     AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile->getFileExtension());
 
