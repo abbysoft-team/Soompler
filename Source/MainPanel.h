@@ -42,8 +42,8 @@ private:
     std::shared_ptr<SampleViewer> sampleViewer;
     std::unique_ptr<PianoRoll> pianoRoll;
 
-    std::unique_ptr<ImageButton> playButton;
-    std::unique_ptr<ImageButton> stopButton;
+//    std::unique_ptr<ImageButton> playButton;
+//    std::unique_ptr<ImageButton> stopButton;
     std::unique_ptr<ImageButton> openFileButton;
     std::unique_ptr<ImageButton> aboutButton;
 
