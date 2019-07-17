@@ -43,7 +43,7 @@ public:
     /** Returns the audio sample data.
         This could return nullptr if there was a problem loading the data.
     */
-    const AudioBuffer<float>& getAudioData() const noexcept       { return *data.get(); }
+    const std::shared_ptr<AudioBuffer<float>> getAudioData() const noexcept       { return data; }
 
     //==============================================================================
     /** Changes the parameters of the ADSR envelope which will be applied to the sample. */
@@ -55,12 +55,14 @@ public:
 
     void setAdsrParams(ADSR::Parameters adrs);
 
+    void reverse();
+
 private:
     //==============================================================================
     friend class ExtendedVoice;
 
     String name;
-    std::unique_ptr<AudioBuffer<float>> data;
+    std::shared_ptr<AudioBuffer<float>> data;
     double sourceSampleRate;
     BigInteger midiNotes;
     int length = 0, midiRootNote = 0;

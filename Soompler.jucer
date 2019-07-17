@@ -76,7 +76,7 @@
         <MODULEPATH id="juce_opengl" path="../../../software/JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
-    <CLION targetFolder="Builds/CLion" clionMakefileEnabled="1">
+    <CLION targetFolder="Builds/CLion" clionMakefileEnabled="1" clionXcodeEnabled="1">
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../software/JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../../software/JUCE/modules"/>

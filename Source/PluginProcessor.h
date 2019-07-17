@@ -112,6 +112,8 @@ public:
     
     void setLoopEnabled(bool loopEnable);
 
+    void reverseSample();
+
 private:
     //==============================================================================
 

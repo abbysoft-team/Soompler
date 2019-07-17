@@ -53,6 +53,11 @@ void ExtendedSound::setAdsrParams(ADSR::Parameters adsr)
     this->params = adsr;
 }
 
+void ExtendedSound::reverse()
+{
+    this->data->reverse(0, data->getNumSamples());
+}
+
 //==============================================================================
     ExtendedVoice::ExtendedVoice(ChangeListener* listener) : eventListener(listener), volume(0), loopingEnabled(false)
 {

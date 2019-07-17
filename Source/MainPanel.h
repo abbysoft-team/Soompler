@@ -49,6 +49,8 @@ private:
     std::unique_ptr<ImageButton> aboutButton;
     std::unique_ptr<ToggledImageButton> loopButton;
 
+    std::unique_ptr<ToggleButton> reverseButton;
+
     ADSR::Parameters adsrParams;
 
     Image backgroundImage;
@@ -63,6 +65,7 @@ private:
     void playSampleButtonClicked();
     void stopSampleButtonClicked();
     void loopButtonClicked();
+    void reverseButtonClicked();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPanel)
 };

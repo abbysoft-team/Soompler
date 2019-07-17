@@ -448,6 +448,20 @@ void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
     voice->enableLooping(loopEnable);
 }
 
+void SoomplerAudioProcessor::reverseSample()
+{
+    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
+    if (sound == nullptr || !thumbnail.isFullyLoaded()) {
+        return;
+    }
+
+    sound->reverse();
+    thumbnail.reset(2, getSampleRate());
+
+    auto newAudioData = sound->getAudioData();
+    thumbnail.addBlock(thumbnail.getNumSamplesFinished(), *newAudioData, 0, newAudioData->getNumSamples());
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()

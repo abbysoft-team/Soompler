@@ -227,6 +227,14 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     sustainKnob->setEnabled(false);
     releaseKnob->setEnabled(false);
 
+    // Reverse sample
+    reverseButton.reset(new ToggleButton(TRANS("Reverse\n")));
+    addAndMakeVisible(reverseButton.get());
+    editor.addToGuiEditor(reverseButton.get());
+    reverseButton->setBounds(380, 230, 100, 50);
+    reverseButton->addListener(this);
+    reverseButton->setEnabled(false);
+
     // add GUI editor last
     // it ensures that gui overlay will work properly
     editor.initOverlay();
@@ -301,6 +309,9 @@ void MainPanel::buttonClicked (Button* buttonThatWasClicked)
     {
         loopButtonClicked();
     }
+    else if (buttonThatWasClicked == reverseButton.get()) {
+        reverseButtonClicked();
+    }
 //    else if (buttonThatWasClicked == playButton.get())
 //    {
 //        playSampleButtonClicked();
@@ -366,6 +377,7 @@ void MainPanel::transportStateChanged(TransportState state)
         releaseKnob->setEnabled(true);
         
         loopButton->setEnabled(true);
+        reverseButton->setEnabled(true);
         break;
     case Starting:
         break;
@@ -380,5 +392,9 @@ void MainPanel::transportStateChanged(TransportState state)
 
 void MainPanel::loopButtonClicked() {
     processor.setLoopEnabled(loopButton->isToggled());
+}
+
+void MainPanel::reverseButtonClicked() {
+    processor.reverseSample();
 }
 
