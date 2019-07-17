@@ -46,6 +46,7 @@
     <FILE id="XCh1dc" name="play.png" compile="0" resource="1" file="Resources/play.png"/>
     <FILE id="Fpn4No" name="stop.png" compile="0" resource="1" file="Resources/stop.png"/>
     <FILE id="RtY5I1" name="openFile.png" compile="0" resource="1" file="Resources/openFile.png"/>
+    <FILE id="c5OhDw" name="loop.png" compile="0" resource="1" file="Resources/loop.png"/>
     <FILE id="SJMWVx" name="background.png" compile="1" resource="1" file="Resources/background.png"/>
   </MAINGROUP>
   <EXPORTFORMATS>
