@@ -12,6 +12,7 @@ static float getAverageKeyWidth();
 PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer)
     : midiSupplier(midiSupplier), midiConsumer(midiConsumer)
 {
+    draggedMarker = noMarker;
     setSize (Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
 
     calculateKeysInfo();
@@ -27,8 +28,8 @@ void PianoRoll::calculateKeysInfo()
 
     auto currentIndex = 0;
     auto nextWhiteKeyX = 0;
-    // init only keys after 48 (C2), cos it's first on the screen
-    for (int i = 48; i < MAX_KEYS; i++) {
+    // init only keys after first key on the screen
+    for (int i = Settings::FIRST_KEY_ON_SCREEN; i < MAX_KEYS; i++) {
         // cycling through pattern array
         if (currentIndex == 12) {
             currentIndex = 0;
@@ -81,6 +82,13 @@ void PianoRoll::paint (Graphics& g)
     drawBlackNotes(g);
     drawActiveNotes(g, getActiveMidiNotes());
     drawNoteTips(g);
+
+    // no sample loaded yet, dont draw markers
+    if (sample == nullptr) {
+        return;
+    }
+
+    drawDisabledNotesMask(g);
 
     // restore start Y
     transform = transform.translated(0, -1 * Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
@@ -190,6 +198,21 @@ void PianoRoll::mouseDown(const MouseEvent &event)
     auto position = event.getPosition();
     auto keyNumber = getKeyClicked(position);
     midiConsumer.noteOn(keyNumber);
+
+    if (sample == nullptr) {
+        return;
+    }
+
+    // markers have negative Y because of render way, so here we compensate it
+    auto positionForMarkers = Point<float>(position.x, position.y - Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
+
+    if (rootMarker.contains(positionForMarkers)) {
+        draggedMarker = rootMarker;
+    } else if (minMarker.contains(positionForMarkers)) {
+        draggedMarker = minMarker;
+    } else if (maxMarker.contains(positionForMarkers)) {
+        draggedMarker = maxMarker;
+    }
 }
 
 void PianoRoll::mouseUp(const MouseEvent &event)
@@ -197,6 +220,28 @@ void PianoRoll::mouseUp(const MouseEvent &event)
     auto position = event.getPosition();
     auto keyNumber = getKeyClicked(position);
     midiConsumer.noteOff(keyNumber);
+
+    draggedMarker = noMarker;
+}
+
+void PianoRoll::mouseDrag(const MouseEvent &event)
+{
+    auto position = event.getPosition();
+    if (draggedMarker == noMarker) {
+        return;
+    }
+
+    position.y += Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT;
+
+    if (draggedMarker == rootMarker) {
+        rootMarkerDragged(position);
+    } else if (draggedMarker == minMarker) {
+        minMarkerDragged(position);
+    } else if (draggedMarker == maxMarker) {
+        maxMarkerDragged(position);
+    } else {
+        DBG("why it is not in list");
+    }
 }
 
 int PianoRoll::getKeyClicked(Point<int> point)
@@ -239,14 +284,20 @@ void drawNoteTips(Graphics& g)
 void PianoRoll::drawNoteRangeAndRoot(Graphics& g)
 {
     g.setColour(Settings::NOTE_ROOT_MARKER_COLOR);
-    drawMarker(Settings::DEFAULT_ROOT_NOTE, g);
-
+    g.fillPath(rootMarker);
     g.setColour(Settings::NOTE_RANGE_MARKER_COLOR);
-    drawMarker(Settings::DEFAULT_MIN_NOTE, g);
-    drawMarker(Settings::DEFAULT_MAX_NOTE, g);
+    g.fillPath(minMarker);
+    g.fillPath(maxMarker);
 }
 
-void PianoRoll::drawMarker(int noteNum, Graphics& g)
+void PianoRoll::createMarkers(std::shared_ptr<SampleInfo> info)
+{
+    rootMarker = createMarker(info->rootNote);
+    minMarker = createMarker(info->minNote);
+    maxMarker = createMarker(info->maxNote);
+}
+
+Path PianoRoll::createMarker(int noteNum)
 {
     auto x = keysInfo[noteNum].x + (keysInfo[noteNum].width / 2);
     auto y = -1 * Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT;
@@ -256,7 +307,61 @@ void PianoRoll::drawMarker(int noteNum, Graphics& g)
 
     marker.addTriangle(Point<float>(x - halfSize, y), Point<float>(x+halfSize, y), Point<float>(x, 0));
 
-    g.fillPath(marker);
+    return marker;
+}
+
+void PianoRoll::drawDisabledNotesMask(Graphics& g)
+{
+    // keys on the left from active range
+    auto key = keysInfo[0];
+    for (int i = sample->minNote - 1; i >= Settings::FIRST_KEY_ON_SCREEN; i--) {
+        key = keysInfo[i];
+
+        g.setColour(Settings::PIANO_ROLL_DISABLED_MASK_COLOR);
+        g.fillRect(key.x, .0f, key.width, key.height);
+    }
+
+    // keys on the right from active region
+    for (int i = sample->maxNote + 1; i < keysInfo.size(); i++) {
+        key = keysInfo[i];
+        if (key.x > this->getWidth()) {
+            break;
+        }
+
+        g.setColour(Settings::PIANO_ROLL_DISABLED_MASK_COLOR);
+        g.fillRect(key.x, .0f, key.width, key.height);
+    }
+}
+
+void PianoRoll::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
+{
+    this->sample = info;
+
+    createMarkers(info);
+}
+
+void PianoRoll::rootMarkerDragged(Point<int> position)
+{
+    auto keyClicked = getKeyClicked(position);
+    rootMarker = createMarker(keyClicked);
+    draggedMarker = rootMarker;
+    sample->rootNote = keyClicked;
+}
+
+void PianoRoll::minMarkerDragged(Point<int> position)
+{
+    auto keyClicked = getKeyClicked(position);
+    minMarker = createMarker(keyClicked);
+    draggedMarker = minMarker;
+    sample->minNote = keyClicked;
+}
+
+void PianoRoll::maxMarkerDragged(Point<int> position)
+{
+    auto keyClicked = getKeyClicked(position);
+    maxMarker = createMarker(keyClicked);
+    draggedMarker = maxMarker;
+    sample->maxNote = keyClicked;
 }
 
 void PianoRoll::resized()

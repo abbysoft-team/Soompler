@@ -41,7 +41,7 @@ private:
     std::unique_ptr<Label> loadSampleTip;
 
     std::shared_ptr<SampleViewer> sampleViewer;
-    std::unique_ptr<PianoRoll> pianoRoll;
+    std::shared_ptr<PianoRoll> pianoRoll;
 
 //    std::unique_ptr<ImageButton> playButton;
 //    std::unique_ptr<ImageButton> stopButton;

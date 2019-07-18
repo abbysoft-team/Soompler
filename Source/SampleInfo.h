@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "Settings.h"
 
 /**
  * All required info about sample.
@@ -24,14 +25,15 @@ public:
 
     SampleInfo(float lengthInSeconds, float sampleRate, String sampleName)
     {
-        DBG("New file: ");
-        DBG(sampleName);
         this->lengthInSeconds = lengthInSeconds;
         this->sampleRate = sampleRate;
         this->lengthInSamples = lengthInSeconds * sampleRate;
         this->startSample = 0;
         this->endSample = lengthInSamples;
         this->sampleName = sampleName;
+        this->rootNote = Settings::DEFAULT_ROOT_NOTE;
+        this->minNote = Settings::DEFAULT_MIN_NOTE;
+        this->maxNote = Settings::DEFAULT_MAX_NOTE;
     }
 
     ~SampleInfo() = default;

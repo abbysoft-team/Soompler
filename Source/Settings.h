@@ -40,6 +40,7 @@ const auto PIANO_ROLL_BLACK_NOTE_COLOR = Colour(20, 20, 20);
 const auto PIANO_ROLL_BLACK_NOTE_TOP_COLOR = Colour((uint8) 154, (uint8) 156, (uint8) 160, (uint8) 51);
 const auto PIANO_ROLL_BLACK_NOTE_HIGHLIGHTS_COLOR = Colour((uint8) 230, (uint8) 230, (uint8) 230, (uint8) 128);
 const auto PIANO_ROLL_ACTIVE_KEY_MASK_COLOR = Colour((uint8) 220, (uint8) 128, (uint8) 128, (uint8) 150);
+const auto PIANO_ROLL_DISABLED_MASK_COLOR = Colour((uint8) 0, (uint8) 0, (uint8) 0, (uint8) 156);
 const auto PIANO_ROLL_TIPS_FONT = Font(10);
 
 constexpr auto PIANO_ROLL_WIDTH = WINDOW_WIDTH;
@@ -95,12 +96,12 @@ constexpr auto DEFAULT_SUSTAIN_LEVEL = 1.0f;
 const auto TOGGLED_BUTTON_MASK_COLOR = Colour((uint8) 255, (uint8) 128, (uint8) 128, (uint8) 128);
 
 // NOTE
+constexpr auto FIRST_KEY_ON_SCREEN = 48;
 constexpr auto DEFAULT_ROOT_NOTE = 60;
 const auto DEFAULT_MIN_NOTE = DEFAULT_ROOT_NOTE - 12;
 const auto DEFAULT_MAX_NOTE = DEFAULT_ROOT_NOTE + 12;
 const auto NOTE_ROOT_MARKER_COLOR = Colour(255, 128, 128);
 const auto NOTE_RANGE_MARKER_COLOR = Colour(255, 200, 128);
-
 }
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H

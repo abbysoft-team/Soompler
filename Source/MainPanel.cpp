@@ -84,7 +84,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     // link processor with sampleViewer
     auto sampleInfoListener = static_cast<SampleInfoListener*> (&processor);
     sampleViewer->setSampleInfoListener(std::shared_ptr<SampleInfoListener>(sampleInfoListener));
-    processor.setSampleInfoListener(sampleViewer);
+    processor.addSampleInfoListener(sampleViewer);
 
     loadSampleTip.reset (new Label ("new label",
                             TRANS("Load sample by clicking load sample button in the upper left corner\n")));
@@ -100,6 +100,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     pianoRoll.reset (new PianoRoll(processor, processor));
     pianoRoll->setBounds (Settings::PIANO_ROLL_BOUNDS);
     pianoRoll->setName ("piano roll component");
+    processor.addSampleInfoListener(pianoRoll);
 
     addAndMakeVisible (pianoRoll.get());
     editor.addToGuiEditor (pianoRoll.get());

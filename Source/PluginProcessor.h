@@ -106,7 +106,7 @@ public:
 
     std::shared_ptr<TransportInfo> getTransportInfo() override;
 
-    void setSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener);
+    void addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener);
 
     void setAdsrParams(ADSR::Parameters params);
     
@@ -137,8 +137,8 @@ private:
 
     double volume;
 
-    SampleInfo sampleInfo;
-    std::shared_ptr<SampleInfoListener> sampleInfoListener;
+    std::shared_ptr<SampleInfo> sampleInfo;
+    std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
 
     SynthesiserSound::Ptr getSampleData(std::shared_ptr<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile);

@@ -22,9 +22,7 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    startSample(0),
                                                    endSample(0),
                                                    volume(0.5),
-                                                   currentSample(0),
-                                                   sampleInfo(0, 44100, ""),
-                                                   sampleInfoListener(nullptr)
+                                                   currentSample(0)
 {
     synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
@@ -169,6 +167,7 @@ void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
 
 void SoomplerAudioProcessor::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
 {
+    this->sampleInfo = info;
     setSampleStartPosition(info->startSample);
     setSampleEndPosition(info->endSample);
 }
@@ -269,17 +268,15 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
     setSampleEndPosition(transportSource.getTotalLength());
     notifyTransportStateChanged(TransportState::Ready);
 
-    sampleInfo = SampleInfo(transportSource.getLengthInSeconds(), getSampleRate(), sampleFile.getFileName());
+    sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), getSampleRate(), sampleFile.getFileName());
 
     notifySampleInfoListeners();
 }
 
 void SoomplerAudioProcessor::notifySampleInfoListeners()
 {
-    if (sampleInfoListener != nullptr) {
-        DBG("new sample received");
-        DBG(sampleInfo.sampleName);
-        sampleInfoListener.get()->newSampleInfoRecieved(std::shared_ptr<SampleInfo>(&sampleInfo));
+    for (auto sampleInfoListener : sampleInfoListeners) {
+        sampleInfoListener->newSampleInfoRecieved(sampleInfo);
     }
 }
 
@@ -428,9 +425,9 @@ std::shared_ptr<TransportInfo> SoomplerAudioProcessor::getTransportInfo()
     return info;
 }
 
-void SoomplerAudioProcessor::setSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener)
+void SoomplerAudioProcessor::addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener)
 {
-    this->sampleInfoListener = sampleInfoListener;
+    this->sampleInfoListeners.push_back(sampleInfoListener);
 }
 
 void SoomplerAudioProcessor::setAdsrParams(ADSR::Parameters params)
