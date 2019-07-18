@@ -22,6 +22,14 @@ public:
     }
 };
 
+enum MarkerType
+{
+    NO_MARKER,
+    MIN_NOTE,
+    MAX_NOTE,
+    ROOT_NOTE
+};
+
 //==============================================================================
 /**
 
@@ -47,13 +55,12 @@ private:
 
     std::shared_ptr<SampleInfo> sample;
 
-    Path noMarker;
     Path rootMarker;
     Path minMarker;
     Path maxMarker;
 
     // Which marker is dragged now
-    Path draggedMarker;
+    MarkerType draggedMarker;
 
     std::vector<int> getActiveMidiNotes();
     void calculateKeysInfo();
@@ -69,7 +76,7 @@ private:
 
     void drawNoteRangeAndRoot(Graphics& g);
     void createMarkers(std::shared_ptr<SampleInfo> info);
-    Path createMarker(int noteNum);
+    Path createMarker(int noteNum, bool root);
 
     void drawDisabledNotesMask(Graphics& g);
 

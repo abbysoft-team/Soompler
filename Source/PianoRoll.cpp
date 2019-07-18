@@ -12,7 +12,7 @@ static float getAverageKeyWidth();
 PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer)
     : midiSupplier(midiSupplier), midiConsumer(midiConsumer)
 {
-    draggedMarker = noMarker;
+    draggedMarker = NO_MARKER;
     setSize (Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
 
     calculateKeysInfo();
@@ -207,11 +207,14 @@ void PianoRoll::mouseDown(const MouseEvent &event)
     auto positionForMarkers = Point<float>(position.x, position.y - Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
 
     if (rootMarker.contains(positionForMarkers)) {
-        draggedMarker = rootMarker;
+        draggedMarker = ROOT_NOTE;
+        DBG("root");
     } else if (minMarker.contains(positionForMarkers)) {
-        draggedMarker = minMarker;
+        DBG("min");
+        draggedMarker = MIN_NOTE;
     } else if (maxMarker.contains(positionForMarkers)) {
-        draggedMarker = maxMarker;
+        DBG("max");
+        draggedMarker = MAX_NOTE;
     }
 }
 
@@ -221,26 +224,24 @@ void PianoRoll::mouseUp(const MouseEvent &event)
     auto keyNumber = getKeyClicked(position);
     midiConsumer.noteOff(keyNumber);
 
-    draggedMarker = noMarker;
+    draggedMarker = NO_MARKER;
 }
 
 void PianoRoll::mouseDrag(const MouseEvent &event)
 {
     auto position = event.getPosition();
-    if (draggedMarker == noMarker) {
+    if (draggedMarker == NO_MARKER) {
         return;
     }
 
     position.y += Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT;
 
-    if (draggedMarker == rootMarker) {
+    if (draggedMarker == ROOT_NOTE) {
         rootMarkerDragged(position);
-    } else if (draggedMarker == minMarker) {
+    } else if (draggedMarker == MIN_NOTE) {
         minMarkerDragged(position);
-    } else if (draggedMarker == maxMarker) {
+    } else if (draggedMarker == MAX_NOTE) {
         maxMarkerDragged(position);
-    } else {
-        DBG("why it is not in list");
     }
 }
 
@@ -292,15 +293,19 @@ void PianoRoll::drawNoteRangeAndRoot(Graphics& g)
 
 void PianoRoll::createMarkers(std::shared_ptr<SampleInfo> info)
 {
-    rootMarker = createMarker(info->rootNote);
-    minMarker = createMarker(info->minNote);
-    maxMarker = createMarker(info->maxNote);
+    rootMarker = createMarker(info->rootNote, true);
+    minMarker = createMarker(info->minNote, false);
+    maxMarker = createMarker(info->maxNote, false);
 }
 
-Path PianoRoll::createMarker(int noteNum)
+Path PianoRoll::createMarker(int noteNum, bool root)
 {
     auto x = keysInfo[noteNum].x + (keysInfo[noteNum].width / 2);
     auto y = -1 * Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT;
+    if (!root) {
+        // root marker must be bigger
+        y *= 0.8;
+    }
 
     auto marker = Path();
     auto halfSize = Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT / 2.0;
@@ -343,24 +348,58 @@ void PianoRoll::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
 void PianoRoll::rootMarkerDragged(Point<int> position)
 {
     auto keyClicked = getKeyClicked(position);
-    rootMarker = createMarker(keyClicked);
-    draggedMarker = rootMarker;
+    if (keyClicked == sample->rootNote) {
+        // no need to update
+        return;
+    }
+    if (keyClicked > sample->maxNote) {
+        // cannot go right
+        draggedMarker = MAX_NOTE;
+        return;
+    }
+    if (keyClicked < sample->minNote) {
+        // cannot go left
+        draggedMarker = MIN_NOTE;
+        return;
+    }
+
+    rootMarker = createMarker(keyClicked, true);
+    draggedMarker = ROOT_NOTE;
     sample->rootNote = keyClicked;
 }
 
 void PianoRoll::minMarkerDragged(Point<int> position)
 {
     auto keyClicked = getKeyClicked(position);
-    minMarker = createMarker(keyClicked);
-    draggedMarker = minMarker;
+    if (keyClicked == sample->minNote) {
+        // no need to update
+        return;
+    }
+    if (keyClicked < Settings::FIRST_KEY_ON_SCREEN) {
+        return;
+    }
+    if (keyClicked > sample->rootNote) {
+        return;
+    }
+
+    minMarker = createMarker(keyClicked, false);
+    draggedMarker = MIN_NOTE;
     sample->minNote = keyClicked;
 }
 
 void PianoRoll::maxMarkerDragged(Point<int> position)
 {
     auto keyClicked = getKeyClicked(position);
-    maxMarker = createMarker(keyClicked);
-    draggedMarker = maxMarker;
+    if (keyClicked == sample->maxNote) {
+        // no need to update
+        return;
+    }
+    if (position.x >= this->getWidth()) {
+        return;
+    }
+
+    maxMarker = createMarker(keyClicked, false);
+    draggedMarker = MAX_NOTE;
     sample->maxNote = keyClicked;
 }
 
