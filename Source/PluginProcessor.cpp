@@ -345,7 +345,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
 
     BigInteger midiNotes;
     midiNotes.setRange(0, 126, true);
-    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x48,
+    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, Settings::DEFAULT_ROOT_NOTE,
                                        Settings::DEFAULT_ATTACK_TIME, Settings::DEFAULT_RELEASE_TIME, Settings::MAX_SAMPLE_LENGTH);
 }
 

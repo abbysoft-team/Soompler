@@ -46,6 +46,11 @@ public:
     int64 endSample;
 
     String sampleName;
+
+    // root note and range for this sample
+    int rootNote;
+    int minNote;
+    int maxNote;
 };
 
 /**

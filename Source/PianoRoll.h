@@ -52,6 +52,9 @@ private:
     void fireNoteOn(int noteNumber);
     void fireNoteOff(int noteNumber);
 
+    void drawNoteRangeAndRoot(Graphics& g);
+    void drawMarker(int noteNum, Graphics& g);
+
     // stores some metadata for keys
     std::array<KeyInfo, MAX_KEYS> keysInfo;
 

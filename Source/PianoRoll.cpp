@@ -68,6 +68,11 @@ PianoRoll::~PianoRoll()
 //==============================================================================
 void PianoRoll::paint (Graphics& g)
 {
+    // move start Y for few pixels so we can draw markers at the end
+    auto transform = AffineTransform();
+    transform = transform.translated(0, Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
+    g.addTransform(transform);
+
     g.setColour(Settings::PIANO_ROLL_WHITE_COLOR);
     g.setGradientFill(Settings::PIANO_ROLL_GRADIENT);
     g.fillRect(0, 0, Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
@@ -76,6 +81,11 @@ void PianoRoll::paint (Graphics& g)
     drawBlackNotes(g);
     drawActiveNotes(g, getActiveMidiNotes());
     drawNoteTips(g);
+
+    // restore start Y
+    transform = transform.translated(0, -1 * Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
+    g.addTransform(transform);
+    drawNoteRangeAndRoot(g);
 }
 
 void drawNoteDelimiters(Graphics& g)
@@ -224,6 +234,29 @@ void drawNoteTips(Graphics& g)
         currentCNote++;
     }
 
+}
+
+void PianoRoll::drawNoteRangeAndRoot(Graphics& g)
+{
+    g.setColour(Settings::NOTE_ROOT_MARKER_COLOR);
+    drawMarker(Settings::DEFAULT_ROOT_NOTE, g);
+
+    g.setColour(Settings::NOTE_RANGE_MARKER_COLOR);
+    drawMarker(Settings::DEFAULT_MIN_NOTE, g);
+    drawMarker(Settings::DEFAULT_MAX_NOTE, g);
+}
+
+void PianoRoll::drawMarker(int noteNum, Graphics& g)
+{
+    auto x = keysInfo[noteNum].x + (keysInfo[noteNum].width / 2);
+    auto y = -1 * Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT;
+
+    auto marker = Path();
+    auto halfSize = Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT / 2.0;
+
+    marker.addTriangle(Point<float>(x - halfSize, y), Point<float>(x+halfSize, y), Point<float>(x, 0));
+
+    g.fillPath(marker);
 }
 
 void PianoRoll::resized()

@@ -6,7 +6,7 @@
 namespace Settings {
 
 constexpr int WINDOW_WIDTH = 500;
-constexpr int WINDOW_HEIGHT = 340;
+constexpr int WINDOW_HEIGHT = 350;
 const auto BUTTON_OPEN_FILE_POSITION = Rectangle<int>(10, 10, 100, 40);
 const auto BUTTON_PLAY_SAMPLE_POSITION = Rectangle<int>(WINDOW_WIDTH/2 + 5, BUTTON_OPEN_FILE_POSITION.getY(), 100, 40);
 const auto THUMBNAIL_BOUNDS = Rectangle<int>(10, 100, WINDOW_WIDTH - 20, 100);
@@ -44,15 +44,17 @@ const auto PIANO_ROLL_TIPS_FONT = Font(10);
 
 constexpr auto PIANO_ROLL_WIDTH = WINDOW_WIDTH;
 constexpr auto PIANO_ROLL_HEIGHT = 64;
+constexpr auto PIANO_ROLL_RANGE_MARKERS_HEIGHT = 10;
 constexpr auto PIANO_ROLL_WHITE_NOTE_WIDTH = 30;
 constexpr auto PIANO_ROLL_BLACK_NOTE_WIDTH = 20;
 constexpr auto PIANO_ROLL_BLACK_NOTE_HEIGHT = PIANO_ROLL_HEIGHT * 0.6;
 constexpr auto PIANO_ROLL_NOTE_COUNT = PIANO_ROLL_WIDTH / PIANO_ROLL_WHITE_NOTE_WIDTH;
 constexpr auto PIANO_ROLL_TIPS_OFFSET_X = 5;
 constexpr auto PIANO_ROLL_TIPS_OFFSET_Y = PIANO_ROLL_HEIGHT - 10;
+constexpr auto PIANO_ROLL_MARKER_SIZE = 5;
 
-const auto PIANO_ROLL_BOUNDS = Rectangle<int>(0, WINDOW_HEIGHT - PIANO_ROLL_HEIGHT,
-                                              PIANO_ROLL_WIDTH, PIANO_ROLL_HEIGHT);
+const auto PIANO_ROLL_BOUNDS = Rectangle<int>(0, WINDOW_HEIGHT - PIANO_ROLL_HEIGHT - PIANO_ROLL_RANGE_MARKERS_HEIGHT,
+                                              PIANO_ROLL_WIDTH, PIANO_ROLL_HEIGHT + PIANO_ROLL_RANGE_MARKERS_HEIGHT);
 
 const auto PIANO_ROLL_GRADIENT = ColourGradient(PIANO_ROLL_WHITE_COLOR, Point<float>(PIANO_ROLL_WIDTH / 2, PIANO_ROLL_HEIGHT - 1),
                                                 PIANO_ROLL_GRADIENT_COLOR, Point<float>(PIANO_ROLL_WIDTH / 2, 0),
@@ -92,6 +94,13 @@ constexpr auto DEFAULT_SUSTAIN_LEVEL = 1.0f;
 // TOGGLE BUTTON
 const auto TOGGLED_BUTTON_MASK_COLOR = Colour((uint8) 255, (uint8) 128, (uint8) 128, (uint8) 128);
 
-};
+// NOTE
+constexpr auto DEFAULT_ROOT_NOTE = 60;
+const auto DEFAULT_MIN_NOTE = DEFAULT_ROOT_NOTE - 12;
+const auto DEFAULT_MAX_NOTE = DEFAULT_ROOT_NOTE + 12;
+const auto NOTE_ROOT_MARKER_COLOR = Colour(255, 128, 128);
+const auto NOTE_RANGE_MARKER_COLOR = Colour(255, 200, 128);
+
+}
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H
