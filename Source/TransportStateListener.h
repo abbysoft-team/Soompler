@@ -12,4 +12,6 @@ enum TransportState
 class TransportStateListener {
 public:
     virtual void transportStateChanged(TransportState state) = 0;
+    
+    virtual ~TransportStateListener() = default;
 };

@@ -34,11 +34,12 @@ bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos);
 
 //==============================================================================
 SampleViewer::SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner)
-    : thumbnail(thumbnail), transportInfoOwner(transportInfoOwner),
+    : thumbnail(thumbnail),
+    currentSample(new SampleInfo(0, 44100, "")),
+    transportInfoOwner(transportInfoOwner),
     startRangeX(0),
     endRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
-    maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
-    currentSample(new SampleInfo(0, 44100, ""))
+    maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth())
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]

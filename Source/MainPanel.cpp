@@ -105,35 +105,6 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     addAndMakeVisible (pianoRoll.get());
     editor.addToGuiEditor (pianoRoll.get());
 
-    // transport control buttons
-//    playButton.reset (new ImageButton ("Preview sample button"));
-//    addAndMakeVisible (playButton.get());
-//    editor.addToGuiEditor (playButton.get());
-//    playButton->setTooltip (TRANS("Preview sample\n"));
-//    playButton->setButtonText (TRANS("Preview sample"));
-//    playButton->addListener (this);
-//    playButton->setImages (false, true, true,
-//                               ImageCache::getFromMemory (BinaryData::play_png, BinaryData::play_pngSize),
-//                               1.000f, Colour (0x00000000),
-//                               Image(), 1.000f, Colour (0x00000000),
-//                               Image(), 1.000f, Colour (0x00000000));
-//    playButton->setBounds (450, 60, 32, 32);
-//    playButton->setVisible(false);
-//
-//    stopButton.reset (new ImageButton ("Stop preview button"));
-//    addAndMakeVisible (stopButton.get());
-//    editor.addToGuiEditor (stopButton.get());
-//    stopButton->setTooltip (TRANS("Stop preview\n"));
-//    stopButton->setButtonText (TRANS("Stop preview"));
-//    stopButton->addListener (this);
-//    stopButton->setImages (false, true, true,
-//                               ImageCache::getFromMemory (BinaryData::stop_png, BinaryData::stop_pngSize),
-//                               1.000f, Colour (0x00000000),
-//                               Image(), 1.000f, Colour (0x00000000),
-//                               Image(), 1.000f, Colour (0x00000000));
-//    stopButton->setBounds (450, 60, 32, 32);
-//    stopButton->setVisible(false);
-
     // ADSR controls
     attackKnob.reset (new Slider ("attack knob"));
     addAndMakeVisible(attackKnob.get());

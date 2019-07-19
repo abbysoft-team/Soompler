@@ -63,4 +63,6 @@ class TransportInfoOwner
 {
 public:
     virtual std::shared_ptr<TransportInfo> getTransportInfo() = 0;
+    
+    virtual ~TransportInfoOwner() = default;
 };

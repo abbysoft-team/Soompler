@@ -14,7 +14,7 @@
 
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), mainFont("DejaVu Sans", 12, Font::plain), mainPanel(processor)
+    : AudioProcessorEditor (&p), processor (p), mainPanel(processor), mainFont("DejaVu Sans", 12, Font::plain)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.

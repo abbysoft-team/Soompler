@@ -93,7 +93,7 @@ public:
     // percent of a sample length
     void setSampleStartPosition(int64 sample);
     void setSampleEndPosition(int64 sample);
-    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info);
+    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
 
     void setVolume(double volume);
 
@@ -101,10 +101,10 @@ public:
 
     std::vector<int> getActiveNotes() override;
 
-    void noteOn(int noteNumber);
-    void noteOff(int noteNumber);
-    void setRootNote(int rootNote);
-    void setNoteRange(const BigInteger& noteRange);
+    void noteOn(int noteNumber) override;
+    void noteOff(int noteNumber) override;
+    void setRootNote(int rootNote) override;
+    void setNoteRange(const BigInteger& noteRange) override;
 
     std::shared_ptr<TransportInfo> getTransportInfo() override;
 

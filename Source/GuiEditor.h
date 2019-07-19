@@ -29,7 +29,7 @@ private:
     void mouseDrag(const MouseEvent &event) override;
     Component* findComponentAt(Point<int> position);
     Point<int> getPositionWithRespectToGrid(Point<int> position, Rectangle<int> componentBounds);
-    bool keyPressed(const KeyPress &key, Component *originatingComponent);
+    bool keyPressed(const KeyPress &key, Component *originatingComponent) override;
     void enableEditor(bool enabled);
     void printNewComponentPositions();
     void increaseSelectedComponentSize();

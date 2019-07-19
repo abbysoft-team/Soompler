@@ -69,7 +69,7 @@ void ExtendedSound::setMidiRange(const BigInteger &midiNotes)
 }
 
 //==============================================================================
-    ExtendedVoice::ExtendedVoice(ChangeListener* listener) : eventListener(listener), volume(0), loopingEnabled(false)
+    ExtendedVoice::ExtendedVoice(ChangeListener* listener) : volume(0), loopingEnabled(false), eventListener(listener)
 {
 }
 

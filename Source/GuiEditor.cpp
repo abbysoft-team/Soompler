@@ -7,8 +7,8 @@
  * @param component
  */
 GuiEditor::GuiEditor(juce::Component *component) :
-    editableComponent(component),
     selectedComponent(nullptr),
+    editableComponent(component),
     currentGridSize(Settings::GUI_EDITOR_GRID_SIZE),
     isEnabled(false)
 {
@@ -125,6 +125,8 @@ Component *GuiEditor::findComponentAt(Point<int> position)
             return component;
         }
     }
+    
+    return nullptr;
 }
 
 Point<int> GuiEditor::getPositionWithRespectToGrid(Point<int> position, Rectangle<int> componentBounds)
@@ -167,6 +169,8 @@ bool GuiEditor::keyPressed(const KeyPress &key, Component *originatingComponent)
         decreaseSelectedComponentSize();
         editableComponent->repaint();
     }
+    
+    return true;
 }
 
 void GuiEditor::enableEditor(bool enabled)

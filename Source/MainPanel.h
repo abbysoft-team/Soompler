@@ -22,7 +22,7 @@ public:
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
-    void transportStateChanged(TransportState state);
+    void transportStateChanged(TransportState state) override;
 
     float getVolume() const;
 

@@ -18,4 +18,6 @@ public:
 
     virtual void setRootNote(int rootNote) = 0;
     virtual void setNoteRange(const BigInteger& notes) = 0;
+    
+    virtual ~MidiEventConsumer() = default;
 };

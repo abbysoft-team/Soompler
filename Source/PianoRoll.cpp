@@ -7,8 +7,6 @@ void drawBlackNotes(Graphics& g);
 void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g);
 void drawBlackNote(int coord, Graphics& g);
 
-static float getAverageKeyWidth();
-
 PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer)
     : midiSupplier(midiSupplier), midiConsumer(midiConsumer)
 {
@@ -252,6 +250,10 @@ int PianoRoll::getKeyClicked(Point<int> point)
             return keysInfo[i].number;
         }
     }
+    
+    // something goes wrong
+    assert(false);
+    return 0;
 }
 
 void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g)

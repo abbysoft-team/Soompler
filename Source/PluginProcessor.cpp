@@ -17,12 +17,12 @@
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
+                                                   currentSample(0),
                                                    thumbnailCache(5),
                                                    thumbnail(256, formatManager, thumbnailCache),
                                                    startSample(0),
                                                    endSample(0),
-                                                   volume(0.5),
-                                                   currentSample(0)
+                                                   volume(0.5)
 {
     synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);

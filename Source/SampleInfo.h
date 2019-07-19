@@ -64,4 +64,6 @@ class SampleInfoListener
 {
 public:
     virtual void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) = 0;
+    
+    virtual ~SampleInfoListener() = default;
 };
