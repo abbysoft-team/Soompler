@@ -10,7 +10,8 @@
 class MainPanel  : public Component,
                    public Slider::Listener,
                    public Button::Listener,
-                   public TransportStateListener
+                   public TransportStateListener,
+                   public FileDragAndDropTarget
 
 {
 public:
@@ -66,6 +67,9 @@ private:
     void stopSampleButtonClicked();
     void loopButtonClicked();
     void reverseButtonClicked();
+    
+    bool isInterestedInFileDrag(const juce::StringArray &files) override;
+    void filesDropped(const juce::StringArray &files, int x, int y) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPanel)
 };

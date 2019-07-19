@@ -102,6 +102,8 @@ const auto DEFAULT_MIN_NOTE = DEFAULT_ROOT_NOTE - 12;
 const auto DEFAULT_MAX_NOTE = DEFAULT_ROOT_NOTE + 12;
 const auto NOTE_ROOT_MARKER_COLOR = Colour(255, 128, 128);
 const auto NOTE_RANGE_MARKER_COLOR = Colour((uint8) 255, (uint8) 200, (uint8) 128, (uint8) 200);
+    
+const auto SUPPORTED_FILE_FORMATS = {"wav", "mp3", "ogg"};
 }
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H

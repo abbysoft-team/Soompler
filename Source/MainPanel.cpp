@@ -399,3 +399,25 @@ void MainPanel::reverseButtonClicked() {
     processor.reverseSample();
 }
 
+bool MainPanel::isInterestedInFileDrag(const juce::StringArray &files) {
+    for (auto fileName : files) {
+        for (auto format : Settings::SUPPORTED_FILE_FORMATS) {
+            if (fileName.endsWith(format)) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+}
+
+
+void MainPanel::filesDropped(const juce::StringArray &files, int x, int y) {
+    // by now only first dropped file will be loaded
+    auto fileName = files[0];
+    
+    processor.loadSample(File(fileName));
+}
+
+
+
