@@ -214,6 +214,18 @@ void SoomplerAudioProcessor::noteOff(int noteNumber)
     synth.noteOff(0, noteNumber, volume, true);
 }
 
+void SoomplerAudioProcessor::setRootNote(int rootNote)
+{
+    auto sound = static_cast<soompler::ExtendedSound*> (synth.getSound(0).get());
+    sound->setRootNote(rootNote);
+}
+
+void SoomplerAudioProcessor::setNoteRange(const BigInteger &noteRange)
+{
+    auto sound = static_cast<soompler::ExtendedSound*> (synth.getSound(0).get());
+    sound->setMidiRange(noteRange);
+}
+
 MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
 {
     MidiBuffer output;
@@ -341,7 +353,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
     thumbnail.setSource(new FileInputSource(*sampleFile));
 
     BigInteger midiNotes;
-    midiNotes.setRange(0, 126, true);
+    midiNotes.setRange(Settings::DEFAULT_MIN_NOTE, Settings::DEFAULT_MAX_NOTE - Settings::DEFAULT_MIN_NOTE + 1, true);
     return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, Settings::DEFAULT_ROOT_NOTE,
                                        Settings::DEFAULT_ATTACK_TIME, Settings::DEFAULT_RELEASE_TIME, Settings::MAX_SAMPLE_LENGTH);
 }

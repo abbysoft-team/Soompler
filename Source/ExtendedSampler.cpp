@@ -58,6 +58,16 @@ void ExtendedSound::reverse()
     this->data->reverse(0, data->getNumSamples());
 }
 
+void ExtendedSound::setRootNote(int rootNote)
+{
+    this->midiRootNote = rootNote;
+}
+
+void ExtendedSound::setMidiRange(const BigInteger &midiNotes)
+{
+    this->midiNotes = midiNotes;
+}
+
 //==============================================================================
     ExtendedVoice::ExtendedVoice(ChangeListener* listener) : eventListener(listener), volume(0), loopingEnabled(false)
 {

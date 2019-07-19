@@ -103,6 +103,8 @@ public:
 
     void noteOn(int noteNumber);
     void noteOff(int noteNumber);
+    void setRootNote(int rootNote);
+    void setNoteRange(const BigInteger& noteRange);
 
     std::shared_ptr<TransportInfo> getTransportInfo() override;
 

@@ -57,6 +57,9 @@ public:
 
     void reverse();
 
+    void setRootNote(int rootNote);
+    void setMidiRange(const BigInteger& midiNotes);
+
 private:
     //==============================================================================
     friend class ExtendedVoice;
