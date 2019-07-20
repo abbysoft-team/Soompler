@@ -32,14 +32,8 @@
 class SampleViewer  : public Component, public SampleInfoListener
 {
 public:
-    //==============================================================================
-    SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner);
+    SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& sampleInfoListener);
     ~SampleViewer();
-
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
-    void setSampleInfoListener(std::shared_ptr<SampleInfoListener> listener);
-    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
@@ -52,7 +46,7 @@ private:
     TransportInfoOwner& transportInfoOwner;
     // this object can modify sample's start and end positions
     // with range lines, so some another object can use this new values
-    std::shared_ptr<SampleInfoListener> sampleInfoListener;
+    SampleInfoListener& sampleInfoListener;
 
     // not active sample regions, before start line and after end lines
     int startRangeX;

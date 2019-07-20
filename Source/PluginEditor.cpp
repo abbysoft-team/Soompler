@@ -14,12 +14,15 @@
 
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), mainPanel(processor), mainFont("DejaVu Sans", 12, Font::plain)
+    : AudioProcessorEditor (&p), processor (p), mainPanel(processor)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
-
+    
+    // load built-in font
+    auto typeface = Typeface::createSystemTypefaceFor(BinaryData::RobotoCondensedRegular_ttf, BinaryData::RobotoCondensedRegular_ttfSize);
+    mainFont = Font(typeface);
     // set OpenGL renderer
     this->glContext.attachTo(*this);
 
@@ -30,7 +33,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // subscribe to thumbnail events, to catch thumbnail fully loaded time
     processor.getThumbnail().addChangeListener(this);
 
-    //LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypefaceName(mainFont.getTypefaceName());
+    LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface(typeface);
 }
 
 //==============================================================================

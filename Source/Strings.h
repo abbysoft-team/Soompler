@@ -8,7 +8,7 @@ namespace Strings {
   constexpr const char *BUTTON_PLAY_SAMPLE_TEXT = "Play sample";
   constexpr const char *BUTTON_STOP_SAMPLE_TEXT = "Stop sample";
   constexpr const char *OPEN_FILE_DIALOG_TEXT = "Please select sample file you want to load...";
-  constexpr const char *NO_SAMPLE_LOADED_TEXT = "Load sample by clicking 'Load sample' button...";
+  constexpr const char *NO_SAMPLE_LOADED_TEXT = "Drag sample to load or use button in upper left corner\n";
   constexpr const char *UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE = "Error";
   constexpr const char *UNSUPPORTED_FILE_EXTENSION_ERROR_MESSAGE = "Cannot read this type of file";
 }

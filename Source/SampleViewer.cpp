@@ -30,42 +30,20 @@ void drawRangeLine(int xPos, Graphics& g);
 void fadePreStartRegion(int startRangeBorderX, Graphics& g);
 void fadePostEndRegion(int endRangeBorderX, Graphics& g);
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos);
-//[/MiscUserDefs]
 
-//==============================================================================
-SampleViewer::SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner)
+SampleViewer::SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener)
     : thumbnail(thumbnail),
     currentSample(new SampleInfo(0, 44100, "")),
     transportInfoOwner(transportInfoOwner),
+    sampleInfoListener(infoListener),
     startRangeX(0),
     endRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
     maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth())
 {
-    //[Constructor_pre] You can add your own custom stuff here..
-    //[/Constructor_pre]
-
-
-    //[UserPreSize]
-    //[/UserPreSize]
-
-    //[Constructor] You can add your own custom stuff here..
-    //[/Constructor]
 }
 
 SampleViewer::~SampleViewer()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
-    //[/Destructor_pre]
-
-
-
-    //[Destructor]. You can add your own custom destruction code here..
-    //[/Destructor]
-}
-
-void SampleViewer::setSampleInfoListener(std::shared_ptr<SampleInfoListener> listener)
-{
-    this->sampleInfoListener = listener;
 }
 
 //==============================================================================
@@ -243,11 +221,7 @@ void SampleViewer::calculateEndRangeX()
 
 void SampleViewer::notifySampleInfoListeners()
 {
-    if (this->sampleInfoListener == nullptr) {
-        return;
-    }
-
-    this->sampleInfoListener->newSampleInfoRecieved(currentSample);
+    this->sampleInfoListener.newSampleInfoRecieved(currentSample);
 }
 
 int64 SampleViewer::calculateSampleByCoords(int coordOnThumbnail)

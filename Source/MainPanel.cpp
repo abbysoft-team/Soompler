@@ -73,21 +73,17 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     loopButton->setEnabled(false);
     
 
-    sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor));
+    sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor, processor));
     addAndMakeVisible (sampleViewer.get());
     editor.addToGuiEditor (sampleViewer.get());
     sampleViewer->setName ("SampleViewer");
     sampleViewer->setBounds(Settings::SAMPLE_VIEWER_BOUNDS);
     // not visible until sample is loaded
     sampleViewer->setVisible(false);
-
-    // link processor with sampleViewer
-    auto sampleInfoListener = static_cast<SampleInfoListener*> (&processor);
-    sampleViewer->setSampleInfoListener(std::shared_ptr<SampleInfoListener>(sampleInfoListener));
     processor.addSampleInfoListener(sampleViewer);
 
-    loadSampleTip.reset (new Label ("new label",
-                            TRANS("Load sample by clicking load sample button in the upper left corner\n")));
+    loadSampleTip.reset (new Label ("no sample loaded label",
+                                    TRANS(Strings::NO_SAMPLE_LOADED_TEXT)));
     addAndMakeVisible (loadSampleTip.get());
     editor.addToGuiEditor (loadSampleTip.get());
     loadSampleTip->setFont (Font (27.90f, Font::plain));
