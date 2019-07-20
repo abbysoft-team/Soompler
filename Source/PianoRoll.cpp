@@ -405,6 +405,9 @@ void PianoRoll::maxMarkerDragged(Point<int> position)
     if (position.x >= this->getWidth()) {
         return;
     }
+    if (keyClicked < sample->rootNote) {
+        return;
+    }
 
     maxMarker = createMarker(keyClicked, false);
     draggedMarker = MAX_NOTE;
