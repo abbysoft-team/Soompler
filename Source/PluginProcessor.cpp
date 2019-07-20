@@ -18,10 +18,11 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
                                                    thumbnailCache(5),
-                                                   thumbnail(512, formatManager, thumbnailCache),
+                                                   thumbnail(256, formatManager, thumbnailCache),
                                                    startSample(0),
                                                    endSample(0),
-                                                   volume(0.5)
+                                                   volume(0.5),
+                                                   currentSample(0)
 {
     auto listener = std::shared_ptr<ChangeListener>((ChangeListener*) this);
     synth.addVoice(new soompler::ExtendedVoice(listener));
@@ -30,8 +31,6 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
     formatManager.registerBasicFormats();
 
     transportSource.addChangeListener(this);
-
-    currentSample = 0;                             // -1 means that it wont played until someone turn on note
 }
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
@@ -163,6 +162,15 @@ void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
 
     auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
     voice->setEndSample(sample);
+}
+
+void SoomplerAudioProcessor::setVolume(double volume)
+{
+    this->volume = volume;
+    transportSource.setGain(volume);
+
+    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+    voice->setVolume(volume);
 }
 
 void SoomplerAudioProcessor::notifyTransportStateChanged(TransportState state)
@@ -304,14 +312,14 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
         return nullptr;
     }
 
-    auto formatReader = formatManager.createReaderFor(*sampleFile);
+    auto formatReader = formatManager.createReaderFor(sampleFile.value());
 
     setTransportSource(formatReader);
-    thumbnail.setSource(new FileInputSource(*sampleFile));
+    thumbnail.setSource(new FileInputSource(sampleFile.value()));
 
     BigInteger midiNotes;
     midiNotes.setRange(0, 126, true);
-    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x40, 0.0, 0.0, 400.0);
+    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x48, 0.0, 0.0, Settings::MAX_SAMPLE_LENGTH);
 }
 
 AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)
@@ -359,6 +367,7 @@ void SoomplerAudioProcessor::changeTransportState(TransportState newState)
         case Playing:
             break;
         case Starting:
+            synth.getVoice(0)->stopNote(0, false);
             transportSource.start();
             break;
         case Stopping:

@@ -20,7 +20,7 @@
 /**
 */
 class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
-        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer, private MouseListener,
+        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer,
         private Slider::Listener
 {
 public:
@@ -46,14 +46,16 @@ private:
 
     void timerCallback() override;
 
-    void mouseDrag(const MouseEvent &event);
+    void mouseDrag(const MouseEvent &event) override;
 
-    bool isIntersectWithStartRangeLine(Point<int>* point);
-    bool isIntersectWithEndRangeLine(Point<int>* point);
+    bool isIntersectWithStartRangeLine(Point<int>& point);
+    bool isIntersectWithEndRangeLine(Point<int>& point);
 
     int64 calculateSampleByCoords(int coord);
 
-    void sliderValueChanged(Slider *slider);
+    void sliderValueChanged(Slider *slider) override;
+
+    void calculateEndRangeX();
 
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
@@ -73,6 +75,12 @@ private:
     // not active sample regions, before start line and after end lines
     int startRangeX;
     int endRangeX;
+
+    // max range x value according to max sample length value
+    int maxRangeX;
+
+    // OpenGL context to speed up UI rendering
+    OpenGLContext glContext;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };

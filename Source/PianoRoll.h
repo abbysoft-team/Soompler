@@ -4,8 +4,9 @@
 #include "MidiEventSupplier.h"
 #include "MidiEventConsumer.h"
 
-struct KeyInfo
+class KeyInfo
 {
+public:
     float x;
     float width;
     float height;
@@ -51,7 +52,7 @@ private:
     void fireNoteOff(int noteNumber);
 
     // stores some metadata for keys
-    KeyInfo keysInfo[MAX_KEYS];
+    std::array<KeyInfo, MAX_KEYS> keysInfo;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoRoll)
 };

@@ -22,11 +22,15 @@ void fadePostEndRegion(int endRangeBorderX, Graphics& g);
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
     : AudioProcessorEditor (&p), processor (p), mainFont("DejaVu Sans", 12, Font::plain), startRangeX(Settings::THUMBNAIL_BOUNDS.getX()),
-      endRangeX(Settings::THUMBNAIL_BOUNDS.getRight()), pianoRoll((MidiEventSupplier&) processor, (MidiEventConsumer&) processor)
+      endRangeX(Settings::THUMBNAIL_BOUNDS.getRight()), pianoRoll((MidiEventSupplier&) processor, (MidiEventConsumer&) processor),
+      maxRangeX(Settings::THUMBNAIL_BOUNDS.getRight())
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
+
+    // set OpenGL renderer
+    this->glContext.attachTo(*this);
 
     // init components state
     openFileButton.setButtonText(Strings::BUTTON_OPEN_FILE_TEXT);
@@ -70,8 +74,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypefaceName(mainFont.getTypefaceName());
 }
 
-SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
-= default;
+SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor() {}
 
 //==============================================================================
 void SoomplerAudioProcessorEditor::paint (Graphics& g)
@@ -173,7 +176,7 @@ void SoomplerAudioProcessorEditor::timerCallback()
 void SoomplerAudioProcessorEditor::mouseDrag(const MouseEvent &event)
 {
     auto position = event.getPosition();
-    if (isIntersectWithStartRangeLine(&position)) {
+    if (isIntersectWithStartRangeLine(position)) {
 
         int rightBorderX = endRangeX - ((int) (Settings::RANGE_LINES_WIDTH*4));
         int leftBorderX = Settings::THUMBNAIL_BOUNDS.getX();
@@ -189,14 +192,13 @@ void SoomplerAudioProcessorEditor::mouseDrag(const MouseEvent &event)
         processor.setSampleStartPosition(calculateSampleByCoords(startRangeX));
 
         repaint();
-    } else if (isIntersectWithEndRangeLine(&position)) {
-        int rightBorderX = Settings::THUMBNAIL_BOUNDS.getRight();
+    } else if (isIntersectWithEndRangeLine(position)) {
         int leftBorderX = startRangeX + ((int) (Settings::RANGE_LINES_WIDTH*4));
 
         if (position.getX() < leftBorderX) {
             endRangeX = leftBorderX;
-        } else if (position.getX() > rightBorderX) {
-            endRangeX = rightBorderX;
+        } else if (position.getX() > maxRangeX) {
+            endRangeX = maxRangeX;
         } else {
             endRangeX = position.getX();
         }
@@ -208,7 +210,7 @@ void SoomplerAudioProcessorEditor::mouseDrag(const MouseEvent &event)
 
 }
 
-bool SoomplerAudioProcessorEditor::isIntersectWithStartRangeLine(Point<int>* point)
+bool SoomplerAudioProcessorEditor::isIntersectWithStartRangeLine(Point<int>& point)
 {
     static Rectangle<int> rangeLine;
     rangeLine.setX(startRangeX - Settings::RANGE_LINES_WIDTH);
@@ -216,10 +218,10 @@ bool SoomplerAudioProcessorEditor::isIntersectWithStartRangeLine(Point<int>* poi
     rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
     rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
 
-    return rangeLine.contains(*point);
+    return rangeLine.contains(point);
 }
 
-bool SoomplerAudioProcessorEditor::isIntersectWithEndRangeLine(Point<int>* point)
+bool SoomplerAudioProcessorEditor::isIntersectWithEndRangeLine(Point<int>& point)
 {
     static Rectangle<int> rangeLine;
     rangeLine.setX(endRangeX - Settings::RANGE_LINES_WIDTH);
@@ -227,7 +229,7 @@ bool SoomplerAudioProcessorEditor::isIntersectWithEndRangeLine(Point<int>* point
     rangeLine.setWidth(Settings::RANGE_LINES_WIDTH * 2);
     rangeLine.setHeight(Settings::THUMBNAIL_BOUNDS.getHeight());
 
-    return rangeLine.contains(*point);
+    return rangeLine.contains(point);
 }
 
 int64 SoomplerAudioProcessorEditor::calculateSampleByCoords(int coordOnThumbnail)
@@ -322,6 +324,7 @@ void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
     switch (state) {
     case Ready:
         startTimer(40);
+        calculateEndRangeX();
         break;
     case Starting:
         break;
@@ -332,6 +335,26 @@ void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
     default:
         break;
     }
+}
+
+void SoomplerAudioProcessorEditor::calculateEndRangeX()
+{
+    auto sampleLength = processor.getThumbnail().getTotalLength();
+    if (sampleLength < Settings::MAX_SAMPLE_LENGTH) {
+        // everything is fine already
+        return;
+    }
+
+    auto partOfSampleAllowed = Settings::MAX_SAMPLE_LENGTH / sampleLength;
+
+    // 513 samples to make sure we dont reach max sample length
+    auto lastAllowedSample = Settings::MAX_SAMPLE_LENGTH * processor.getSampleRate() - 513;
+
+    processor.setSampleEndPosition(lastAllowedSample);
+
+    endRangeX = Settings::THUMBNAIL_BOUNDS.getX() +
+            (partOfSampleAllowed * Settings::THUMBNAIL_BOUNDS.getWidth());
+    maxRangeX = endRangeX;
 }
 
 void SoomplerAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster *source)

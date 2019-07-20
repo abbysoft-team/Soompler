@@ -34,7 +34,7 @@ public:
                   double maxSampleLengthSeconds);
 
     /** Destructor. */
-    ~ExtendedSound() override;
+    ~ExtendedSound() override = default;
 
     //==============================================================================
     /** Returns the sample's name */
@@ -43,7 +43,7 @@ public:
     /** Returns the audio sample data.
         This could return nullptr if there was a problem loading the data.
     */
-    AudioBuffer<float>* getAudioData() const noexcept       { return data.get(); }
+    const AudioBuffer<float>& getAudioData() const noexcept       { return *data.get(); }
 
     //==============================================================================
     /** Changes the parameters of the ADSR envelope which will be applied to the sample. */
@@ -84,7 +84,7 @@ public:
     ExtendedVoice(std::shared_ptr<ChangeListener> listener);
 
     /** Destructor. */
-    ~ExtendedVoice() override;
+    ~ExtendedVoice() override = default;
 
     //==============================================================================
     bool canPlaySound (SynthesiserSound*) override;
@@ -104,11 +104,15 @@ public:
 
     double getCurrentPosition() const;
 
+    // volume from 0.0f to 1.0f
+    void setVolume(float volume);
+
 private:
     //==============================================================================
     double pitchRatio = 0;
     double sourceSamplePosition = 0;
     float lgain = 0, rgain = 0;
+    float volume;
 
     int64 firstSampleToPlay = 0;
     int64 endSample = 0;
