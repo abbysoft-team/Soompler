@@ -6,7 +6,9 @@
               pluginFormats="buildAUv3,buildStandalone,buildVST,buildVST3"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginDesc="Easy to use sampler" pluginManufacturerCode="abby"
-              pluginCode="as1" cppLanguageStandard="14">
+              pluginCode="as1" cppLanguageStandard="14" pluginAUMainType="'aumu'"
+              pluginManufacturer="AbbySoft" aaxIdentifier="com.abbysoft.soompler"
+              pluginAUExportPrefix="soompler_au">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
       <FILE id="hlDDr3" name="ToggledImageButton.cpp" compile="1" resource="0"

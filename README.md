@@ -1,9 +1,15 @@
+
+
 # Soompler
+![donation rate](http://img.shields.io/liberapay/receives/abbysoft.svg?logo=liberapay)
+
 Soompler is JUCE based sampler VST and Standalone plugin for Linux, MacOS, Windows.
 
-![alt Screenshot](https://i.imgur.com/xgWU7Ad.png)
+![alt Screenshot](https://i.ibb.co/bK4MLvD/2019-07-16-5-38-24.png)
 
 Notice. At this point license is proprietary, thus any commercial usage of this code or its parts prohibited. All code is property of AbbySoft team and all its members.
+
+**Please, if you want us to continue development of this plugin consider donate us a dime. We are thankful to all support, it will motivate us to bring better software to community.** <noscript><a href="https://liberapay.com/abbysoft/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a></noscript>
 
 # Building
 
