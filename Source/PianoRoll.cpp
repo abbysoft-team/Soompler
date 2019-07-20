@@ -195,7 +195,9 @@ void PianoRoll::mouseDown(const MouseEvent &event)
 {
     auto position = event.getPosition();
     auto keyNumber = getKeyClicked(position);
-    midiConsumer.noteOn(keyNumber);
+    if (keyNumber != -1) {
+        midiConsumer.noteOn(keyNumber);
+    }
 
     if (sample == nullptr) {
         return;
@@ -251,9 +253,7 @@ int PianoRoll::getKeyClicked(Point<int> point)
         }
     }
     
-    // something goes wrong
-    assert(false);
-    return 0;
+    return -1;
 }
 
 void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g)
