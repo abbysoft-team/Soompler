@@ -7,11 +7,10 @@ void drawBlackNotes(Graphics& g);
 void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g);
 void drawBlackNote(int coord, Graphics& g);
 
-static float getAverageKeyWidth();
-
 PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer)
     : midiSupplier(midiSupplier), midiConsumer(midiConsumer)
 {
+    draggedMarker = NO_MARKER;
     setSize (Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
 
     calculateKeysInfo();
@@ -27,8 +26,8 @@ void PianoRoll::calculateKeysInfo()
 
     auto currentIndex = 0;
     auto nextWhiteKeyX = 0;
-    // init only keys after 48 (C2), cos it's first on the screen
-    for (int i = 48; i < MAX_KEYS; i++) {
+    // init only keys after first key on the screen
+    for (int i = Settings::FIRST_KEY_ON_SCREEN; i < MAX_KEYS; i++) {
         // cycling through pattern array
         if (currentIndex == 12) {
             currentIndex = 0;
@@ -68,6 +67,11 @@ PianoRoll::~PianoRoll()
 //==============================================================================
 void PianoRoll::paint (Graphics& g)
 {
+    // move start Y for few pixels so we can draw markers at the end
+    auto transform = AffineTransform();
+    transform = transform.translated(0, Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
+    g.addTransform(transform);
+
     g.setColour(Settings::PIANO_ROLL_WHITE_COLOR);
     g.setGradientFill(Settings::PIANO_ROLL_GRADIENT);
     g.fillRect(0, 0, Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
@@ -76,6 +80,18 @@ void PianoRoll::paint (Graphics& g)
     drawBlackNotes(g);
     drawActiveNotes(g, getActiveMidiNotes());
     drawNoteTips(g);
+
+    // no sample loaded yet, dont draw markers
+    if (sample == nullptr) {
+        return;
+    }
+
+    drawDisabledNotesMask(g);
+
+    // restore start Y
+    transform = transform.translated(0, -1 * Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
+    g.addTransform(transform);
+    drawNoteRangeAndRoot(g);
 }
 
 void drawNoteDelimiters(Graphics& g)
@@ -180,6 +196,24 @@ void PianoRoll::mouseDown(const MouseEvent &event)
     auto position = event.getPosition();
     auto keyNumber = getKeyClicked(position);
     midiConsumer.noteOn(keyNumber);
+
+    if (sample == nullptr) {
+        return;
+    }
+
+    // markers have negative Y because of render way, so here we compensate it
+    auto positionForMarkers = Point<float>(position.x, position.y - Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
+
+    if (rootMarker.contains(positionForMarkers)) {
+        draggedMarker = ROOT_NOTE;
+        DBG("root");
+    } else if (minMarker.contains(positionForMarkers)) {
+        DBG("min");
+        draggedMarker = MIN_NOTE;
+    } else if (maxMarker.contains(positionForMarkers)) {
+        DBG("max");
+        draggedMarker = MAX_NOTE;
+    }
 }
 
 void PianoRoll::mouseUp(const MouseEvent &event)
@@ -187,6 +221,26 @@ void PianoRoll::mouseUp(const MouseEvent &event)
     auto position = event.getPosition();
     auto keyNumber = getKeyClicked(position);
     midiConsumer.noteOff(keyNumber);
+
+    draggedMarker = NO_MARKER;
+}
+
+void PianoRoll::mouseDrag(const MouseEvent &event)
+{
+    auto position = event.getPosition();
+    if (draggedMarker == NO_MARKER) {
+        return;
+    }
+
+    position.y += Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT;
+
+    if (draggedMarker == ROOT_NOTE) {
+        rootMarkerDragged(position);
+    } else if (draggedMarker == MIN_NOTE) {
+        minMarkerDragged(position);
+    } else if (draggedMarker == MAX_NOTE) {
+        maxMarkerDragged(position);
+    }
 }
 
 int PianoRoll::getKeyClicked(Point<int> point)
@@ -196,6 +250,10 @@ int PianoRoll::getKeyClicked(Point<int> point)
             return keysInfo[i].number;
         }
     }
+    
+    // something goes wrong
+    assert(false);
+    return 0;
 }
 
 void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g)
@@ -208,7 +266,8 @@ void drawNoteTips(Graphics& g)
 {
     static constexpr auto spaceBetweenCNotes = Settings::PIANO_ROLL_WHITE_NOTE_WIDTH * 7;
 
-    g.setFont(Settings::PIANO_ROLL_TIPS_FONT);
+    // produces a lot of leaks =(
+    //g.setFont(Settings::PIANO_ROLL_TIPS_FONT);
     g.setColour(Settings::PIANO_ROLL_NOTE_TIPS_COLOR);
 
     auto currentCNote = 2;
@@ -225,6 +284,137 @@ void drawNoteTips(Graphics& g)
 
 }
 
+void PianoRoll::drawNoteRangeAndRoot(Graphics& g)
+{
+    g.setColour(Settings::NOTE_ROOT_MARKER_COLOR);
+    g.fillPath(rootMarker);
+    g.setColour(Settings::NOTE_RANGE_MARKER_COLOR);
+    g.fillPath(minMarker);
+    g.fillPath(maxMarker);
+}
+
+void PianoRoll::createMarkers(std::shared_ptr<SampleInfo> info)
+{
+    rootMarker = createMarker(info->rootNote, true);
+    minMarker = createMarker(info->minNote, false);
+    maxMarker = createMarker(info->maxNote, false);
+}
+
+Path PianoRoll::createMarker(int noteNum, bool root)
+{
+    auto x = keysInfo[noteNum].x + (keysInfo[noteNum].width / 2);
+    auto y = -1 * Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT;
+    if (!root) {
+        // root marker must be bigger
+        y *= 0.8;
+    }
+
+    auto marker = Path();
+    auto halfSize = Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT / 2.0;
+
+    marker.addTriangle(Point<float>(x - halfSize, y), Point<float>(x+halfSize, y), Point<float>(x, 0));
+
+    return marker;
+}
+
+void PianoRoll::drawDisabledNotesMask(Graphics& g)
+{
+    // keys on the left from active range
+    auto key = keysInfo[0];
+    for (int i = sample->minNote - 1; i >= Settings::FIRST_KEY_ON_SCREEN; i--) {
+        key = keysInfo[i];
+
+        g.setColour(Settings::PIANO_ROLL_DISABLED_MASK_COLOR);
+        g.fillRect(key.x, .0f, key.width, key.height);
+    }
+
+    // keys on the right from active region
+    for (int i = sample->maxNote + 1; i < keysInfo.size(); i++) {
+        key = keysInfo[i];
+        if (key.x > this->getWidth()) {
+            break;
+        }
+
+        g.setColour(Settings::PIANO_ROLL_DISABLED_MASK_COLOR);
+        g.fillRect(key.x, .0f, key.width, key.height);
+    }
+}
+
+void PianoRoll::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
+{
+    this->sample = info;
+
+    createMarkers(info);
+}
+
+void PianoRoll::rootMarkerDragged(Point<int> position)
+{
+    auto keyClicked = getKeyClicked(position);
+    if (keyClicked == sample->rootNote) {
+        // no need to update
+        return;
+    }
+    if (keyClicked > sample->maxNote) {
+        // cannot go right
+        draggedMarker = MAX_NOTE;
+        return;
+    }
+    if (keyClicked < sample->minNote) {
+        // cannot go left
+        draggedMarker = MIN_NOTE;
+        return;
+    }
+
+    rootMarker = createMarker(keyClicked, true);
+    draggedMarker = ROOT_NOTE;
+    sample->rootNote = keyClicked;
+
+    midiConsumer.setRootNote(keyClicked);
+}
+
+void PianoRoll::minMarkerDragged(Point<int> position)
+{
+    auto keyClicked = getKeyClicked(position);
+    if (keyClicked == sample->minNote) {
+        // no need to update
+        return;
+    }
+    if (keyClicked < Settings::FIRST_KEY_ON_SCREEN) {
+        return;
+    }
+    if (keyClicked > sample->rootNote) {
+        return;
+    }
+
+    minMarker = createMarker(keyClicked, false);
+    draggedMarker = MIN_NOTE;
+    sample->minNote = keyClicked;
+
+    auto range = BigInteger();
+    range.setRange(sample->minNote, sample->maxNote - sample->minNote + 1, true);
+    midiConsumer.setNoteRange(range);
+}
+
+void PianoRoll::maxMarkerDragged(Point<int> position)
+{
+    auto keyClicked = getKeyClicked(position);
+    if (keyClicked == sample->maxNote) {
+        // no need to update
+        return;
+    }
+    if (position.x >= this->getWidth()) {
+        return;
+    }
+
+    maxMarker = createMarker(keyClicked, false);
+    draggedMarker = MAX_NOTE;
+    sample->maxNote = keyClicked;
+
+    auto range = BigInteger();
+    range.setRange(sample->minNote, sample->maxNote - sample->minNote + 1, true);
+    midiConsumer.setNoteRange(range);
+}
+
 void PianoRoll::resized()
 {
 }
@@ -233,23 +423,4 @@ std::vector<int> PianoRoll::getActiveMidiNotes()
 {
     return midiSupplier.getActiveNotes();
 }
-
-#if 0
-/*  -- Projucer information section --
-
-    This is where the Projucer stores the metadata that describe this GUI layout, so
-    make changes in here at your peril!
-
-BEGIN_JUCER_METADATA
-
-<JUCER_COMPONENT documentType="Component" className="PianoRoll" componentName="Piano roll"
-                 parentClasses="public Component" constructorParams="" variableInitialisers=""
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="1" initialWidth="Settings::PIANO_ROLL_WIDTH" initialHeight="Settings::PIANO_ROLL_HEIGHT">
-  <BACKGROUND backgroundColour="ff323e44"/>
-</JUCER_COMPONENT>
-
-END_JUCER_METADATA
-*/
-#endif
 

@@ -18,4 +18,6 @@
 class MidiEventSupplier {
 public:
     virtual std::vector<int> getActiveNotes() = 0;
+    
+    virtual ~MidiEventSupplier() = default;
 };

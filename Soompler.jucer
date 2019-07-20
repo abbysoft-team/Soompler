@@ -6,11 +6,24 @@
               pluginFormats="buildAUv3,buildStandalone,buildVST,buildVST3"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
               pluginDesc="Easy to use sampler" pluginManufacturerCode="abby"
-              pluginCode="as1" cppLanguageStandard="latest" pluginAUMainType="'aumu'"
+              pluginCode="as1" cppLanguageStandard="14" pluginAUMainType="'aumu'"
               pluginManufacturer="AbbySoft" aaxIdentifier="com.abbysoft.soompler"
               pluginAUExportPrefix="soompler_au">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="hlDDr3" name="ToggledImageButton.cpp" compile="1" resource="0"
+            file="Source/ToggledImageButton.cpp"/>
+      <FILE id="WE99ZN" name="ToggledImageButton.h" compile="0" resource="0"
+            file="Source/ToggledImageButton.h"/>
+      <FILE id="gupJ6Y" name="GuiEditor.h" compile="0" resource="0" file="Source/GuiEditor.h"/>
+      <FILE id="xF0vjE" name="GuiEditor.cpp" compile="1" resource="0" file="Source/GuiEditor.cpp"/>
+      <FILE id="HE5JfF" name="TransportInfo.h" compile="0" resource="0" file="Source/TransportInfo.h"/>
+      <FILE id="XWwcUI" name="SampleInfo.h" compile="0" resource="0" file="Source/SampleInfo.h"/>
+      <FILE id="m8JTaG" name="SampleViewer.cpp" compile="1" resource="0"
+            file="Source/SampleViewer.cpp"/>
+      <FILE id="FN51EI" name="SampleViewer.h" compile="0" resource="0" file="Source/SampleViewer.h"/>
+      <FILE id="SSO38O" name="MainPanel.cpp" compile="1" resource="0" file="Source/MainPanel.cpp"/>
+      <FILE id="VEWxzN" name="MainPanel.h" compile="0" resource="0" file="Source/MainPanel.h"/>
       <FILE id="zomdcA" name="MidiEventConsumer.h" compile="0" resource="0"
             file="Source/MidiEventConsumer.h"/>
       <FILE id="JAhtnA" name="MidiEventSupplier.h" compile="0" resource="1"
@@ -21,8 +34,6 @@
             file="Source/ExtendedSampler.cpp"/>
       <FILE id="NuGZSt" name="ExtendedSampler.h" compile="0" resource="0"
             file="Source/ExtendedSampler.h"/>
-      <FILE id="RcJsns" name="SKnob.h" compile="0" resource="0" file="Source/SKnob.h"/>
-      <FILE id="YJF4iY" name="SKnob.cpp" compile="1" resource="0" file="Source/SKnob.cpp"/>
       <FILE id="LqYQa3" name="Settings.h" compile="0" resource="0" file="Source/Settings.h"/>
       <FILE id="PIRvl8" name="TransportStateListener.h" compile="0" resource="0"
             file="Source/TransportStateListener.h"/>
@@ -35,7 +46,14 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="xoPeua" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <FILE id="A4HqCo" name="about.png" compile="0" resource="1" file="Resources/about.png"/>
+    <FILE id="XCh1dc" name="play.png" compile="0" resource="1" file="Resources/play.png"/>
+    <FILE id="Fpn4No" name="stop.png" compile="0" resource="1" file="Resources/stop.png"/>
+    <FILE id="RtY5I1" name="openFile.png" compile="0" resource="1" file="Resources/openFile.png"/>
+    <FILE id="c5OhDw" name="loop.png" compile="0" resource="1" file="Resources/loop.png"/>
     <FILE id="SJMWVx" name="background.png" compile="1" resource="1" file="Resources/background.png"/>
+    <FILE id="v8H9xB" name="RobotoCondensed-Regular.ttf" compile="0" resource="1"
+          file="Resources/RobotoCondensed-Regular.ttf"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
@@ -60,7 +78,7 @@
         <MODULEPATH id="juce_opengl" path="../../../software/JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
-    <CLION targetFolder="Builds/CLion" clionMakefileEnabled="1">
+    <CLION targetFolder="Builds/CLion" clionMakefileEnabled="1" clionXcodeEnabled="1">
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../software/JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../../software/JUCE/modules"/>

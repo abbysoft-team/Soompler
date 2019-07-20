@@ -17,15 +17,14 @@
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
+                                                   currentSample(0),
                                                    thumbnailCache(5),
                                                    thumbnail(256, formatManager, thumbnailCache),
                                                    startSample(0),
                                                    endSample(0),
-                                                   volume(0.5),
-                                                   currentSample(0)
+                                                   volume(0.5)
 {
-    auto listener = std::shared_ptr<ChangeListener>((ChangeListener*) this);
-    synth.addVoice(new soompler::ExtendedVoice(listener));
+    synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
 
     formatManager.registerBasicFormats();
@@ -123,15 +122,6 @@ void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
         return;
     }
 
-    // TODO maybe this all multi-bus thing is unnesesary?
-//    auto busCount = getBusCount(false);
-//    for (auto busNr = 0; busNr < busCount; ++busNr) {
-//        auto midiChannelBuffer = filterMidiMessagesForChannel(MidiBuffer, busNr + 1);
-//        auto audioBusBuffer = getBusBuffer(buffer, false, busNr);
-
-//        synth.renderNextBlock();
-//    }
-
     lastMidiEvents = filterMidiMessagesForChannel(midiMessages, 1);
     auto audioBusBuffer = getBusBuffer(buffer, false, 0);
 
@@ -144,7 +134,18 @@ void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
     audioSource.buffer = &buffer;
     audioSource.startSample = 0;
     audioSource.numSamples = buffer.getNumSamples();
+
+//    // ADSR
+//    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+//    auto adsr = voice->getAdsr();
+
+//    auto adsrValue = adsr.getNextSample();
+
     transportSource.getNextAudioBlock(audioSource);
+}
+
+std::shared_ptr<File> SoomplerAudioProcessor::getLoadedSample() const {
+    return loadedSample;
 }
 
 void SoomplerAudioProcessor::setSampleStartPosition(int64 sample)
@@ -162,6 +163,13 @@ void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
 
     auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
     voice->setEndSample(sample);
+}
+
+void SoomplerAudioProcessor::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
+{
+    this->sampleInfo = info;
+    setSampleStartPosition(info->startSample);
+    setSampleEndPosition(info->endSample);
 }
 
 void SoomplerAudioProcessor::setVolume(double volume)
@@ -206,6 +214,18 @@ void SoomplerAudioProcessor::noteOff(int noteNumber)
     synth.noteOff(0, noteNumber, volume, true);
 }
 
+void SoomplerAudioProcessor::setRootNote(int rootNote)
+{
+    auto sound = static_cast<soompler::ExtendedSound*> (synth.getSound(0).get());
+    sound->setRootNote(rootNote);
+}
+
+void SoomplerAudioProcessor::setNoteRange(const BigInteger &noteRange)
+{
+    auto sound = static_cast<soompler::ExtendedSound*> (synth.getSound(0).get());
+    sound->setMidiRange(noteRange);
+}
+
 MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
 {
     MidiBuffer output;
@@ -247,7 +267,7 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
 {
-    this->loadedSample = sampleFile;
+    this->loadedSample = std::make_shared<File>(sampleFile);
 
     auto sound = getSampleData(loadedSample);
     if (sound != nullptr)
@@ -259,11 +279,22 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
     setSampleStartPosition(0);
     setSampleEndPosition(transportSource.getTotalLength());
     notifyTransportStateChanged(TransportState::Ready);
+
+    sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), getSampleRate(), sampleFile.getFileName());
+
+    notifySampleInfoListeners();
+}
+
+void SoomplerAudioProcessor::notifySampleInfoListeners()
+{
+    for (auto sampleInfoListener : sampleInfoListeners) {
+        sampleInfoListener->newSampleInfoRecieved(sampleInfo);
+    }
 }
 
 void SoomplerAudioProcessor::playSample()
 {
-    if (!loadedSample.has_value())
+    if (loadedSample == nullptr)
     {
         DBG("sample is not loaded and cannot be played");
         return;
@@ -303,8 +334,12 @@ void SoomplerAudioProcessor::updateTransportState()
     }
 }
 
-SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> sampleFile)
+SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File> sampleFile)
 {
+    if (sampleFile == nullptr) {
+        return nullptr;
+    }
+    
     //auto* soundBuffer = sampleFile->createInputStream();
     AudioFormat* format = getFormatForFileOrNullptr(sampleFile);
     if (format == nullptr)
@@ -312,17 +347,18 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::optional<File> 
         return nullptr;
     }
 
-    auto formatReader = formatManager.createReaderFor(sampleFile.value());
+    auto formatReader = formatManager.createReaderFor(*sampleFile);
 
     setTransportSource(formatReader);
-    thumbnail.setSource(new FileInputSource(sampleFile.value()));
+    thumbnail.setSource(new FileInputSource(*sampleFile));
 
     BigInteger midiNotes;
-    midiNotes.setRange(0, 126, true);
-    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, 0x48, 0.0, 0.0, Settings::MAX_SAMPLE_LENGTH);
+    midiNotes.setRange(Settings::DEFAULT_MIN_NOTE, Settings::DEFAULT_MAX_NOTE - Settings::DEFAULT_MIN_NOTE + 1, true);
+    return new soompler::ExtendedSound(sampleFile->getFileName(), *formatReader, midiNotes, Settings::DEFAULT_ROOT_NOTE,
+                                       Settings::DEFAULT_ATTACK_TIME, Settings::DEFAULT_RELEASE_TIME, Settings::MAX_SAMPLE_LENGTH);
 }
 
-AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::optional<File> sampleFile)
+AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile)
 {
     AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile->getFileExtension());
 
@@ -393,6 +429,47 @@ double SoomplerAudioProcessor::getSynthCurrentPosition()
     return voice->getCurrentPosition();
 }
 
+std::shared_ptr<TransportInfo> SoomplerAudioProcessor::getTransportInfo()
+{
+    auto info = std::make_shared<TransportInfo>(this->getSampleRate());
+    info->setAudioPosition(getCurrentAudioPosition());
+
+    return info;
+}
+
+void SoomplerAudioProcessor::addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener)
+{
+    this->sampleInfoListeners.push_back(sampleInfoListener);
+}
+
+void SoomplerAudioProcessor::setAdsrParams(ADSR::Parameters params)
+{
+    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
+    if (sound == nullptr) {
+        return;
+    }
+
+    sound->setAdsrParams(params);
+}
+
+void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
+    auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
+    voice->enableLooping(loopEnable);
+}
+
+void SoomplerAudioProcessor::reverseSample()
+{
+    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
+    if (sound == nullptr || !thumbnail.isFullyLoaded()) {
+        return;
+    }
+
+    sound->reverse();
+    thumbnail.reset(2, getSampleRate());
+
+    auto newAudioData = sound->getAudioData();
+    thumbnail.addBlock(thumbnail.getNumSamplesFinished(), *newAudioData, 0, newAudioData->getNumSamples());
+}
 
 //==============================================================================
 // This creates new instances of the plugin..

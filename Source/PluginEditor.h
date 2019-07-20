@@ -14,46 +14,35 @@
 #include "PluginProcessor.h"
 #include "TransportStateListener.h"
 #include "Settings.h"
-#include "PianoRoll.h"
+#include "MainPanel.h"
 
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessorEditor  : public AudioProcessorEditor,
-        private Button::Listener, private TransportStateListener, private ChangeListener, private Timer,
-        private Slider::Listener
+class SoomplerAudioProcessorEditor  :
+        public AudioProcessorEditor,
+        private TransportStateListener,
+        private ChangeListener,
+        private Timer
 {
 public:
     explicit SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
-    ~SoomplerAudioProcessorEditor() override;
+    ~SoomplerAudioProcessorEditor() override = default;
 
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
 
 private:
-    void buttonClicked(Button*) override;
-    void openFileButtonClicked();
-    void playSampleButtonClicked();
-    void stopSampleButtonClicked();
-    String getLoadedSampleNameOrPlaceholder();
     void transportStateChanged(TransportState state) override;
 
     void changeListenerCallback(ChangeBroadcaster* source) override ;
     void thumbnailChanged(AudioThumbnail& thumbnail);
-    void drawThumbnail(Graphics& graphics);
     void drawSampleNameOrMessage(Graphics& graphics);
 
     void timerCallback() override;
 
-    void mouseDrag(const MouseEvent &event) override;
-
-    bool isIntersectWithStartRangeLine(Point<int>& point);
-    bool isIntersectWithEndRangeLine(Point<int>& point);
-
     int64 calculateSampleByCoords(int coord);
-
-    void sliderValueChanged(Slider *slider) override;
 
     void calculateEndRangeX();
 
@@ -61,23 +50,9 @@ private:
     // access the processor object that created it.
     SoomplerAudioProcessor& processor;
 
-    TextButton openFileButton;
-    TextButton playSampleButton;
-    TextButton stopSampleButton;
-    Slider volumeKnob;
-    Label volumeLabel;
-    PianoRoll pianoRoll;
-
-    Image backgroundImage;
+    MainPanel mainPanel;
 
     Font mainFont;
-
-    // not active sample regions, before start line and after end lines
-    int startRangeX;
-    int endRangeX;
-
-    // max range x value according to max sample length value
-    int maxRangeX;
 
     // OpenGL context to speed up UI rendering
     OpenGLContext glContext;

@@ -14,11 +14,19 @@
 #include "TransportStateListener.h"
 #include "MidiEventSupplier.h"
 #include "MidiEventConsumer.h"
+#include "TransportInfo.h"
+#include "SampleInfo.h"
 
 //==============================================================================
 /**
 */
-class SoomplerAudioProcessor  : public AudioProcessor, ChangeListener, MidiEventSupplier, MidiEventConsumer
+class SoomplerAudioProcessor  :
+        public AudioProcessor,
+        ChangeListener,
+        public MidiEventSupplier,
+        public MidiEventConsumer,
+        public TransportInfoOwner,
+        public SampleInfoListener
 {
 public:
     //==============================================================================
@@ -58,9 +66,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    std::optional<File> getLoadedSample() const {
-        return loadedSample;
-    }
+    std::shared_ptr<File> getLoadedSample() const;
 
     AudioThumbnail& getThumbnail() {
         return thumbnail;
@@ -87,6 +93,7 @@ public:
     // percent of a sample length
     void setSampleStartPosition(int64 sample);
     void setSampleEndPosition(int64 sample);
+    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
 
     void setVolume(double volume);
 
@@ -94,16 +101,26 @@ public:
 
     std::vector<int> getActiveNotes() override;
 
-    void noteOn(int noteNumber);
-    void noteOff(int noteNumber);
+    void noteOn(int noteNumber) override;
+    void noteOff(int noteNumber) override;
+    void setRootNote(int rootNote) override;
+    void setNoteRange(const BigInteger& noteRange) override;
+
+    std::shared_ptr<TransportInfo> getTransportInfo() override;
+
+    void addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener);
+
+    void setAdsrParams(ADSR::Parameters params);
+    
+    void setLoopEnabled(bool loopEnable);
+
+    void reverseSample();
 
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 
-    std::optional<File> loadedSample;
+    std::shared_ptr<File> loadedSample;
     Synthesiser synth;
-    std::unique_ptr<SynthesiserSound> synthSound;
     int currentSample;
 
     AudioFormatManager formatManager;
@@ -122,12 +139,17 @@ private:
 
     double volume;
 
-    SynthesiserSound::Ptr getSampleData(std::optional<File> sampleFile);
-    AudioFormat* getFormatForFileOrNullptr(std::optional<File> sampleFile);
+    std::shared_ptr<SampleInfo> sampleInfo;
+    std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
+
+    SynthesiserSound::Ptr getSampleData(std::shared_ptr<File> sampleFile);
+    AudioFormat* getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);
     double getSynthCurrentPosition();
     MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel);
+    void notifySampleInfoListeners();
 
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 };

@@ -15,4 +15,9 @@ class MidiEventConsumer
 public:
     virtual void noteOn(int noteNumber) = 0;
     virtual void noteOff(int noteNumber) = 0;
+
+    virtual void setRootNote(int rootNote) = 0;
+    virtual void setNoteRange(const BigInteger& notes) = 0;
+    
+    virtual ~MidiEventConsumer() = default;
 };

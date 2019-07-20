@@ -43,7 +43,7 @@ public:
     /** Returns the audio sample data.
         This could return nullptr if there was a problem loading the data.
     */
-    const AudioBuffer<float>& getAudioData() const noexcept       { return *data.get(); }
+    const std::shared_ptr<AudioBuffer<float>> getAudioData() const noexcept       { return data; }
 
     //==============================================================================
     /** Changes the parameters of the ADSR envelope which will be applied to the sample. */
@@ -53,12 +53,19 @@ public:
     bool appliesToNote (int midiNoteNumber) override;
     bool appliesToChannel (int midiChannel) override;
 
+    void setAdsrParams(ADSR::Parameters adrs);
+
+    void reverse();
+
+    void setRootNote(int rootNote);
+    void setMidiRange(const BigInteger& midiNotes);
+
 private:
     //==============================================================================
     friend class ExtendedVoice;
 
     String name;
-    std::unique_ptr<AudioBuffer<float>> data;
+    std::shared_ptr<AudioBuffer<float>> data;
     double sourceSampleRate;
     BigInteger midiNotes;
     int length = 0, midiRootNote = 0;
@@ -81,7 +88,7 @@ class JUCE_API  ExtendedVoice    : public SynthesiserVoice
 {
 public:
     //==============================================================================
-    ExtendedVoice(std::shared_ptr<ChangeListener> listener);
+    ExtendedVoice(ChangeListener* listener);
 
     /** Destructor. */
     ~ExtendedVoice() override = default;
@@ -107,17 +114,22 @@ public:
     // volume from 0.0f to 1.0f
     void setVolume(float volume);
 
+    void removeListener();
+    
+    void enableLooping(bool enable);
+
 private:
     //==============================================================================
     double pitchRatio = 0;
     double sourceSamplePosition = 0;
     float lgain = 0, rgain = 0;
     float volume;
+    bool loopingEnabled;
 
     int64 firstSampleToPlay = 0;
     int64 endSample = 0;
 
-    std::shared_ptr<ChangeListener> eventListener;
+    ChangeListener* eventListener;
 
     ADSR adsr;
 

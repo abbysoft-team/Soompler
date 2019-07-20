@@ -3,6 +3,8 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MidiEventSupplier.h"
 #include "MidiEventConsumer.h"
+#include <array>
+#include "SampleInfo.h"
 
 class KeyInfo
 {
@@ -15,16 +17,24 @@ public:
 
     bool contains(Point<int> point)
     {
-        Rectangle<int> rect(x, 0, width, height);
+        Rectangle<int> rect(x, Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT, width, height);
         return rect.contains(point);
     }
+};
+
+enum MarkerType
+{
+    NO_MARKER,
+    MIN_NOTE,
+    MAX_NOTE,
+    ROOT_NOTE
 };
 
 //==============================================================================
 /**
 
 */
-class PianoRoll  : public Component
+class PianoRoll  : public Component, public SampleInfoListener
 {
 public:
     PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer);
@@ -40,6 +50,18 @@ private:
     MidiEventSupplier& midiSupplier;
     MidiEventConsumer& midiConsumer;
 
+    // stores some metadata for keys
+    std::array<KeyInfo, MAX_KEYS> keysInfo;
+
+    std::shared_ptr<SampleInfo> sample;
+
+    Path rootMarker;
+    Path minMarker;
+    Path maxMarker;
+
+    // Which marker is dragged now
+    MarkerType draggedMarker;
+
     std::vector<int> getActiveMidiNotes();
     void calculateKeysInfo();
     void drawActiveNotes(Graphics& g, std::vector<int> activeNotes);
@@ -47,13 +69,24 @@ private:
 
     void mouseDown(const MouseEvent& event) override;
     void mouseUp(const MouseEvent& event) override;
+    void mouseDrag(const MouseEvent& event) override;
 
     void fireNoteOn(int noteNumber);
     void fireNoteOff(int noteNumber);
 
-    // stores some metadata for keys
-    std::array<KeyInfo, MAX_KEYS> keysInfo;
+    void drawNoteRangeAndRoot(Graphics& g);
+    void createMarkers(std::shared_ptr<SampleInfo> info);
+    Path createMarker(int noteNum, bool root);
+
+    void drawDisabledNotesMask(Graphics& g);
+
+    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
+
+    void rootMarkerDragged(Point<int> position);
+    void minMarkerDragged(Point<int> position);
+    void maxMarkerDragged(Point<int> position);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoRoll)
+
 };
 
