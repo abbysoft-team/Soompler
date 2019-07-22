@@ -24,12 +24,50 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    endSample(0),
                                                    volume(0.5)
 {
+    initParameters();
+    
     synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
 
     formatManager.registerBasicFormats();
 
     transportSource.addChangeListener(this);
+}
+
+void SoomplerAudioProcessor::initParameters()
+{
+    volumeParameter = new AudioParameterFloat("volume",
+                                              TRANS("Volume\n"),
+                                              0.0f,
+                                              1.0f,
+                                              0.5f);
+    attackParameter = new AudioParameterFloat("attack",
+                                              TRANS("Attack\n"),
+                                              0.0f,
+                                              Settings::MAX_ATTACK_TIME,
+                                              0.0f);
+    decayParameter = new AudioParameterFloat("decay",
+                                             TRANS("Decay\n"),
+                                             0.0f,
+                                             Settings::MAX_DECAY_TIME,
+                                             0.0f);
+    sustainParameter = new AudioParameterFloat("sustain",
+                                               TRANS("Sustain\n"),
+                                               0.0f,
+                                               1.0f,
+                                               1.0f);
+    releaseParameter = new AudioParameterFloat("release",
+                                               TRANS("Release\n"),
+                                               0.0f,
+                                               Settings::MAX_RELEASE_TIME,
+                                               0.0f);
+    
+    
+    addParameter(volumeParameter);
+    addParameter(attackParameter);
+    addParameter(decayParameter);
+    addParameter(sustainParameter);
+    addParameter(releaseParameter);
 }
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()

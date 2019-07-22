@@ -29,6 +29,14 @@ class SoomplerAudioProcessor  :
         public SampleInfoListener
 {
 public:
+    
+    // parameters
+    AudioParameterFloat* volumeParameter;
+    AudioParameterFloat* attackParameter;
+    AudioParameterFloat* decayParameter;
+    AudioParameterFloat* sustainParameter;
+    AudioParameterFloat* releaseParameter;
+    
     //==============================================================================
     SoomplerAudioProcessor();
     ~SoomplerAudioProcessor() override;
@@ -142,6 +150,8 @@ private:
     std::shared_ptr<SampleInfo> sampleInfo;
     std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
 
+    void initParameters();
+    
     SynthesiserSound::Ptr getSampleData(std::shared_ptr<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
