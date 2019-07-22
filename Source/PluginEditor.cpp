@@ -19,7 +19,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
-    
+   
     // load built-in font
     auto typeface = Typeface::createSystemTypefaceFor(BinaryData::RobotoCondensedRegular_ttf, BinaryData::RobotoCondensedRegular_ttfSize);
     mainFont = Font(typeface);

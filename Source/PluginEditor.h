@@ -56,6 +56,8 @@ private:
 
     // OpenGL context to speed up UI rendering
     OpenGLContext glContext;
+    
+    SharedResourcePointer<TooltipWindow> tooltipWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };
