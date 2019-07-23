@@ -17,57 +17,35 @@
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
                                                    ChangeListener(),
+                                                   stateManager(*this, nullptr, Identifier("SoomplerState"), createParametersLayout()),
                                                    currentSample(0),
                                                    thumbnailCache(5),
                                                    thumbnail(256, formatManager, thumbnailCache),
                                                    startSample(0),
-                                                   endSample(0),
-                                                   volume(0.5)
-{
-    initParameters();
-    
+                                                   endSample(0)
+{    
     synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
 
     formatManager.registerBasicFormats();
 
     transportSource.addChangeListener(this);
+
+    volume = *(stateManager.getRawParameterValue("volume"));
 }
 
-void SoomplerAudioProcessor::initParameters()
+AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createParametersLayout()
 {
-    volumeParameter = new AudioParameterFloat("volume",
-                                              TRANS("Volume\n"),
-                                              0.0f,
-                                              1.0f,
-                                              0.5f);
-    attackParameter = new AudioParameterFloat("attack",
-                                              TRANS("Attack\n"),
-                                              0.0f,
-                                              Settings::MAX_ATTACK_TIME,
-                                              0.0f);
-    decayParameter = new AudioParameterFloat("decay",
-                                             TRANS("Decay\n"),
-                                             0.0f,
-                                             Settings::MAX_DECAY_TIME,
-                                             0.0f);
-    sustainParameter = new AudioParameterFloat("sustain",
-                                               TRANS("Sustain\n"),
-                                               0.0f,
-                                               1.0f,
-                                               1.0f);
-    releaseParameter = new AudioParameterFloat("release",
-                                               TRANS("Release\n"),
-                                               0.0f,
-                                               Settings::MAX_RELEASE_TIME,
-                                               0.0f);
+
+    AudioProcessorValueTreeState::ParameterLayout parameterLayout = {
+        std::make_unique<AudioParameterFloat>("volume", TRANS("Volume\n"), 0.0f, 1.0f, 0.5f),
+        std::make_unique<AudioParameterFloat>("attack", TRANS("Attack\n"), 0.0f, Settings::MAX_ATTACK_TIME, 0.0f),
+        std::make_unique<AudioParameterFloat>("decay", TRANS("Decay\n"), 0.0f, Settings::MAX_DECAY_TIME, 0.0f),
+        std::make_unique<AudioParameterFloat>("sustain", TRANS("Sustain\n"), 0.0f, 1.0f, 1.0f),
+        std::make_unique<AudioParameterFloat>("release", TRANS("Release\n"), 0.0f, Settings::MAX_RELEASE_TIME, 0.0f),
+    };
     
-    
-    addParameter(volumeParameter);
-    addParameter(attackParameter);
-    addParameter(decayParameter);
-    addParameter(sustainParameter);
-    addParameter(releaseParameter);
+    return parameterLayout;
 }
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
@@ -210,6 +188,7 @@ void SoomplerAudioProcessor::newSampleInfoRecieved(std::shared_ptr<SampleInfo> i
     setSampleEndPosition(info->endSample);
 }
 
+//TODO remove
 void SoomplerAudioProcessor::setVolume(double volume)
 {
     this->volume = volume;
@@ -244,12 +223,22 @@ std::vector<int> SoomplerAudioProcessor::getActiveNotes()
 
 void SoomplerAudioProcessor::noteOn(int noteNumber)
 {
-    synth.noteOn(0, noteNumber, volume);
+    // set current adsr params
+    auto adsr = ADSR::Parameters();
+    adsr.attack = getFloatParameter("attack");
+    adsr.decay = getFloatParameter("decay");
+    adsr.sustain = getFloatParameter("sustain");
+    adsr.release = getFloatParameter("release");
+
+    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
+    sound->setAdsrParams(adsr);
+
+    synth.noteOn(0, noteNumber, getFloatParameter("volume"));
 }
 
 void SoomplerAudioProcessor::noteOff(int noteNumber)
 {
-    synth.noteOff(0, noteNumber, volume, true);
+    synth.noteOff(0, noteNumber, getFloatParameter("volume"), true);
 }
 
 void SoomplerAudioProcessor::setRootNote(int rootNote)
@@ -292,15 +281,22 @@ AudioProcessorEditor* SoomplerAudioProcessor::createEditor()
 //==============================================================================
 void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto state = stateManager.copyState();
+    std::unique_ptr<XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+
+    if (xmlState.get() == nullptr) {
+        return;
+    }
+
+    if (xmlState->hasTagName(stateManager.state.getType())) {
+        stateManager.replaceState(ValueTree::fromXml(*xmlState));
+    }
 }
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
@@ -507,6 +503,16 @@ void SoomplerAudioProcessor::reverseSample()
 
     auto newAudioData = sound->getAudioData();
     thumbnail.addBlock(thumbnail.getNumSamplesFinished(), *newAudioData, 0, newAudioData->getNumSamples());
+}
+
+AudioProcessorValueTreeState &SoomplerAudioProcessor::getStateManager()
+{
+    return stateManager;
+}
+
+float SoomplerAudioProcessor::getFloatParameter(const String &paramId)
+{
+    return *(stateManager.getRawParameterValue(paramId));
 }
 
 //==============================================================================

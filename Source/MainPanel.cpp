@@ -3,7 +3,8 @@
 #include "Strings.h"
 
 //==============================================================================
-MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor), editor(this)
+MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processor.getStateManager()),
+    processor(processor), editor(this)
 {
     setSize(Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
     setName("mainPanel");
@@ -14,12 +15,13 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     addAndMakeVisible(volumeKnob.get());
     editor.addToGuiEditor(volumeKnob.get());
     volumeKnob->setTooltip (TRANS("volume"));
-    volumeKnob->setRange (0.0, 1.0, 0.01);
-    volumeKnob->setValue(0.5);
+    //volumeKnob->setRange (0.0, 1.0, 0.01);
+    //volumeKnob->setValue(0.5);
     volumeKnob->setSliderStyle (Slider::Rotary);
     volumeKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    volumeKnob->addListener (this);
+    //volumeKnob->addListener (this);
     volumeKnob->setBounds (60, 230, 50, 50);
+    volumeAttachment.reset(new SliderAttachment(stateManager, "volume", *volumeKnob));
 
     volumeKnobLabel.reset (new Label ("volume knob label",
                                       TRANS("Volume\n")));
@@ -106,12 +108,13 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     addAndMakeVisible(attackKnob.get());
     editor.addToGuiEditor(attackKnob.get());
     attackKnob->setTooltip (TRANS("Attack"));
-    attackKnob->setRange (0.0, Settings::MAX_ATTACK_TIME, 0.01);
-    attackKnob->setValue(Settings::DEFAULT_ATTACK_TIME);
+//    attackKnob->setRange (0.0, Settings::MAX_ATTACK_TIME, 0.01);
+//    attackKnob->setValue(Settings::DEFAULT_ATTACK_TIME);
     attackKnob->setSliderStyle (Slider::Rotary);
     attackKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    attackKnob->addListener (this);
+    //attackKnob->addListener (this);
     attackKnob->setBounds (150, 230, 50, 50);
+    attackAttachment.reset(new SliderAttachment(stateManager, "attack", *attackKnob));
 
     attackKnobLabel.reset (new Label ("attack knob label",
                                       TRANS("Attack\n")));
@@ -128,12 +131,13 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     addAndMakeVisible(decayKnob.get());
     editor.addToGuiEditor(decayKnob.get());
     decayKnob->setTooltip (TRANS("Decay"));
-    decayKnob->setRange (0.0, Settings::MAX_DECAY_TIME, 0.01);
-    decayKnob->setValue(Settings::DEFAULT_DECAY_TIME);
+//    decayKnob->setRange (0.0, Settings::MAX_DECAY_TIME, 0.01);
+//    decayKnob->setValue(Settings::DEFAULT_DECAY_TIME);
     decayKnob->setSliderStyle (Slider::Rotary);
     decayKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    decayKnob->addListener (this);
+    //decayKnob->addListener (this);
     decayKnob->setBounds (200, 230, 50, 50);
+    decayAttachment.reset(new SliderAttachment(stateManager, "decay", *decayKnob));
 
     decayKnobLabel.reset (new Label ("decay knob label",
                                       TRANS("Decay\n")));
@@ -150,12 +154,13 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     addAndMakeVisible(sustainKnob.get());
     editor.addToGuiEditor(sustainKnob.get());
     sustainKnob->setTooltip (TRANS("Sustain"));
-    sustainKnob->setRange (0.0, 1.0, 0.01);
-    sustainKnob->setValue(Settings::DEFAULT_SUSTAIN_LEVEL);
+//    sustainKnob->setRange (0.0, 1.0, 0.01);
+//    sustainKnob->setValue(Settings::DEFAULT_SUSTAIN_LEVEL);
     sustainKnob->setSliderStyle (Slider::Rotary);
     sustainKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    sustainKnob->addListener (this);
+   // sustainKnob->addListener (this);
     sustainKnob->setBounds (250, 230, 50, 50);
+    sustainAttachment.reset(new SliderAttachment(stateManager, "sustain", *sustainKnob));
 
     sustainKnobLabel.reset (new Label ("sustain knob label",
                                       TRANS("Sustain\n")));
@@ -172,12 +177,13 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     addAndMakeVisible(releaseKnob.get());
     editor.addToGuiEditor(releaseKnob.get());
     releaseKnob->setTooltip (TRANS("Release"));
-    releaseKnob->setRange (0.0, Settings::MAX_RELEASE_TIME, 0.01);
-    releaseKnob->setValue(Settings::DEFAULT_RELEASE_TIME);
+//    releaseKnob->setRange (0.0, Settings::MAX_RELEASE_TIME, 0.01);
+//    releaseKnob->setValue(Settings::DEFAULT_RELEASE_TIME);
     releaseKnob->setSliderStyle (Slider::Rotary);
     releaseKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    releaseKnob->addListener (this);
+    //releaseKnob->addListener (this);
     releaseKnob->setBounds (300, 230, 50, 50);
+    releaseAttachment.reset(new SliderAttachment(stateManager, "release", *releaseKnob));
 
     releaseKnobLabel.reset (new Label ("release knob label",
                                       TRANS("Release\n")));
@@ -210,6 +216,16 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
 
 MainPanel::~MainPanel()
 {
+    volumeAttachment = nullptr;
+    attackAttachment = nullptr;
+    decayAttachment = nullptr;
+    sustainAttachment = nullptr;
+    releaseAttachment = nullptr;
+
+    attackKnob = nullptr;
+    decayKnob = nullptr;
+    sustainKnob = nullptr;
+    releaseKnob = nullptr;
     volumeKnob = nullptr;
     volumeKnobLabel = nullptr;
     openFileButton = nullptr;
@@ -217,6 +233,8 @@ MainPanel::~MainPanel()
     sampleViewer = nullptr;
     loadSampleTip = nullptr;
     pianoRoll = nullptr;
+    reverseButton = nullptr;
+    loopButton = nullptr;
 }
 
 //==============================================================================

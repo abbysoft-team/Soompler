@@ -27,6 +27,15 @@ public:
     float getVolume() const;
 
 private:
+
+    AudioProcessorValueTreeState& stateManager;
+
+    std::unique_ptr<SliderAttachment> volumeAttachment;
+    std::unique_ptr<SliderAttachment> attackAttachment;
+    std::unique_ptr<SliderAttachment> decayAttachment;
+    std::unique_ptr<SliderAttachment> sustainAttachment;
+    std::unique_ptr<SliderAttachment> releaseAttachment;
+
     std::unique_ptr<Slider> volumeKnob;
     std::unique_ptr<Slider> attackKnob;
     std::unique_ptr<Slider> decayKnob;

@@ -17,6 +17,9 @@
 #include "TransportInfo.h"
 #include "SampleInfo.h"
 
+typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
+
 //==============================================================================
 /**
 */
@@ -29,13 +32,6 @@ class SoomplerAudioProcessor  :
         public SampleInfoListener
 {
 public:
-    
-    // parameters
-    AudioParameterFloat* volumeParameter;
-    AudioParameterFloat* attackParameter;
-    AudioParameterFloat* decayParameter;
-    AudioParameterFloat* sustainParameter;
-    AudioParameterFloat* releaseParameter;
     
     //==============================================================================
     SoomplerAudioProcessor();
@@ -124,8 +120,14 @@ public:
 
     void reverseSample();
 
+    AudioProcessorValueTreeState& getStateManager();
+
+    float getFloatParameter(const String& paramId);
+
 private:
     //==============================================================================
+
+    AudioProcessorValueTreeState stateManager;
 
     std::shared_ptr<File> loadedSample;
     Synthesiser synth;
@@ -145,13 +147,13 @@ private:
 
     MidiBuffer lastMidiEvents;
 
-    double volume;
+    float volume;
 
     std::shared_ptr<SampleInfo> sampleInfo;
     std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
 
-    void initParameters();
-    
+    AudioProcessorValueTreeState::ParameterLayout createParametersLayout();
+
     SynthesiserSound::Ptr getSampleData(std::shared_ptr<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
