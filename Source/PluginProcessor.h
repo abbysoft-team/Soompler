@@ -124,6 +124,8 @@ public:
 
     float getFloatParameter(const String& paramId);
 
+    std::shared_ptr<SampleInfo> getCurrentSampleInfo();
+
 private:
     //==============================================================================
 

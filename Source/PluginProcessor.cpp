@@ -42,7 +42,7 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
         std::make_unique<AudioParameterFloat>("attack", TRANS("Attack\n"), 0.0f, Settings::MAX_ATTACK_TIME, 0.0f),
         std::make_unique<AudioParameterFloat>("decay", TRANS("Decay\n"), 0.0f, Settings::MAX_DECAY_TIME, 0.0f),
         std::make_unique<AudioParameterFloat>("sustain", TRANS("Sustain\n"), 0.0f, 1.0f, 1.0f),
-        std::make_unique<AudioParameterFloat>("release", TRANS("Release\n"), 0.0f, Settings::MAX_RELEASE_TIME, 0.0f),
+        std::make_unique<AudioParameterFloat>("release", TRANS("Release\n"), 0.0f, Settings::MAX_RELEASE_TIME, 0.0f)
     };
     
     return parameterLayout;
@@ -281,6 +281,22 @@ AudioProcessorEditor* SoomplerAudioProcessor::createEditor()
 //==============================================================================
 void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
+    // save state
+    ValueTree loadedSampleNameValue = ValueTree("loadedSampleName");
+    ValueTree loadedSampleLengthValue = ValueTree("loadedSampleLength");
+    ValueTree startSampleValue = ValueTree("startSample");
+    ValueTree endSampleValue = ValueTree("endSample");
+
+    stateManager.state.appendChild(loadedSampleNameValue, nullptr);
+    stateManager.state.appendChild(loadedSampleLengthValue, nullptr);
+    stateManager.state.appendChild(startSampleValue, nullptr);
+    stateManager.state.appendChild(endSampleValue, nullptr);
+
+    stateManager.state.setProperty("loadedSampleName", loadedSample->getFileName(), nullptr);
+    stateManager.state.setProperty("loadedSampleLength", sampleInfo->lengthInSeconds, nullptr);
+    stateManager.state.setProperty("startSample", startSample, nullptr);
+    stateManager.state.setProperty("endSample", endSample, nullptr);
+
     auto state = stateManager.copyState();
     std::unique_ptr<XmlElement> xml(state.createXml());
     copyXmlToBinary(*xml, destData);
@@ -288,7 +304,7 @@ void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
 
 void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+    std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes - sizeof(bool)));
 
     if (xmlState.get() == nullptr) {
         return;
@@ -297,6 +313,19 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     if (xmlState->hasTagName(stateManager.state.getType())) {
         stateManager.replaceState(ValueTree::fromXml(*xmlState));
     }
+
+    // restore variables
+    String sampleName = stateManager.state.getPropertyAsValue("loadedSampleName", nullptr).getValue();
+    float sampleLength = stateManager.state.getPropertyAsValue("loadedSampleLength", nullptr).getValue();
+    int64 startSample = stateManager.state.getPropertyAsValue("startSample", nullptr).getValue();
+    int64 endSample = stateManager.state.getPropertyAsValue("endSample", nullptr).getValue();
+
+    sampleInfo = std::make_shared<SampleInfo>(sampleLength, getSampleRate(), sampleName);
+    sampleInfo->startSample = startSample;
+    sampleInfo->endSample = endSample;
+
+    this->startSample = startSample;
+    this->endSample = endSample;
 }
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
@@ -313,6 +342,8 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
     setSampleStartPosition(0);
     setSampleEndPosition(transportSource.getTotalLength());
     notifyTransportStateChanged(TransportState::Ready);
+
+    stateManager.state.setProperty("loadedSample", var(sampleFile.getFullPathName()), nullptr);
 
     sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), getSampleRate(), sampleFile.getFileName());
 
@@ -513,6 +544,11 @@ AudioProcessorValueTreeState &SoomplerAudioProcessor::getStateManager()
 float SoomplerAudioProcessor::getFloatParameter(const String &paramId)
 {
     return *(stateManager.getRawParameterValue(paramId));
+}
+
+std::shared_ptr<SampleInfo> SoomplerAudioProcessor::getCurrentSampleInfo()
+{
+    return sampleInfo;
 }
 
 //==============================================================================

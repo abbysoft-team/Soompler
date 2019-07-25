@@ -37,6 +37,7 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -61,12 +62,12 @@ private:
     void drawThumbnail(Graphics& g);
     void drawPositionLine(Graphics& g);
     int64 calculateSampleByCoords(int coordOnThumbnail);
+    int calculateCoordBySample(int64 sample);
     void calculateEndRangeX();
     void notifySampleInfoListeners();
     String getCroppedNameIfNeeded();
 
     void mouseDrag(const MouseEvent &event) override;
-    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SampleViewer)

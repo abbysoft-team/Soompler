@@ -195,6 +195,8 @@ bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos)
 void SampleViewer::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
 {
     this->currentSample = info;
+    endRangeX = calculateCoordBySample(currentSample->endSample);
+    startRangeX = calculateCoordBySample(currentSample->startSample);
 
     calculateEndRangeX();
 }
@@ -215,7 +217,10 @@ void SampleViewer::calculateEndRangeX()
 
     notifySampleInfoListeners();
 
-    endRangeX = (partOfSampleAllowed * Settings::THUMBNAIL_BOUNDS.getWidth());
+    // end range of sample may be changed from end of sample allready,
+    // so we need to respect these changes
+    auto newEndRangeX = (partOfSampleAllowed * Settings::THUMBNAIL_BOUNDS.getWidth());
+    endRangeX = std::min((int) newEndRangeX, endRangeX);
     maxRangeX = endRangeX;
 }
 
@@ -226,9 +231,14 @@ void SampleViewer::notifySampleInfoListeners()
 
 int64 SampleViewer::calculateSampleByCoords(int coordOnThumbnail)
 {
-    double conversionsError = 0;
-    auto percentOfLength = coordOnThumbnail * 1.0 / Settings::THUMBNAIL_BOUNDS.getWidth() - conversionsError;
+    auto percentOfLength = coordOnThumbnail * 1.0 / Settings::THUMBNAIL_BOUNDS.getWidth();
     return ((int64) (percentOfLength * currentSample->lengthInSamples));
+}
+
+int SampleViewer::calculateCoordBySample(int64 sample)
+{
+    auto percentOfLength = sample * 1.0 / currentSample->lengthInSamples;
+    return getWidth() * percentOfLength;
 }
 
 void SampleViewer::resized()

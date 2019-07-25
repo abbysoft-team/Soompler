@@ -212,6 +212,14 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     // add GUI editor last
     // it ensures that gui overlay will work properly
     editor.initOverlay();
+
+    // check if sample already loaded
+    // (plugin reopened)
+    if (processor.getThumbnail().getNumChannels() > 0) {
+        // load current sample
+        sampleViewer->newSampleInfoRecieved(processor.getCurrentSampleInfo());
+        this->transportStateChanged(TransportState::Ready);
+    }
 }
 
 MainPanel::~MainPanel()
