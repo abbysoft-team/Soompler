@@ -11,7 +11,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
 
     backgroundImage = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
 
-    volumeKnob.reset (new Slider ("volume knob"));
+    volumeKnob.reset (new SoomplerSlider ("volume knob"));
     addAndMakeVisible(volumeKnob.get());
     editor.addToGuiEditor(volumeKnob.get());
     volumeKnob->setTooltip (TRANS("volume"));
@@ -34,7 +34,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     volumeKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     volumeKnobLabel->setBounds (60, 215, 64, 24);
 
-    openFileButton.reset (new ImageButton ("open file button"));
+    openFileButton.reset (new SoomplerImageButton ("open file button"));
     addAndMakeVisible (openFileButton.get());
     editor.addToGuiEditor (openFileButton.get());
     openFileButton->setTooltip (TRANS("Open Sample\n"));
@@ -47,7 +47,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
                                Image(), 1.000f, Colour (0x00000000));
     openFileButton->setBounds (8, 8, 39, 32);
 
-    aboutButton.reset (new ImageButton ("about button"));
+    aboutButton.reset (new SoomplerImageButton ("about button"));
     addAndMakeVisible (aboutButton.get());
     editor.addToGuiEditor (aboutButton.get());
     aboutButton->setTooltip (TRANS("About Program\n"));
@@ -104,7 +104,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     editor.addToGuiEditor (pianoRoll.get());
 
     // ADSR controls
-    attackKnob.reset (new Slider ("attack knob"));
+    attackKnob.reset (new SoomplerSlider ("attack knob"));
     addAndMakeVisible(attackKnob.get());
     editor.addToGuiEditor(attackKnob.get());
     attackKnob->setTooltip (TRANS("Attack"));
@@ -127,7 +127,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     attackKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     attackKnobLabel->setBounds (150, 215, 64, 24);
 
-    decayKnob.reset (new Slider ("decay knob"));
+    decayKnob.reset (new SoomplerSlider ("decay knob"));
     addAndMakeVisible(decayKnob.get());
     editor.addToGuiEditor(decayKnob.get());
     decayKnob->setTooltip (TRANS("Decay"));
@@ -150,7 +150,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     decayKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     decayKnobLabel->setBounds (200, 215, 64, 24);
 
-    sustainKnob.reset (new Slider ("sustain knob"));
+    sustainKnob.reset (new SoomplerSlider ("sustain knob"));
     addAndMakeVisible(sustainKnob.get());
     editor.addToGuiEditor(sustainKnob.get());
     sustainKnob->setTooltip (TRANS("Sustain"));
@@ -173,7 +173,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     sustainKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     sustainKnobLabel->setBounds (250, 215, 64, 24);
 
-    releaseKnob.reset (new Slider ("release knob"));
+    releaseKnob.reset (new SoomplerSlider ("release knob"));
     addAndMakeVisible(releaseKnob.get());
     editor.addToGuiEditor(releaseKnob.get());
     releaseKnob->setTooltip (TRANS("Release"));
@@ -197,7 +197,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     releaseKnobLabel->setBounds (300, 215, 64, 24);
 
     // Reverse sample
-    reverseButton.reset(new ToggleButton(TRANS("Reverse\n")));
+    reverseButton.reset(new SoomplerToggleButton(TRANS("Reverse\n")));
     addAndMakeVisible(reverseButton.get());
     editor.addToGuiEditor(reverseButton.get());
     reverseButton->setBounds(380, 230, 100, 50);

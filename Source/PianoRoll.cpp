@@ -245,6 +245,24 @@ void PianoRoll::mouseDrag(const MouseEvent &event)
     }
 }
 
+void PianoRoll::mouseMove(const MouseEvent &event)
+{
+    auto position = event.getPosition();
+
+    // markers have negative Y because of render way, so here we compensate it
+    auto positionForMarkers = Point<float>(position.x, position.y - Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
+
+    if (rootMarker.contains(positionForMarkers)) {
+        setMouseCursor(MouseCursor::PointingHandCursor);
+    } else if (minMarker.contains(positionForMarkers)) {
+        setMouseCursor(MouseCursor::PointingHandCursor);
+    } else if (maxMarker.contains(positionForMarkers)) {
+        setMouseCursor(MouseCursor::PointingHandCursor);
+    } else {
+        setMouseCursor(MouseCursor::NormalCursor);
+    }
+}
+
 int PianoRoll::getKeyClicked(Point<int> point)
 {
     for (int i = FIRST_VISIBLE_KEY; i < MAX_KEYS; i++) {

@@ -68,6 +68,7 @@ private:
     String getCroppedNameIfNeeded();
 
     void mouseDrag(const MouseEvent &event) override;
+    void mouseMove(const MouseEvent &event) override;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SampleViewer)

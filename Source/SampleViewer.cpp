@@ -181,6 +181,18 @@ void SampleViewer::mouseDrag(const MouseEvent &event)
     }
 }
 
+void SampleViewer::mouseMove(const MouseEvent &event)
+{
+    Component::mouseMove(event);
+
+    auto position = event.getPosition();
+    if (isIntersectWithRangeLine(position, startRangeX) || isIntersectWithRangeLine(position, endRangeX)) {
+        setMouseCursor(MouseCursor::PointingHandCursor);
+    } else {
+        setMouseCursor(MouseCursor::NormalCursor);
+    }
+}
+
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos)
 {
     static Rectangle<int> rangeLine;

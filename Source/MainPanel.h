@@ -6,6 +6,9 @@
 #include "PianoRoll.h"
 #include "GuiEditor.h"
 #include "ToggledImageButton.h"
+#include "SoomplerSlider.h"
+#include "SoomplerImageButton.h"
+#include "SoomplerToggleButton.h"
 
 class MainPanel  : public Component,
                    public Slider::Listener,
@@ -38,11 +41,11 @@ private:
     std::unique_ptr<SliderAttachment> releaseAttachment;
     std::unique_ptr<ButtonAttachment> loopAttachment;
 
-    std::unique_ptr<Slider> volumeKnob;
-    std::unique_ptr<Slider> attackKnob;
-    std::unique_ptr<Slider> decayKnob;
-    std::unique_ptr<Slider> sustainKnob;
-    std::unique_ptr<Slider> releaseKnob;
+    std::unique_ptr<SoomplerSlider> volumeKnob;
+    std::unique_ptr<SoomplerSlider> attackKnob;
+    std::unique_ptr<SoomplerSlider> decayKnob;
+    std::unique_ptr<SoomplerSlider> sustainKnob;
+    std::unique_ptr<SoomplerSlider> releaseKnob;
 
     std::unique_ptr<Label> volumeKnobLabel;
     std::unique_ptr<Label> attackKnobLabel;
@@ -57,11 +60,11 @@ private:
 
 //    std::unique_ptr<ImageButton> playButton;
 //    std::unique_ptr<ImageButton> stopButton;
-    std::unique_ptr<ImageButton> openFileButton;
-    std::unique_ptr<ImageButton> aboutButton;
+    std::unique_ptr<SoomplerImageButton> openFileButton;
+    std::unique_ptr<SoomplerImageButton> aboutButton;
     std::unique_ptr<ToggledImageButton> loopButton;
 
-    std::unique_ptr<ToggleButton> reverseButton;
+    std::unique_ptr<SoomplerToggleButton> reverseButton;
 
     ADSR::Parameters adsrParams;
 

@@ -35,6 +35,13 @@ void ToggledImageButton::mouseDown(const juce::MouseEvent &event) {
     toggled = !toggled;
 }
 
+void ToggledImageButton::mouseMove(const MouseEvent &event)
+{
+    ImageButton::Component::mouseMove(event);
+
+    this->setMouseCursor(MouseCursor::PointingHandCursor);
+}
+
 void ToggledImageButton::setToggled(bool toggled) {
     this->toggled = toggled;
 }
