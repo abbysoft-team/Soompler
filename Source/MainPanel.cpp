@@ -421,6 +421,7 @@ void MainPanel::restoreMainPanelState() {
     if (processor.getThumbnail().getNumChannels() > 0) {
         // load current sample
         sampleViewer->newSampleInfoRecieved(processor.getCurrentSampleInfo());
+        pianoRoll->newSampleInfoRecieved(processor.getCurrentSampleInfo());
         
         bool reversed = processor.isSampleReversed();
         bool looped = processor.isLoopModeOn();
