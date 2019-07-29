@@ -536,6 +536,8 @@ void SoomplerAudioProcessor::setAdsrParams(ADSR::Parameters params)
 void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
     auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
     voice->enableLooping(loopEnable);
+
+    loopMode = loopEnable;
 }
 
 void SoomplerAudioProcessor::reverseSample()
@@ -550,6 +552,8 @@ void SoomplerAudioProcessor::reverseSample()
 
     auto newAudioData = sound->getAudioData();
     thumbnail.addBlock(thumbnail.getNumSamplesFinished(), *newAudioData, 0, newAudioData->getNumSamples());
+
+    reverse = !reverse;
 }
 
 AudioProcessorValueTreeState &SoomplerAudioProcessor::getStateManager()
