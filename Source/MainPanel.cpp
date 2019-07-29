@@ -73,9 +73,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
                             Image(), 1.000f, Colour (0x00000000),
                             Image(), 1.000f, Colour (0x00000000));
     loopButton->setBounds (450, 60, 30, 30);
-    loopAttachment.reset(new ButtonAttachment(stateManager, "loop", *loopButton));
-    loopButton->setEnabled(false);
-    
+    loopAttachment.reset(new ButtonAttachment(stateManager, "loop", *loopButton));    
 
     sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor, processor));
     addAndMakeVisible (sampleViewer.get());
@@ -198,18 +196,26 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     releaseKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     releaseKnobLabel->setBounds (300, 215, 64, 24);
 
-    attackKnob->setEnabled(false);
-    decayKnob->setEnabled(false);
-    sustainKnob->setEnabled(false);
-    releaseKnob->setEnabled(false);
-
     // Reverse sample
     reverseButton.reset(new ToggleButton(TRANS("Reverse\n")));
     addAndMakeVisible(reverseButton.get());
     editor.addToGuiEditor(reverseButton.get());
     reverseButton->setBounds(380, 230, 100, 50);
     reverseButton->addListener(this);
-    reverseButton->setEnabled(false);
+
+    // hide some controls until sample is loaded
+    attackKnob->setVisible(false);
+    attackKnobLabel->setVisible(false);
+    decayKnob->setVisible(false);
+    decayKnobLabel->setVisible(false);
+    sustainKnob->setVisible(false);
+    sustainKnobLabel->setVisible(false);
+    releaseKnob->setVisible(false);
+    releaseKnobLabel->setVisible(false);
+    volumeKnob->setVisible(false);
+    volumeKnobLabel->setVisible(false);
+    reverseButton->setVisible(false);
+    loopButton->setVisible(false);
 
     // add GUI editor last
     // it ensures that gui overlay will work properly
@@ -363,16 +369,20 @@ void MainPanel::transportStateChanged(TransportState state)
     switch (state) {
     case Ready:
         loadSampleTip->setVisible(false);
-        sampleViewer->setVisible(true);
-        //playButton->setVisible(true);
 
-        attackKnob->setEnabled(true);
-        decayKnob->setEnabled(true);
-        sustainKnob->setEnabled(true);
-        releaseKnob->setEnabled(true);
-        
-        loopButton->setEnabled(true);
-        reverseButton->setEnabled(true);
+        sampleViewer->setVisible(true);
+        attackKnob->setVisible(true);
+        attackKnobLabel->setVisible(true);
+        decayKnob->setVisible(true);
+        decayKnobLabel->setVisible(true);
+        sustainKnob->setVisible(true);
+        sustainKnobLabel->setVisible(true);
+        releaseKnob->setVisible(true);
+        releaseKnobLabel->setVisible(true);
+        volumeKnob->setVisible(true);
+        volumeKnobLabel->setVisible(true);
+        reverseButton->setVisible(true);
+        loopButton->setVisible(true);
         
         // start gui updates
         startTimer(40);

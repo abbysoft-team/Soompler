@@ -72,6 +72,8 @@ private:
     // ability to edit components for this panel
     GuiEditor editor;
 
+    bool sampleLoaded;
+
     void restoreMainPanelState();
 
     void openFileButtonClicked();
