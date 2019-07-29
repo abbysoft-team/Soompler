@@ -22,8 +22,7 @@
 class SoomplerAudioProcessorEditor  :
         public AudioProcessorEditor,
         private TransportStateListener,
-        private ChangeListener,
-        private Timer
+        private ChangeListener
 {
 public:
     explicit SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
@@ -39,8 +38,6 @@ private:
     void changeListenerCallback(ChangeBroadcaster* source) override ;
     void thumbnailChanged(AudioThumbnail& thumbnail);
     void drawSampleNameOrMessage(Graphics& graphics);
-
-    void timerCallback() override;
 
     int64 calculateSampleByCoords(int coord);
 

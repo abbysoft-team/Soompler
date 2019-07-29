@@ -17,6 +17,7 @@ public:
     ~ToggledImageButton() = default;
     
     bool isToggled() const;
+    void setToggled(bool toggled);
     
 protected:
     

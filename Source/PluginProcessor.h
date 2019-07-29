@@ -90,7 +90,7 @@ public:
         return transportSource.getTotalLength();
     }
 
-    void updateTransportState();
+//    void updateTransportState();
 
     void processTransport(AudioBuffer<float>& buffer);
 
@@ -125,6 +125,9 @@ public:
     float getFloatParameter(const String& paramId);
 
     std::shared_ptr<SampleInfo> getCurrentSampleInfo();
+    
+    bool isSampleReversed() const;
+    bool isLoopModeOn() const;
 
 private:
     //==============================================================================
@@ -134,6 +137,8 @@ private:
     std::shared_ptr<File> loadedSample;
     Synthesiser synth;
     int currentSample;
+    bool loopMode;
+    bool reverse;
 
     AudioFormatManager formatManager;
     std::unique_ptr<AudioFormatReaderSource> readerSource;

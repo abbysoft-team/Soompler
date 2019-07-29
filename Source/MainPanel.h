@@ -11,7 +11,8 @@ class MainPanel  : public Component,
                    public Slider::Listener,
                    public Button::Listener,
                    public TransportStateListener,
-                   public FileDragAndDropTarget
+                   public FileDragAndDropTarget,
+                   private Timer
 
 {
 public:
@@ -35,6 +36,7 @@ private:
     std::unique_ptr<SliderAttachment> decayAttachment;
     std::unique_ptr<SliderAttachment> sustainAttachment;
     std::unique_ptr<SliderAttachment> releaseAttachment;
+    std::unique_ptr<ButtonAttachment> loopAttachment;
 
     std::unique_ptr<Slider> volumeKnob;
     std::unique_ptr<Slider> attackKnob;
@@ -70,6 +72,8 @@ private:
     // ability to edit components for this panel
     GuiEditor editor;
 
+    void restoreMainPanelState();
+
     void openFileButtonClicked();
     void aboutButtonClicked();
     void playSampleButtonClicked();
@@ -79,7 +83,9 @@ private:
     
     bool isInterestedInFileDrag(const juce::StringArray &files) override;
     void filesDropped(const juce::StringArray &files, int x, int y) override;
-
+    
+    void timerCallback() override;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPanel)
 };
 

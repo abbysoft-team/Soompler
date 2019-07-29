@@ -44,12 +44,6 @@ void SoomplerAudioProcessorEditor::paint (Graphics& g)
 
 }
 
-void SoomplerAudioProcessorEditor::timerCallback()
-{
-    processor.updateTransportState();
-    repaint();
-}
-
 void SoomplerAudioProcessorEditor::resized()
 {
 }
@@ -58,7 +52,6 @@ void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
 {
     switch (state) {
     case Ready:
-        startTimer(40);
         break;
     case Starting:
         break;

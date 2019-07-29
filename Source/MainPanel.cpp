@@ -72,6 +72,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
                             Image(), 1.000f, Colour (0x00000000),
                             Image(), 1.000f, Colour (0x00000000));
     loopButton->setBounds (450, 60, 30, 30);
+    loopAttachment.reset(new ButtonAttachment(stateManager, "loop", *loopButton));
     loopButton->setEnabled(false);
     
 
@@ -212,14 +213,8 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     // add GUI editor last
     // it ensures that gui overlay will work properly
     editor.initOverlay();
-
-    // check if sample already loaded
-    // (plugin reopened)
-    if (processor.getThumbnail().getNumChannels() > 0) {
-        // load current sample
-        sampleViewer->newSampleInfoRecieved(processor.getCurrentSampleInfo());
-        this->transportStateChanged(TransportState::Ready);
-    }
+    
+    restoreMainPanelState();
 }
 
 MainPanel::~MainPanel()
@@ -229,6 +224,7 @@ MainPanel::~MainPanel()
     decayAttachment = nullptr;
     sustainAttachment = nullptr;
     releaseAttachment = nullptr;
+    loopAttachment = nullptr;
 
     attackKnob = nullptr;
     decayKnob = nullptr;
@@ -356,6 +352,10 @@ void MainPanel::stopSampleButtonClicked()
     processor.stopSamplePlayback();
 }
 
+void MainPanel::timerCallback()
+{
+    repaint();
+}
 
 void MainPanel::transportStateChanged(TransportState state)
 {
@@ -372,6 +372,9 @@ void MainPanel::transportStateChanged(TransportState state)
         
         loopButton->setEnabled(true);
         reverseButton->setEnabled(true);
+        
+        // start gui updates
+        startTimer(40);
         break;
     case Starting:
         break;
@@ -411,6 +414,25 @@ void MainPanel::filesDropped(const juce::StringArray &files, int x, int y) {
     
     processor.loadSample(File(fileName));
 }
+
+void MainPanel::restoreMainPanelState() {
+    // check if sample already loaded
+    // (plugin reopened)
+    if (processor.getThumbnail().getNumChannels() > 0) {
+        // load current sample
+        sampleViewer->newSampleInfoRecieved(processor.getCurrentSampleInfo());
+        
+        bool reversed = processor.isSampleReversed();
+        bool looped = processor.isLoopModeOn();
+        
+        reverseButton->setToggleState(reversed, false);
+        loopButton->setToggled(looped);
+        
+        
+        this->transportStateChanged(TransportState::Ready);
+    }
+}
+
 
 
 

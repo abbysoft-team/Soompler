@@ -19,6 +19,8 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    ChangeListener(),
                                                    stateManager(*this, nullptr, Identifier("SoomplerState"), createParametersLayout()),
                                                    currentSample(0),
+                                                   loopMode(false),
+                                                   reverse(false),
                                                    thumbnailCache(5),
                                                    thumbnail(256, formatManager, thumbnailCache),
                                                    startSample(0),
@@ -42,7 +44,7 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
         std::make_unique<AudioParameterFloat>("attack", TRANS("Attack\n"), 0.0f, Settings::MAX_ATTACK_TIME, 0.0f),
         std::make_unique<AudioParameterFloat>("decay", TRANS("Decay\n"), 0.0f, Settings::MAX_DECAY_TIME, 0.0f),
         std::make_unique<AudioParameterFloat>("sustain", TRANS("Sustain\n"), 0.0f, 1.0f, 1.0f),
-        std::make_unique<AudioParameterFloat>("release", TRANS("Release\n"), 0.0f, Settings::MAX_RELEASE_TIME, 0.0f)
+        std::make_unique<AudioParameterFloat>("release", TRANS("Release\n"), 0.0f, Settings::MAX_RELEASE_TIME, 0.0f),
     };
     
     return parameterLayout;
@@ -286,16 +288,27 @@ void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
     ValueTree loadedSampleLengthValue = ValueTree("loadedSampleLength");
     ValueTree startSampleValue = ValueTree("startSample");
     ValueTree endSampleValue = ValueTree("endSample");
+    ValueTree reverseValue = ValueTree("reverse");
+    ValueTree loopModeValue = ValueTree("loopMode");
 
     stateManager.state.appendChild(loadedSampleNameValue, nullptr);
     stateManager.state.appendChild(loadedSampleLengthValue, nullptr);
     stateManager.state.appendChild(startSampleValue, nullptr);
     stateManager.state.appendChild(endSampleValue, nullptr);
+    stateManager.state.appendChild(loopModeValue, nullptr);
+    stateManager.state.appendChild(reverseValue, nullptr);
 
-    stateManager.state.setProperty("loadedSampleName", loadedSample->getFileName(), nullptr);
-    stateManager.state.setProperty("loadedSampleLength", sampleInfo->lengthInSeconds, nullptr);
+    if (loadedSample != nullptr) {
+        stateManager.state.setProperty("loadedSampleName", loadedSample->getFileName(), nullptr);
+    }
+    if (sampleInfo != nullptr) {
+        stateManager.state.setProperty("loadedSampleLength", sampleInfo->lengthInSeconds, nullptr);
+    }
+    
     stateManager.state.setProperty("startSample", startSample, nullptr);
     stateManager.state.setProperty("endSample", endSample, nullptr);
+    stateManager.state.setProperty("loopMode", loopMode, nullptr);
+    stateManager.state.setProperty("reverse", reverse, nullptr);
 
     auto state = stateManager.copyState();
     std::unique_ptr<XmlElement> xml(state.createXml());
@@ -319,6 +332,8 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     float sampleLength = stateManager.state.getPropertyAsValue("loadedSampleLength", nullptr).getValue();
     int64 startSample = stateManager.state.getPropertyAsValue("startSample", nullptr).getValue();
     int64 endSample = stateManager.state.getPropertyAsValue("endSample", nullptr).getValue();
+    bool looping = stateManager.state.getPropertyAsValue("loopMode", nullptr).getValue();
+    bool reverse = stateManager.state.getPropertyAsValue("reverse", nullptr).getValue();
 
     sampleInfo = std::make_shared<SampleInfo>(sampleLength, getSampleRate(), sampleName);
     sampleInfo->startSample = startSample;
@@ -326,6 +341,8 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
     this->startSample = startSample;
     this->endSample = endSample;
+    this->loopMode = looping;
+    this->reverse = reverse;
 }
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
@@ -386,18 +403,17 @@ double SoomplerAudioProcessor::getCurrentAudioPosition()
     return transportSource.getCurrentPosition();
 }
 
-void SoomplerAudioProcessor::updateTransportState()
-{
-    if (!transportSource.isPlaying()) {
-        // sample is not in listen mode
-        return;
-    }
-
-    if (transportSource.getNextReadPosition() >= endSample) {
-        // TODO handle when looping on
-        transportSource.stop();
-    }
-}
+//void SoomplerAudioProcessor::updateTransportState()
+//{
+//    if (!transportSource.isPlaying()) {
+//        // sample is not in listen mode
+//        return;
+//    }
+//
+//    if (transportSource.getNextReadPosition() >= endSample) {
+//        transportSource.stop();
+//    }
+//}
 
 SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File> sampleFile)
 {
@@ -550,6 +566,16 @@ std::shared_ptr<SampleInfo> SoomplerAudioProcessor::getCurrentSampleInfo()
 {
     return sampleInfo;
 }
+
+bool SoomplerAudioProcessor::isLoopModeOn() const {
+    return loopMode;
+}
+
+
+bool SoomplerAudioProcessor::isSampleReversed() const {
+    return reverse;
+}
+
 
 //==============================================================================
 // This creates new instances of the plugin..
