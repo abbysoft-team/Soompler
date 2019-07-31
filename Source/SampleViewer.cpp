@@ -255,15 +255,8 @@ int SampleViewer::calculateCoordBySample(int64 sample)
 
 void SampleViewer::resized()
 {
-    //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
 
-    //[UserResized] Add your own custom resize handling here..
-    //[/UserResized]
 }
-
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-//[/MiscUserCode]
 
 
 //==============================================================================

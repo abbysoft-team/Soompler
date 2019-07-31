@@ -36,6 +36,11 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface(typeface);
 }
 
+SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
+{
+    processor.getThumbnail().removeChangeListener(this);
+}
+
 //==============================================================================
 void SoomplerAudioProcessorEditor::paint (Graphics& g)
 {

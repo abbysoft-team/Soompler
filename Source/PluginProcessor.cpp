@@ -403,18 +403,6 @@ double SoomplerAudioProcessor::getCurrentAudioPosition()
     return transportSource.getCurrentPosition();
 }
 
-//void SoomplerAudioProcessor::updateTransportState()
-//{
-//    if (!transportSource.isPlaying()) {
-//        // sample is not in listen mode
-//        return;
-//    }
-//
-//    if (transportSource.getNextReadPosition() >= endSample) {
-//        transportSource.stop();
-//    }
-//}
-
 SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File> sampleFile)
 {
     if (sampleFile == nullptr) {

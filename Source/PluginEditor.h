@@ -26,7 +26,7 @@ class SoomplerAudioProcessorEditor  :
 {
 public:
     explicit SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
-    ~SoomplerAudioProcessorEditor() override = default;
+    ~SoomplerAudioProcessorEditor();
 
     //==============================================================================
     void paint (Graphics&) override;
