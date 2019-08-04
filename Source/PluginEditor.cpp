@@ -77,7 +77,7 @@ void SoomplerAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster *sou
     }
 }
 
-void SoomplerAudioProcessorEditor::thumbnailChanged(AudioThumbnail &thumbnail)
+void SoomplerAudioProcessorEditor::thumbnailChanged(SAudioThumbnail &thumbnail)
 {
     // sample loaded
     processor.setVolume(mainPanel.getVolume());

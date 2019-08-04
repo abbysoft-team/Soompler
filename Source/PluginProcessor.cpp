@@ -22,7 +22,7 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    loopMode(false),
                                                    reverse(false),
                                                    thumbnailCache(5),
-                                                   thumbnail(256, formatManager, thumbnailCache),
+                                                   thumbnail(Settings::THUMBNAIL_RESOLUTION_SAMPLES, formatManager, thumbnailCache),
                                                    startSample(0),
                                                    endSample(0)
 {    
@@ -152,12 +152,6 @@ void SoomplerAudioProcessor::processTransport(AudioBuffer<float>& buffer)
     audioSource.buffer = &buffer;
     audioSource.startSample = 0;
     audioSource.numSamples = buffer.getNumSamples();
-
-//    // ADSR
-//    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
-//    auto adsr = voice->getAdsr();
-
-//    auto adsrValue = adsr.getNextSample();
 
     transportSource.getNextAudioBlock(audioSource);
 }
@@ -329,6 +323,7 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
     // restore variables
     String sampleName = stateManager.state.getPropertyAsValue("loadedSampleName", nullptr).getValue();
+    String fullSamplePath = stateManager.state.getPropertyAsValue("fullSamplePath", nullptr).getValue();
     float sampleLength = stateManager.state.getPropertyAsValue("loadedSampleLength", nullptr).getValue();
     int64 startSample = stateManager.state.getPropertyAsValue("startSample", nullptr).getValue();
     int64 endSample = stateManager.state.getPropertyAsValue("endSample", nullptr).getValue();
@@ -343,6 +338,10 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     this->endSample = endSample;
     this->loopMode = looping;
     this->reverse = reverse;
+
+    if (!isSampleLoaded() && fullSamplePath.isNotEmpty()) {
+        loadSample(File(fullSamplePath));
+    }
 }
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
@@ -372,6 +371,11 @@ void SoomplerAudioProcessor::notifySampleInfoListeners()
     for (auto sampleInfoListener : sampleInfoListeners) {
         sampleInfoListener->newSampleInfoRecieved(sampleInfo);
     }
+}
+
+bool SoomplerAudioProcessor::isSampleLoaded()
+{
+    return getThumbnail().getNumChannels() > 0;
 }
 
 void SoomplerAudioProcessor::playSample()
@@ -536,10 +540,8 @@ void SoomplerAudioProcessor::reverseSample()
     }
 
     sound->reverse();
-    thumbnail.reset(2, getSampleRate());
 
-    auto newAudioData = sound->getAudioData();
-    thumbnail.addBlock(thumbnail.getNumSamplesFinished(), *newAudioData, 0, newAudioData->getNumSamples());
+    thumbnail.reverse();
 
     reverse = !reverse;
 }

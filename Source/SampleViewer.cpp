@@ -31,7 +31,7 @@ void fadePreStartRegion(int startRangeBorderX, Graphics& g);
 void fadePostEndRegion(int endRangeBorderX, Graphics& g);
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos);
 
-SampleViewer::SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener)
+SampleViewer::SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener)
     : thumbnail(thumbnail),
     currentSample(new SampleInfo(0, 44100, "")),
     transportInfoOwner(transportInfoOwner),

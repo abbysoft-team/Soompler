@@ -29,9 +29,9 @@ ExtendedSound::ExtendedSound (const String& soundName,
         length = jmin ((int) source.lengthInSamples,
                        (int) (maxSampleLengthSeconds * sourceSampleRate));
 
-        data.reset (new AudioBuffer<float> (jmin (2, (int) source.numChannels), length + 4));
+        data.reset (new AudioBuffer<float> (jmin (2, (int) source.numChannels), length));
 
-        source.read (data.get(), 0, length + 4, 0, true, true);
+        source.read (data.get(), 0, length, 0, true, true);
 
         params.attack  = static_cast<float> (attackTimeSecs);
         params.release = static_cast<float> (releaseTimeSecs);

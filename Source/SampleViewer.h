@@ -22,6 +22,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SampleInfo.h"
 #include "TransportInfo.h"
+#include "SAudioThumbnail.h"
 
 /**
   Component with AudioThumbnail and range lines.
@@ -32,7 +33,7 @@
 class SampleViewer  : public Component, public SampleInfoListener
 {
 public:
-    SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& sampleInfoListener);
+    SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& sampleInfoListener);
     ~SampleViewer();
 
     void paint (Graphics& g) override;
@@ -42,7 +43,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
-    AudioThumbnail& thumbnail;
+    SAudioThumbnail& thumbnail;
     std::shared_ptr<SampleInfo> currentSample;
     TransportInfoOwner& transportInfoOwner;
     // this object can modify sample's start and end positions

@@ -16,6 +16,7 @@
 #include "MidiEventConsumer.h"
 #include "TransportInfo.h"
 #include "SampleInfo.h"
+#include "SAudioThumbnail.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -72,7 +73,7 @@ public:
 
     std::shared_ptr<File> getLoadedSample() const;
 
-    AudioThumbnail& getThumbnail() {
+    SAudioThumbnail& getThumbnail() {
         return thumbnail;
     }
 
@@ -129,6 +130,8 @@ public:
     bool isSampleReversed() const;
     bool isLoopModeOn() const;
 
+    bool isSampleLoaded();
+
 private:
     //==============================================================================
 
@@ -147,7 +150,7 @@ private:
     TransportStateListener* transportStateListener;
 
     AudioThumbnailCache thumbnailCache;
-    AudioThumbnail thumbnail;
+    SAudioThumbnail thumbnail;
 
     int64 startSample;
     int64 endSample;
