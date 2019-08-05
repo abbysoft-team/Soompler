@@ -119,7 +119,7 @@ public:
     
     void setLoopEnabled(bool loopEnable);
 
-    void reverseSample();
+    void setSampleReversed(bool reverse);
 
     AudioProcessorValueTreeState& getStateManager();
 
@@ -127,7 +127,7 @@ public:
 
     std::shared_ptr<SampleInfo> getCurrentSampleInfo();
     
-    bool isSampleReversed() const;
+    bool isSampleReversed();
     bool isLoopModeOn() const;
 
     bool isSampleLoaded();
@@ -141,7 +141,6 @@ private:
     Synthesiser synth;
     int currentSample;
     bool loopMode;
-    bool reverse;
 
     AudioFormatManager formatManager;
     std::unique_ptr<AudioFormatReaderSource> readerSource;

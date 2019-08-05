@@ -383,7 +383,7 @@ void MainPanel::loopButtonClicked() {
 }
 
 void MainPanel::reverseButtonClicked() {
-    processor.reverseSample();
+    processor.setSampleReversed(reverseButton->isToggle());
 }
 
 bool MainPanel::isInterestedInFileDrag(const juce::StringArray &files) {
@@ -417,7 +417,7 @@ void MainPanel::restoreMainPanelState() {
         bool reversed = processor.isSampleReversed();
         bool looped = processor.isLoopModeOn();
         
-        reverseButton->setToggleState(reversed, false);
+        reverseButton->setToggled(reversed);
         loopButton->setToggled(looped);
         
         

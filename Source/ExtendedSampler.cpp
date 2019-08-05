@@ -22,7 +22,8 @@ ExtendedSound::ExtendedSound (const String& soundName,
     : name (soundName),
     sourceSampleRate (source.sampleRate),
     midiNotes (notes),
-    midiRootNote (midiNoteForNormalPitch)
+    midiRootNote (midiNoteForNormalPitch),
+    reversed(false)
 {
     if (sourceSampleRate > 0 && source.lengthInSamples > 0)
     {
@@ -53,9 +54,20 @@ void ExtendedSound::setAdsrParams(ADSR::Parameters adsr)
     this->params = adsr;
 }
 
-void ExtendedSound::reverse()
+void ExtendedSound::setReversed(bool reversed)
 {
-    this->data->reverse(0, data->getNumSamples());
+    DBG("setSampleReversed");
+    if (reversed) {
+        DBG("TRUE");
+    } else {
+        DBG("FALSE");
+    }
+
+    if (this->reversed != reversed) {
+        DBG("reversed != newReversed");
+        this->data->reverse(0, data->getNumSamples());
+        this->reversed = reversed;
+    }
 }
 
 void ExtendedSound::setRootNote(int rootNote)
@@ -69,7 +81,7 @@ void ExtendedSound::setMidiRange(const BigInteger &midiNotes)
 }
 
 //==============================================================================
-    ExtendedVoice::ExtendedVoice(ChangeListener* listener) : volume(0), loopingEnabled(false), eventListener(listener)
+    ExtendedVoice::ExtendedVoice(ChangeListener* listener) : volume(1), loopingEnabled(false), eventListener(listener)
 {
 }
 

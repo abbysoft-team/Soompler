@@ -55,7 +55,7 @@ public:
 
     void setAdsrParams(ADSR::Parameters adrs);
 
-    void reverse();
+    void setReversed(bool reversed);
 
     void setRootNote(int rootNote);
     void setMidiRange(const BigInteger& midiNotes);
@@ -71,6 +71,8 @@ private:
     int length = 0, midiRootNote = 0;
 
     ADSR::Parameters params;
+
+    bool reversed;
 
     JUCE_LEAK_DETECTOR (ExtendedSound)
 };

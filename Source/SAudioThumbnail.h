@@ -192,6 +192,10 @@ public:
 
     void reverse();
 
+    void setReversed(bool reversed);
+
+    bool isReversed() const;
+
 private:
     //==============================================================================
     AudioFormatManager& formatManagerToUse;

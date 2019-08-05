@@ -391,6 +391,15 @@ public:
         invalidate();
     }
 
+    void setReversed(bool reversed) {
+        this->reversed = reversed;
+        invalidate();
+    }
+
+    bool isReversed() const {
+        return reversed;
+    }
+
     void drawChannel (Graphics& g, const Rectangle<int>& area,
                       const double startTime, const double endTime,
                       const int channelNum, const float verticalZoomFactor,
@@ -717,6 +726,22 @@ void SAudioThumbnail::reverse()
     if (window != nullptr) {
         window->reverse();
     }
+}
+
+void SAudioThumbnail::setReversed(bool reversed)
+{
+    if (window != nullptr) {
+        window->setReversed(reversed);
+    }
+}
+
+bool SAudioThumbnail::isReversed() const
+{
+    if (window != nullptr) {
+        return window->isReversed();
+    }
+
+    return false;
 }
 
 void SAudioThumbnail::addBlock (int64 startSample, const AudioBuffer<float>& incoming,

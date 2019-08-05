@@ -20,11 +20,11 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    stateManager(*this, nullptr, Identifier("SoomplerState"), createParametersLayout()),
                                                    currentSample(0),
                                                    loopMode(false),
-                                                   reverse(false),
                                                    thumbnailCache(5),
                                                    thumbnail(Settings::THUMBNAIL_RESOLUTION_SAMPLES, formatManager, thumbnailCache),
                                                    startSample(0),
-                                                   endSample(0)
+                                                   endSample(0),
+                                                   transportStateListener(nullptr)
 {    
     synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
@@ -34,6 +34,14 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
     transportSource.addChangeListener(this);
 
     volume = *(stateManager.getRawParameterValue("volume"));
+
+    ValueTree loadedSampleFullNameValue = ValueTree("loadedSample");
+    ValueTree reverseValue = ValueTree("reverse");
+    ValueTree loopModeValue = ValueTree("loopMode");
+
+    stateManager.state.appendChild(loadedSampleFullNameValue, nullptr);
+    stateManager.state.appendChild(loopModeValue, nullptr);
+    stateManager.state.appendChild(reverseValue, nullptr);
 }
 
 AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createParametersLayout()
@@ -53,6 +61,7 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
     transportSource.releaseResources();
+    transportStateListener = nullptr;
 }
 
 //==============================================================================
@@ -282,15 +291,15 @@ void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
     ValueTree loadedSampleLengthValue = ValueTree("loadedSampleLength");
     ValueTree startSampleValue = ValueTree("startSample");
     ValueTree endSampleValue = ValueTree("endSample");
-    ValueTree reverseValue = ValueTree("reverse");
-    ValueTree loopModeValue = ValueTree("loopMode");
+//    ValueTree reverseValue = ValueTree("reverse");
+//    ValueTree loopModeValue = ValueTree("loopMode");
 
     stateManager.state.appendChild(loadedSampleNameValue, nullptr);
     stateManager.state.appendChild(loadedSampleLengthValue, nullptr);
     stateManager.state.appendChild(startSampleValue, nullptr);
     stateManager.state.appendChild(endSampleValue, nullptr);
-    stateManager.state.appendChild(loopModeValue, nullptr);
-    stateManager.state.appendChild(reverseValue, nullptr);
+//    stateManager.state.appendChild(loopModeValue, nullptr);
+//    stateManager.state.appendChild(reverseValue, nullptr);
 
     if (loadedSample != nullptr) {
         stateManager.state.setProperty("loadedSampleName", loadedSample->getFileName(), nullptr);
@@ -301,8 +310,8 @@ void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
     
     stateManager.state.setProperty("startSample", startSample, nullptr);
     stateManager.state.setProperty("endSample", endSample, nullptr);
-    stateManager.state.setProperty("loopMode", loopMode, nullptr);
-    stateManager.state.setProperty("reverse", reverse, nullptr);
+//    stateManager.state.setProperty("loopMode", loopMode, nullptr);
+//    stateManager.state.setProperty("reverse", reverse, nullptr);
 
     auto state = stateManager.copyState();
     std::unique_ptr<XmlElement> xml(state.createXml());
@@ -323,7 +332,7 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
     // restore variables
     String sampleName = stateManager.state.getPropertyAsValue("loadedSampleName", nullptr).getValue();
-    String fullSamplePath = stateManager.state.getPropertyAsValue("fullSamplePath", nullptr).getValue();
+    String fullSamplePath = stateManager.state.getPropertyAsValue("loadedSample", nullptr).getValue();
     float sampleLength = stateManager.state.getPropertyAsValue("loadedSampleLength", nullptr).getValue();
     int64 startSample = stateManager.state.getPropertyAsValue("startSample", nullptr).getValue();
     int64 endSample = stateManager.state.getPropertyAsValue("endSample", nullptr).getValue();
@@ -337,10 +346,10 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     this->startSample = startSample;
     this->endSample = endSample;
     this->loopMode = looping;
-    this->reverse = reverse;
 
     if (!isSampleLoaded() && fullSamplePath.isNotEmpty()) {
         loadSample(File(fullSamplePath));
+        setSampleReversed(reverse);
     }
 }
 
@@ -532,18 +541,18 @@ void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
     loopMode = loopEnable;
 }
 
-void SoomplerAudioProcessor::reverseSample()
+void SoomplerAudioProcessor::setSampleReversed(bool reversed)
 {
     auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
-    if (sound == nullptr || !thumbnail.isFullyLoaded()) {
+    if (sound == nullptr) {
         return;
     }
 
-    sound->reverse();
+    sound->setReversed(reversed);
 
-    thumbnail.reverse();
+    thumbnail.setReversed(reversed);
 
-    reverse = !reverse;
+    stateManager.state.setProperty("reverse", reversed, nullptr);
 }
 
 AudioProcessorValueTreeState &SoomplerAudioProcessor::getStateManager()
@@ -566,8 +575,8 @@ bool SoomplerAudioProcessor::isLoopModeOn() const {
 }
 
 
-bool SoomplerAudioProcessor::isSampleReversed() const {
-    return reverse;
+bool SoomplerAudioProcessor::isSampleReversed() {
+    return stateManager.state.getPropertyAsValue("reverse", nullptr).getValue();
 }
 
 

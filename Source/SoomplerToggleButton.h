@@ -17,7 +17,14 @@ public:
     SoomplerToggleButton(String buttonName);
     ~SoomplerToggleButton() = default;
 
+    bool isToggle() const;
+    void setToggled(bool toggled);
+
 protected:
 
     void mouseMove(const MouseEvent &event) override;
+    void mouseDown(const MouseEvent &) override;
+
+private:
+    bool toggled;
 };
