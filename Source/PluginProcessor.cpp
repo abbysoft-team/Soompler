@@ -19,7 +19,6 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    ChangeListener(),
                                                    stateManager(*this, nullptr, Identifier("SoomplerState"), createParametersLayout()),
                                                    currentSample(0),
-                                                   loopMode(false),
                                                    thumbnailCache(5),
                                                    thumbnail(Settings::THUMBNAIL_RESOLUTION_SAMPLES, formatManager, thumbnailCache),
                                                    startSample(0),
@@ -345,11 +344,11 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
     this->startSample = startSample;
     this->endSample = endSample;
-    this->loopMode = looping;
 
     if (!isSampleLoaded() && fullSamplePath.isNotEmpty()) {
         loadSample(File(fullSamplePath));
         setSampleReversed(reverse);
+        setLoopEnabled(looping);
     }
 }
 
@@ -538,7 +537,7 @@ void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
     auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
     voice->enableLooping(loopEnable);
 
-    loopMode = loopEnable;
+    stateManager.state.setProperty("loopMode", loopEnable, nullptr);
 }
 
 void SoomplerAudioProcessor::setSampleReversed(bool reversed)
@@ -571,7 +570,7 @@ std::shared_ptr<SampleInfo> SoomplerAudioProcessor::getCurrentSampleInfo()
 }
 
 bool SoomplerAudioProcessor::isLoopModeOn() const {
-    return loopMode;
+    return stateManager.state.getProperty("loopMode", false);
 }
 
 

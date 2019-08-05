@@ -56,15 +56,7 @@ void ExtendedSound::setAdsrParams(ADSR::Parameters adsr)
 
 void ExtendedSound::setReversed(bool reversed)
 {
-    DBG("setSampleReversed");
-    if (reversed) {
-        DBG("TRUE");
-    } else {
-        DBG("FALSE");
-    }
-
     if (this->reversed != reversed) {
-        DBG("reversed != newReversed");
         this->data->reverse(0, data->getNumSamples());
         this->reversed = reversed;
     }

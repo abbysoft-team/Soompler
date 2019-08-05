@@ -140,7 +140,6 @@ private:
     std::shared_ptr<File> loadedSample;
     Synthesiser synth;
     int currentSample;
-    bool loopMode;
 
     AudioFormatManager formatManager;
     std::unique_ptr<AudioFormatReaderSource> readerSource;
