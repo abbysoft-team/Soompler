@@ -109,7 +109,7 @@ public:
     void noteOn(int noteNumber) override;
     void noteOff(int noteNumber) override;
     void setRootNote(int rootNote) override;
-    void setNoteRange(const BigInteger& noteRange) override;
+    void setNoteRange(int minNote, int maxNote) override;
 
     std::shared_ptr<TransportInfo> getTransportInfo() override;
 

@@ -37,10 +37,16 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
     ValueTree loadedSampleFullNameValue = ValueTree("loadedSample");
     ValueTree reverseValue = ValueTree("reverse");
     ValueTree loopModeValue = ValueTree("loopMode");
+    ValueTree rootNoteValue = ValueTree("rootNote");
+    ValueTree minNoteValue = ValueTree("minNote");
+    ValueTree maxNoteValue = ValueTree("maxNote");
 
     stateManager.state.appendChild(loadedSampleFullNameValue, nullptr);
     stateManager.state.appendChild(loopModeValue, nullptr);
     stateManager.state.appendChild(reverseValue, nullptr);
+    stateManager.state.appendChild(rootNoteValue, nullptr);
+    stateManager.state.appendChild(minNoteValue, nullptr);
+    stateManager.state.appendChild(maxNoteValue, nullptr);
 }
 
 AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createParametersLayout()
@@ -249,12 +255,20 @@ void SoomplerAudioProcessor::setRootNote(int rootNote)
 {
     auto sound = static_cast<soompler::ExtendedSound*> (synth.getSound(0).get());
     sound->setRootNote(rootNote);
+
+    stateManager.state.setProperty("rootNote", rootNote, nullptr);
 }
 
-void SoomplerAudioProcessor::setNoteRange(const BigInteger &noteRange)
+void SoomplerAudioProcessor::setNoteRange(int minNote, int maxNote)
 {
+    auto range = BigInteger();
+    range.setRange(minNote, maxNote - minNote + 1, true);
+
     auto sound = static_cast<soompler::ExtendedSound*> (synth.getSound(0).get());
-    sound->setMidiRange(noteRange);
+    sound->setMidiRange(range);
+
+    stateManager.state.setProperty("minNote", minNote, nullptr);
+    stateManager.state.setProperty("maxNote", maxNote, nullptr);
 }
 
 MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer &input, int channel)
@@ -337,19 +351,35 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     int64 endSample = stateManager.state.getPropertyAsValue("endSample", nullptr).getValue();
     bool looping = stateManager.state.getPropertyAsValue("loopMode", nullptr).getValue();
     bool reverse = stateManager.state.getPropertyAsValue("reverse", nullptr).getValue();
-
-    sampleInfo = std::make_shared<SampleInfo>(sampleLength, getSampleRate(), sampleName);
-    sampleInfo->startSample = startSample;
-    sampleInfo->endSample = endSample;
-
-    this->startSample = startSample;
-    this->endSample = endSample;
+    int rootNote = stateManager.state.getPropertyAsValue("rootNote", nullptr).getValue();
+    int minNote = stateManager.state.getPropertyAsValue("minNote", nullptr).getValue();
+    int maxNote = stateManager.state.getPropertyAsValue("maxNote", nullptr).getValue();
 
     if (!isSampleLoaded() && fullSamplePath.isNotEmpty()) {
         loadSample(File(fullSamplePath));
         setSampleReversed(reverse);
         setLoopEnabled(looping);
     }
+
+    sampleInfo = std::make_shared<SampleInfo>(sampleLength, getSampleRate(), sampleName);
+    sampleInfo->startSample = startSample;
+    sampleInfo->endSample = endSample;
+    if (rootNote == 0 && minNote == 0 && maxNote == 0) {
+    } else {
+        sampleInfo->rootNote = rootNote;
+        sampleInfo->minNote = minNote;
+        sampleInfo->maxNote = maxNote;
+
+        if (minNote)
+        setRootNote(rootNote);
+        setNoteRange(minNote, maxNote);
+    }
+
+    this->startSample = startSample;
+    this->endSample = endSample;
+
+    notifySampleInfoListeners();
+
 }
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)

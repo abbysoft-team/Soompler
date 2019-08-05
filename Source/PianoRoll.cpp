@@ -408,9 +408,7 @@ void PianoRoll::minMarkerDragged(Point<int> position)
     draggedMarker = MIN_NOTE;
     sample->minNote = keyClicked;
 
-    auto range = BigInteger();
-    range.setRange(sample->minNote, sample->maxNote - sample->minNote + 1, true);
-    midiConsumer.setNoteRange(range);
+    midiConsumer.setNoteRange(sample->minNote, sample->maxNote);
 }
 
 void PianoRoll::maxMarkerDragged(Point<int> position)
@@ -431,9 +429,7 @@ void PianoRoll::maxMarkerDragged(Point<int> position)
     draggedMarker = MAX_NOTE;
     sample->maxNote = keyClicked;
 
-    auto range = BigInteger();
-    range.setRange(sample->minNote, sample->maxNote - sample->minNote + 1, true);
-    midiConsumer.setNoteRange(range);
+    midiConsumer.setNoteRange(sample->minNote, sample->maxNote);
 }
 
 void PianoRoll::resized()
