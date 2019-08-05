@@ -54,6 +54,7 @@ public:
     bool appliesToChannel (int midiChannel) override;
 
     void setAdsrParams(ADSR::Parameters adrs);
+    ADSR::Parameters& getAdsrParams();
 
     void setReversed(bool reversed);
 
@@ -119,6 +120,8 @@ public:
     void removeListener();
     
     void enableLooping(bool enable);
+
+    void setAdsrParams(ADSR::Parameters &params);
 
 private:
     //==============================================================================

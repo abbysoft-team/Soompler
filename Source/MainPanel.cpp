@@ -205,6 +205,13 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     reverseButton->setVisible(false);
     loopButton->setVisible(false);
 
+    // connect knobs to listener
+    attackKnob->addListener(this);
+    decayKnob->addListener(this);
+    sustainKnob->addListener(this);
+    releaseKnob->addListener(this);
+    volumeKnob->addListener(this);
+
     // add GUI editor last
     // it ensures that gui overlay will work properly
     editor.initOverlay();

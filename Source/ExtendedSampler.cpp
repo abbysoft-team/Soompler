@@ -54,6 +54,11 @@ void ExtendedSound::setAdsrParams(ADSR::Parameters adsr)
     this->params = adsr;
 }
 
+ADSR::Parameters &ExtendedSound::getAdsrParams()
+{
+    return params;
+}
+
 void ExtendedSound::setReversed(bool reversed)
 {
     if (this->reversed != reversed) {
@@ -222,6 +227,9 @@ void ExtendedVoice::setVolume(float volume)
 {
     jassert(volume <= 1.0f && volume >= .0f);
     this->volume = volume;
+
+    this->lgain = volume;
+    this->rgain = volume;
 }
 
 void ExtendedVoice::removeListener()
@@ -231,6 +239,11 @@ void ExtendedVoice::removeListener()
     
     void ExtendedVoice::enableLooping(bool enable) {
         this->loopingEnabled = enable;
+    }
+
+    void ExtendedVoice::setAdsrParams(ADSR::Parameters &params)
+    {
+        adsr.setParameters(params);
     }
 
 }

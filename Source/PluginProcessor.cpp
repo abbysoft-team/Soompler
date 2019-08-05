@@ -559,8 +559,10 @@ void SoomplerAudioProcessor::setAdsrParams(ADSR::Parameters params)
     if (sound == nullptr) {
         return;
     }
+    auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
 
     sound->setAdsrParams(params);
+    voice->setAdsrParams(sound->getAdsrParams());
 }
 
 void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
