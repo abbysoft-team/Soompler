@@ -24,6 +24,12 @@
 #include "TransportInfo.h"
 #include "SAudioThumbnail.h"
 
+enum RangeLine {
+    NONE,
+    LEFT,
+    RIGHT
+};
+
 /**
   Component with AudioThumbnail and range lines.
 
@@ -57,6 +63,8 @@ private:
     // max range x value according to max sample length value
     int maxRangeX;
 
+    RangeLine draggedLine;
+
     //[/UserVariables]
 
     //==============================================================================
@@ -70,6 +78,8 @@ private:
 
     void mouseDrag(const MouseEvent &event) override;
     void mouseMove(const MouseEvent &event) override;
+    void mouseDown(const MouseEvent &event) override;
+    void mouseUp(const MouseEvent &event) override;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SampleViewer)

@@ -38,7 +38,8 @@ SampleViewer::SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& tran
     sampleInfoListener(infoListener),
     startRangeX(0),
     endRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
-    maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth())
+    maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
+    draggedLine(NONE)
 {
 }
 
@@ -146,7 +147,8 @@ void fadePostEndRegion(int endRangeBorderX, Graphics& g) {
 void SampleViewer::mouseDrag(const MouseEvent &event)
 {
     auto position = event.getPosition();
-    if (isIntersectWithRangeLine(position, startRangeX)) {
+
+    if (draggedLine == LEFT) {
 
         int rightBorderX = endRangeX - ((int) (Settings::RANGE_LINES_WIDTH*4));
         int leftBorderX = 0;
@@ -163,7 +165,7 @@ void SampleViewer::mouseDrag(const MouseEvent &event)
         notifySampleInfoListeners();
 
         repaint();
-    } else if (isIntersectWithRangeLine(position, endRangeX)) {
+    } else if (draggedLine == RIGHT) {
         int leftBorderX = startRangeX + ((int) (Settings::RANGE_LINES_WIDTH*4));
 
         if (position.getX() < leftBorderX) {
@@ -191,6 +193,21 @@ void SampleViewer::mouseMove(const MouseEvent &event)
     } else {
         setMouseCursor(MouseCursor::NormalCursor);
     }
+}
+
+void SampleViewer::mouseDown(const MouseEvent &event)
+{
+    auto position = event.getPosition();
+    if (isIntersectWithRangeLine(position, startRangeX)) {
+        draggedLine = LEFT;
+    } else if (isIntersectWithRangeLine(position, endRangeX)) {
+        draggedLine = RIGHT;
+    }
+}
+
+void SampleViewer::mouseUp(const MouseEvent &event)
+{
+    draggedLine = NONE;
 }
 
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos)
