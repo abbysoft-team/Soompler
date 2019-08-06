@@ -361,25 +361,22 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
         setLoopEnabled(looping);
     }
 
-    sampleInfo = std::make_shared<SampleInfo>(sampleLength, getSampleRate(), sampleName);
     sampleInfo->startSample = startSample;
     sampleInfo->endSample = endSample;
-    if (rootNote == 0 && minNote == 0 && maxNote == 0) {
-    } else {
-        sampleInfo->rootNote = rootNote;
-        sampleInfo->minNote = minNote;
-        sampleInfo->maxNote = maxNote;
-
-        if (minNote)
-        setRootNote(rootNote);
-        setNoteRange(minNote, maxNote);
-    }
-
     this->startSample = startSample;
     this->endSample = endSample;
 
-    notifySampleInfoListeners();
+    if (rootNote != 0) {
+        sampleInfo->rootNote = rootNote;
+        setRootNote(rootNote);
+    } else if (minNote != 0 && maxNote != 0) {
+        sampleInfo->minNote = minNote;
+        sampleInfo->maxNote = maxNote;
 
+        setNoteRange(minNote, maxNote);
+    }
+
+    notifySampleInfoListeners();
 }
 
 void SoomplerAudioProcessor::loadSample(File sampleFile)
@@ -399,7 +396,8 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
 
     stateManager.state.setProperty("loadedSample", var(sampleFile.getFullPathName()), nullptr);
 
-    sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), getSampleRate(), sampleFile.getFileName());
+    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+    sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName());
 
     notifySampleInfoListeners();
 }
