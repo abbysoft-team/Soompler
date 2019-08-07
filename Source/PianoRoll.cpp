@@ -288,7 +288,7 @@ void drawNoteTips(Graphics& g)
     //g.setFont(Settings::PIANO_ROLL_TIPS_FONT);
     g.setColour(Settings::PIANO_ROLL_NOTE_TIPS_COLOR);
 
-    auto currentCNote = 2;
+    auto currentCNote = 3;
     auto currentCNoteCoord  = Settings::PIANO_ROLL_TIPS_OFFSET_X;
     String noteName = "";
     while (currentCNoteCoord < Settings::PIANO_ROLL_WIDTH) {
