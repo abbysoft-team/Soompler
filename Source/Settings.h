@@ -84,12 +84,12 @@ constexpr auto GUI_EDITOR_SIZE_STEP_COEFF_INCR = 1.05;
 constexpr auto GUI_EDITOR_SIZE_STEP_COEFF_DECR = 0.95;
 
 // GUI ADSR
-constexpr auto MAX_ATTACK_TIME = 5;
+constexpr auto MAX_ATTACK_TIME = 2;
 constexpr auto MAX_DECAY_TIME = 5;
 constexpr auto MAX_RELEASE_TIME = 5;
 
 constexpr auto DEFAULT_ATTACK_TIME = 0.0f;
-constexpr auto DEFAULT_DECAY_TIME = 0.1f;
+constexpr auto DEFAULT_DECAY_TIME = 0.0f;
 constexpr auto DEFAULT_RELEASE_TIME = 0.0f;
 constexpr auto DEFAULT_SUSTAIN_LEVEL = 1.0f;
     
