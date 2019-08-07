@@ -19,7 +19,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
-    
+   
     // load built-in font
     auto typeface = Typeface::createSystemTypefaceFor(BinaryData::RobotoCondensedRegular_ttf, BinaryData::RobotoCondensedRegular_ttfSize);
     mainFont = Font(typeface);
@@ -36,18 +36,17 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface(typeface);
 }
 
+SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
+{
+    processor.getThumbnail().removeChangeListener(this);
+}
+
 //==============================================================================
 void SoomplerAudioProcessorEditor::paint (Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
 
-}
-
-void SoomplerAudioProcessorEditor::timerCallback()
-{
-    processor.updateTransportState();
-    repaint();
 }
 
 void SoomplerAudioProcessorEditor::resized()
@@ -58,7 +57,6 @@ void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
 {
     switch (state) {
     case Ready:
-        startTimer(40);
         break;
     case Starting:
         break;
@@ -79,7 +77,7 @@ void SoomplerAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster *sou
     }
 }
 
-void SoomplerAudioProcessorEditor::thumbnailChanged(AudioThumbnail &thumbnail)
+void SoomplerAudioProcessorEditor::thumbnailChanged(SAudioThumbnail &thumbnail)
 {
     // sample loaded
     processor.setVolume(mainPanel.getVolume());

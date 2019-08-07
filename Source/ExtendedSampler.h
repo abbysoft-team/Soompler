@@ -54,8 +54,9 @@ public:
     bool appliesToChannel (int midiChannel) override;
 
     void setAdsrParams(ADSR::Parameters adrs);
+    ADSR::Parameters& getAdsrParams();
 
-    void reverse();
+    void setReversed(bool reversed);
 
     void setRootNote(int rootNote);
     void setMidiRange(const BigInteger& midiNotes);
@@ -71,6 +72,8 @@ private:
     int length = 0, midiRootNote = 0;
 
     ADSR::Parameters params;
+
+    bool reversed;
 
     JUCE_LEAK_DETECTOR (ExtendedSound)
 };
@@ -117,6 +120,8 @@ public:
     void removeListener();
     
     void enableLooping(bool enable);
+
+    void setAdsrParams(ADSR::Parameters &params);
 
 private:
     //==============================================================================

@@ -16,6 +16,10 @@
 #include "MidiEventConsumer.h"
 #include "TransportInfo.h"
 #include "SampleInfo.h"
+#include "SAudioThumbnail.h"
+
+typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
 //==============================================================================
 /**
@@ -29,6 +33,7 @@ class SoomplerAudioProcessor  :
         public SampleInfoListener
 {
 public:
+    
     //==============================================================================
     SoomplerAudioProcessor();
     ~SoomplerAudioProcessor() override;
@@ -68,7 +73,7 @@ public:
 
     std::shared_ptr<File> getLoadedSample() const;
 
-    AudioThumbnail& getThumbnail() {
+    SAudioThumbnail& getThumbnail() {
         return thumbnail;
     }
 
@@ -86,7 +91,7 @@ public:
         return transportSource.getTotalLength();
     }
 
-    void updateTransportState();
+//    void updateTransportState();
 
     void processTransport(AudioBuffer<float>& buffer);
 
@@ -104,7 +109,7 @@ public:
     void noteOn(int noteNumber) override;
     void noteOff(int noteNumber) override;
     void setRootNote(int rootNote) override;
-    void setNoteRange(const BigInteger& noteRange) override;
+    void setNoteRange(int minNote, int maxNote) override;
 
     std::shared_ptr<TransportInfo> getTransportInfo() override;
 
@@ -114,10 +119,23 @@ public:
     
     void setLoopEnabled(bool loopEnable);
 
-    void reverseSample();
+    void setSampleReversed(bool reverse);
+
+    AudioProcessorValueTreeState& getStateManager();
+
+    float getFloatParameter(const String& paramId);
+
+    std::shared_ptr<SampleInfo> getCurrentSampleInfo();
+    
+    bool isSampleReversed();
+    bool isLoopModeOn() const;
+
+    bool isSampleLoaded();
 
 private:
     //==============================================================================
+
+    AudioProcessorValueTreeState stateManager;
 
     std::shared_ptr<File> loadedSample;
     Synthesiser synth;
@@ -130,17 +148,19 @@ private:
     TransportStateListener* transportStateListener;
 
     AudioThumbnailCache thumbnailCache;
-    AudioThumbnail thumbnail;
+    SAudioThumbnail thumbnail;
 
     int64 startSample;
     int64 endSample;
 
     MidiBuffer lastMidiEvents;
 
-    double volume;
+    float volume;
 
     std::shared_ptr<SampleInfo> sampleInfo;
     std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
+
+    AudioProcessorValueTreeState::ParameterLayout createParametersLayout();
 
     SynthesiserSound::Ptr getSampleData(std::shared_ptr<File> sampleFile);
     AudioFormat* getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile);

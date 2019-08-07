@@ -6,12 +6,16 @@
 #include "PianoRoll.h"
 #include "GuiEditor.h"
 #include "ToggledImageButton.h"
+#include "SoomplerSlider.h"
+#include "SoomplerImageButton.h"
+#include "SoomplerToggleButton.h"
 
 class MainPanel  : public Component,
                    public Slider::Listener,
                    public Button::Listener,
                    public TransportStateListener,
-                   public FileDragAndDropTarget
+                   public FileDragAndDropTarget,
+                   private Timer
 
 {
 public:
@@ -27,11 +31,21 @@ public:
     float getVolume() const;
 
 private:
-    std::unique_ptr<Slider> volumeKnob;
-    std::unique_ptr<Slider> attackKnob;
-    std::unique_ptr<Slider> decayKnob;
-    std::unique_ptr<Slider> sustainKnob;
-    std::unique_ptr<Slider> releaseKnob;
+
+    AudioProcessorValueTreeState& stateManager;
+
+    std::unique_ptr<SliderAttachment> volumeAttachment;
+    std::unique_ptr<SliderAttachment> attackAttachment;
+    std::unique_ptr<SliderAttachment> decayAttachment;
+    std::unique_ptr<SliderAttachment> sustainAttachment;
+    std::unique_ptr<SliderAttachment> releaseAttachment;
+    std::unique_ptr<ButtonAttachment> loopAttachment;
+
+    std::unique_ptr<SoomplerSlider> volumeKnob;
+    std::unique_ptr<SoomplerSlider> attackKnob;
+    std::unique_ptr<SoomplerSlider> decayKnob;
+    std::unique_ptr<SoomplerSlider> sustainKnob;
+    std::unique_ptr<SoomplerSlider> releaseKnob;
 
     std::unique_ptr<Label> volumeKnobLabel;
     std::unique_ptr<Label> attackKnobLabel;
@@ -46,11 +60,11 @@ private:
 
 //    std::unique_ptr<ImageButton> playButton;
 //    std::unique_ptr<ImageButton> stopButton;
-    std::unique_ptr<ImageButton> openFileButton;
-    std::unique_ptr<ImageButton> aboutButton;
+    std::unique_ptr<SoomplerImageButton> openFileButton;
+    std::unique_ptr<SoomplerImageButton> aboutButton;
     std::unique_ptr<ToggledImageButton> loopButton;
 
-    std::unique_ptr<ToggleButton> reverseButton;
+    std::unique_ptr<SoomplerToggleButton> reverseButton;
 
     ADSR::Parameters adsrParams;
 
@@ -61,6 +75,10 @@ private:
     // ability to edit components for this panel
     GuiEditor editor;
 
+    bool sampleLoaded;
+
+    void restoreMainPanelState();
+
     void openFileButtonClicked();
     void aboutButtonClicked();
     void playSampleButtonClicked();
@@ -70,7 +88,9 @@ private:
     
     bool isInterestedInFileDrag(const juce::StringArray &files) override;
     void filesDropped(const juce::StringArray &files, int x, int y) override;
-
+    
+    void timerCallback() override;
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainPanel)
 };
 

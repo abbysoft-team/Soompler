@@ -3,23 +3,25 @@
 #include "Strings.h"
 
 //==============================================================================
-MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor), editor(this)
+MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processor.getStateManager()),
+    processor(processor), editor(this)
 {
     setSize(Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
     setName("mainPanel");
 
     backgroundImage = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
 
-    volumeKnob.reset (new Slider ("volume knob"));
+    volumeKnob.reset (new SoomplerSlider ("volume knob"));
     addAndMakeVisible(volumeKnob.get());
     editor.addToGuiEditor(volumeKnob.get());
     volumeKnob->setTooltip (TRANS("volume"));
-    volumeKnob->setRange (0.0, 1.0, 0.01);
-    volumeKnob->setValue(0.5);
+    //volumeKnob->setRange (0.0, 1.0, 0.01);
+    //volumeKnob->setValue(0.5);
     volumeKnob->setSliderStyle (Slider::Rotary);
     volumeKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    volumeKnob->addListener (this);
+    //volumeKnob->addListener (this);
     volumeKnob->setBounds (60, 230, 50, 50);
+    volumeAttachment.reset(new SliderAttachment(stateManager, "volume", *volumeKnob));
 
     volumeKnobLabel.reset (new Label ("volume knob label",
                                       TRANS("Volume\n")));
@@ -32,7 +34,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     volumeKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     volumeKnobLabel->setBounds (60, 215, 64, 24);
 
-    openFileButton.reset (new ImageButton ("open file button"));
+    openFileButton.reset (new SoomplerImageButton ("open file button"));
     addAndMakeVisible (openFileButton.get());
     editor.addToGuiEditor (openFileButton.get());
     openFileButton->setTooltip (TRANS("Open Sample\n"));
@@ -45,7 +47,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
                                Image(), 1.000f, Colour (0x00000000));
     openFileButton->setBounds (8, 8, 39, 32);
 
-    aboutButton.reset (new ImageButton ("about button"));
+    aboutButton.reset (new SoomplerImageButton ("about button"));
     addAndMakeVisible (aboutButton.get());
     editor.addToGuiEditor (aboutButton.get());
     aboutButton->setTooltip (TRANS("About Program\n"));
@@ -57,6 +59,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
                                Image(), 1.000f, Colour (0x00000000),
                                Image(), 1.000f, Colour (0x00000000));
     aboutButton->setBounds (52, 8, 39, 32);
+    aboutButton->setVisible(false);
     
     loopButton.reset (new ToggledImageButton ("loop button"));
     addAndMakeVisible (loopButton.get());
@@ -70,8 +73,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
                             Image(), 1.000f, Colour (0x00000000),
                             Image(), 1.000f, Colour (0x00000000));
     loopButton->setBounds (450, 60, 30, 30);
-    loopButton->setEnabled(false);
-    
+    loopAttachment.reset(new ButtonAttachment(stateManager, "loop", *loopButton));    
 
     sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor, processor));
     addAndMakeVisible (sampleViewer.get());
@@ -102,16 +104,14 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     editor.addToGuiEditor (pianoRoll.get());
 
     // ADSR controls
-    attackKnob.reset (new Slider ("attack knob"));
+    attackKnob.reset (new SoomplerSlider ("attack knob"));
     addAndMakeVisible(attackKnob.get());
     editor.addToGuiEditor(attackKnob.get());
     attackKnob->setTooltip (TRANS("Attack"));
-    attackKnob->setRange (0.0, Settings::MAX_ATTACK_TIME, 0.01);
-    attackKnob->setValue(Settings::DEFAULT_ATTACK_TIME);
     attackKnob->setSliderStyle (Slider::Rotary);
     attackKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    attackKnob->addListener (this);
     attackKnob->setBounds (150, 230, 50, 50);
+    attackAttachment.reset(new SliderAttachment(stateManager, "attack", *attackKnob));
 
     attackKnobLabel.reset (new Label ("attack knob label",
                                       TRANS("Attack\n")));
@@ -124,16 +124,14 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     attackKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     attackKnobLabel->setBounds (150, 215, 64, 24);
 
-    decayKnob.reset (new Slider ("decay knob"));
+    decayKnob.reset (new SoomplerSlider ("decay knob"));
     addAndMakeVisible(decayKnob.get());
     editor.addToGuiEditor(decayKnob.get());
     decayKnob->setTooltip (TRANS("Decay"));
-    decayKnob->setRange (0.0, Settings::MAX_DECAY_TIME, 0.01);
-    decayKnob->setValue(Settings::DEFAULT_DECAY_TIME);
     decayKnob->setSliderStyle (Slider::Rotary);
     decayKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    decayKnob->addListener (this);
     decayKnob->setBounds (200, 230, 50, 50);
+    decayAttachment.reset(new SliderAttachment(stateManager, "decay", *decayKnob));
 
     decayKnobLabel.reset (new Label ("decay knob label",
                                       TRANS("Decay\n")));
@@ -146,16 +144,14 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     decayKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     decayKnobLabel->setBounds (200, 215, 64, 24);
 
-    sustainKnob.reset (new Slider ("sustain knob"));
+    sustainKnob.reset (new SoomplerSlider ("sustain knob"));
     addAndMakeVisible(sustainKnob.get());
     editor.addToGuiEditor(sustainKnob.get());
     sustainKnob->setTooltip (TRANS("Sustain"));
-    sustainKnob->setRange (0.0, 1.0, 0.01);
-    sustainKnob->setValue(Settings::DEFAULT_SUSTAIN_LEVEL);
     sustainKnob->setSliderStyle (Slider::Rotary);
     sustainKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    sustainKnob->addListener (this);
     sustainKnob->setBounds (250, 230, 50, 50);
+    sustainAttachment.reset(new SliderAttachment(stateManager, "sustain", *sustainKnob));
 
     sustainKnobLabel.reset (new Label ("sustain knob label",
                                       TRANS("Sustain\n")));
@@ -168,16 +164,14 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     sustainKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     sustainKnobLabel->setBounds (250, 215, 64, 24);
 
-    releaseKnob.reset (new Slider ("release knob"));
+    releaseKnob.reset (new SoomplerSlider ("release knob"));
     addAndMakeVisible(releaseKnob.get());
     editor.addToGuiEditor(releaseKnob.get());
     releaseKnob->setTooltip (TRANS("Release"));
-    releaseKnob->setRange (0.0, Settings::MAX_RELEASE_TIME, 0.01);
-    releaseKnob->setValue(Settings::DEFAULT_RELEASE_TIME);
     releaseKnob->setSliderStyle (Slider::Rotary);
     releaseKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    releaseKnob->addListener (this);
     releaseKnob->setBounds (300, 230, 50, 50);
+    releaseAttachment.reset(new SliderAttachment(stateManager, "release", *releaseKnob));
 
     releaseKnobLabel.reset (new Label ("release knob label",
                                       TRANS("Release\n")));
@@ -190,26 +184,54 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : processor(processor),
     releaseKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     releaseKnobLabel->setBounds (300, 215, 64, 24);
 
-    attackKnob->setEnabled(false);
-    decayKnob->setEnabled(false);
-    sustainKnob->setEnabled(false);
-    releaseKnob->setEnabled(false);
-
     // Reverse sample
-    reverseButton.reset(new ToggleButton(TRANS("Reverse\n")));
+    reverseButton.reset(new SoomplerToggleButton(TRANS("Reverse\n")));
     addAndMakeVisible(reverseButton.get());
     editor.addToGuiEditor(reverseButton.get());
     reverseButton->setBounds(380, 230, 100, 50);
     reverseButton->addListener(this);
-    reverseButton->setEnabled(false);
+
+    // hide some controls until sample is loaded
+    attackKnob->setVisible(false);
+    attackKnobLabel->setVisible(false);
+    decayKnob->setVisible(false);
+    decayKnobLabel->setVisible(false);
+    sustainKnob->setVisible(false);
+    sustainKnobLabel->setVisible(false);
+    releaseKnob->setVisible(false);
+    releaseKnobLabel->setVisible(false);
+    volumeKnob->setVisible(false);
+    volumeKnobLabel->setVisible(false);
+    reverseButton->setVisible(false);
+    loopButton->setVisible(false);
+
+    // connect knobs to listener
+    attackKnob->addListener(this);
+    decayKnob->addListener(this);
+    sustainKnob->addListener(this);
+    releaseKnob->addListener(this);
+    volumeKnob->addListener(this);
 
     // add GUI editor last
     // it ensures that gui overlay will work properly
     editor.initOverlay();
+    
+    restoreMainPanelState();
 }
 
 MainPanel::~MainPanel()
 {
+    volumeAttachment = nullptr;
+    attackAttachment = nullptr;
+    decayAttachment = nullptr;
+    sustainAttachment = nullptr;
+    releaseAttachment = nullptr;
+    loopAttachment = nullptr;
+
+    attackKnob = nullptr;
+    decayKnob = nullptr;
+    sustainKnob = nullptr;
+    releaseKnob = nullptr;
     volumeKnob = nullptr;
     volumeKnobLabel = nullptr;
     openFileButton = nullptr;
@@ -217,6 +239,8 @@ MainPanel::~MainPanel()
     sampleViewer = nullptr;
     loadSampleTip = nullptr;
     pianoRoll = nullptr;
+    reverseButton = nullptr;
+    loopButton = nullptr;
 }
 
 //==============================================================================
@@ -280,14 +304,6 @@ void MainPanel::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == reverseButton.get()) {
         reverseButtonClicked();
     }
-//    else if (buttonThatWasClicked == playButton.get())
-//    {
-//        playSampleButtonClicked();
-//    }
-//    else if (buttonThatWasClicked == stopButton.get())
-//    {
-//        stopSampleButtonClicked();
-//    }
 }
 
 float MainPanel::getVolume() const
@@ -330,22 +346,33 @@ void MainPanel::stopSampleButtonClicked()
     processor.stopSamplePlayback();
 }
 
+void MainPanel::timerCallback()
+{
+    repaint();
+}
 
 void MainPanel::transportStateChanged(TransportState state)
 {
     switch (state) {
     case Ready:
         loadSampleTip->setVisible(false);
-        sampleViewer->setVisible(true);
-        //playButton->setVisible(true);
 
-        attackKnob->setEnabled(true);
-        decayKnob->setEnabled(true);
-        sustainKnob->setEnabled(true);
-        releaseKnob->setEnabled(true);
+        sampleViewer->setVisible(true);
+        attackKnob->setVisible(true);
+        attackKnobLabel->setVisible(true);
+        decayKnob->setVisible(true);
+        decayKnobLabel->setVisible(true);
+        sustainKnob->setVisible(true);
+        sustainKnobLabel->setVisible(true);
+        releaseKnob->setVisible(true);
+        releaseKnobLabel->setVisible(true);
+        volumeKnob->setVisible(true);
+        volumeKnobLabel->setVisible(true);
+        reverseButton->setVisible(true);
+        loopButton->setVisible(true);
         
-        loopButton->setEnabled(true);
-        reverseButton->setEnabled(true);
+        // start gui updates
+        startTimer(40);
         break;
     case Starting:
         break;
@@ -363,7 +390,7 @@ void MainPanel::loopButtonClicked() {
 }
 
 void MainPanel::reverseButtonClicked() {
-    processor.reverseSample();
+    processor.setSampleReversed(reverseButton->isToggle());
 }
 
 bool MainPanel::isInterestedInFileDrag(const juce::StringArray &files) {
@@ -385,6 +412,26 @@ void MainPanel::filesDropped(const juce::StringArray &files, int x, int y) {
     
     processor.loadSample(File(fileName));
 }
+
+void MainPanel::restoreMainPanelState() {
+    // check if sample already loaded
+    // (plugin reopened)
+    if (processor.getThumbnail().getNumChannels() > 0) {
+        // load current sample
+        sampleViewer->newSampleInfoRecieved(processor.getCurrentSampleInfo());
+        pianoRoll->newSampleInfoRecieved(processor.getCurrentSampleInfo());
+        
+        bool reversed = processor.isSampleReversed();
+        bool looped = processor.isLoopModeOn();
+        
+        reverseButton->setToggled(reversed);
+        loopButton->setToggled(looped);
+        
+        
+        this->transportStateChanged(TransportState::Ready);
+    }
+}
+
 
 
 

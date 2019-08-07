@@ -22,6 +22,13 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SampleInfo.h"
 #include "TransportInfo.h"
+#include "SAudioThumbnail.h"
+
+enum RangeLine {
+    NONE,
+    LEFT,
+    RIGHT
+};
 
 /**
   Component with AudioThumbnail and range lines.
@@ -32,16 +39,17 @@
 class SampleViewer  : public Component, public SampleInfoListener
 {
 public:
-    SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& sampleInfoListener);
+    SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& sampleInfoListener);
     ~SampleViewer();
 
     void paint (Graphics& g) override;
     void resized() override;
+    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
-    AudioThumbnail& thumbnail;
+    SAudioThumbnail& thumbnail;
     std::shared_ptr<SampleInfo> currentSample;
     TransportInfoOwner& transportInfoOwner;
     // this object can modify sample's start and end positions
@@ -55,18 +63,23 @@ private:
     // max range x value according to max sample length value
     int maxRangeX;
 
+    RangeLine draggedLine;
+
     //[/UserVariables]
 
     //==============================================================================
     void drawThumbnail(Graphics& g);
     void drawPositionLine(Graphics& g);
     int64 calculateSampleByCoords(int coordOnThumbnail);
+    int calculateCoordBySample(int64 sample);
     void calculateEndRangeX();
     void notifySampleInfoListeners();
     String getCroppedNameIfNeeded();
 
     void mouseDrag(const MouseEvent &event) override;
-    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
+    void mouseMove(const MouseEvent &event) override;
+    void mouseDown(const MouseEvent &event) override;
+    void mouseUp(const MouseEvent &event) override;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SampleViewer)

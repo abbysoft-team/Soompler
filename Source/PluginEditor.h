@@ -22,12 +22,11 @@
 class SoomplerAudioProcessorEditor  :
         public AudioProcessorEditor,
         private TransportStateListener,
-        private ChangeListener,
-        private Timer
+        private ChangeListener
 {
 public:
     explicit SoomplerAudioProcessorEditor (SoomplerAudioProcessor&);
-    ~SoomplerAudioProcessorEditor() override = default;
+    ~SoomplerAudioProcessorEditor();
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -37,10 +36,8 @@ private:
     void transportStateChanged(TransportState state) override;
 
     void changeListenerCallback(ChangeBroadcaster* source) override ;
-    void thumbnailChanged(AudioThumbnail& thumbnail);
+    void thumbnailChanged(SAudioThumbnail& thumbnail);
     void drawSampleNameOrMessage(Graphics& graphics);
-
-    void timerCallback() override;
 
     int64 calculateSampleByCoords(int coord);
 
@@ -56,6 +53,8 @@ private:
 
     // OpenGL context to speed up UI rendering
     OpenGLContext glContext;
+    
+    SharedResourcePointer<TooltipWindow> tooltipWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessorEditor)
 };

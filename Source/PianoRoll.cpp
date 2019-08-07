@@ -245,6 +245,24 @@ void PianoRoll::mouseDrag(const MouseEvent &event)
     }
 }
 
+void PianoRoll::mouseMove(const MouseEvent &event)
+{
+    auto position = event.getPosition();
+
+    // markers have negative Y because of render way, so here we compensate it
+    auto positionForMarkers = Point<float>(position.x, position.y - Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT);
+
+    if (rootMarker.contains(positionForMarkers)) {
+        setMouseCursor(MouseCursor::PointingHandCursor);
+    } else if (minMarker.contains(positionForMarkers)) {
+        setMouseCursor(MouseCursor::PointingHandCursor);
+    } else if (maxMarker.contains(positionForMarkers)) {
+        setMouseCursor(MouseCursor::PointingHandCursor);
+    } else {
+        setMouseCursor(MouseCursor::NormalCursor);
+    }
+}
+
 int PianoRoll::getKeyClicked(Point<int> point)
 {
     for (int i = FIRST_VISIBLE_KEY; i < MAX_KEYS; i++) {
@@ -270,7 +288,7 @@ void drawNoteTips(Graphics& g)
     //g.setFont(Settings::PIANO_ROLL_TIPS_FONT);
     g.setColour(Settings::PIANO_ROLL_NOTE_TIPS_COLOR);
 
-    auto currentCNote = 2;
+    auto currentCNote = 3;
     auto currentCNoteCoord  = Settings::PIANO_ROLL_TIPS_OFFSET_X;
     String noteName = "";
     while (currentCNoteCoord < Settings::PIANO_ROLL_WIDTH) {
@@ -390,9 +408,7 @@ void PianoRoll::minMarkerDragged(Point<int> position)
     draggedMarker = MIN_NOTE;
     sample->minNote = keyClicked;
 
-    auto range = BigInteger();
-    range.setRange(sample->minNote, sample->maxNote - sample->minNote + 1, true);
-    midiConsumer.setNoteRange(range);
+    midiConsumer.setNoteRange(sample->minNote, sample->maxNote);
 }
 
 void PianoRoll::maxMarkerDragged(Point<int> position)
@@ -413,9 +429,7 @@ void PianoRoll::maxMarkerDragged(Point<int> position)
     draggedMarker = MAX_NOTE;
     sample->maxNote = keyClicked;
 
-    auto range = BigInteger();
-    range.setRange(sample->minNote, sample->maxNote - sample->minNote + 1, true);
-    midiConsumer.setNoteRange(range);
+    midiConsumer.setNoteRange(sample->minNote, sample->maxNote);
 }
 
 void PianoRoll::resized()

@@ -31,14 +31,15 @@ void fadePreStartRegion(int startRangeBorderX, Graphics& g);
 void fadePostEndRegion(int endRangeBorderX, Graphics& g);
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos);
 
-SampleViewer::SampleViewer (AudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener)
+SampleViewer::SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener)
     : thumbnail(thumbnail),
     currentSample(new SampleInfo(0, 44100, "")),
     transportInfoOwner(transportInfoOwner),
     sampleInfoListener(infoListener),
     startRangeX(0),
     endRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
-    maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth())
+    maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
+    draggedLine(NONE)
 {
 }
 
@@ -146,7 +147,8 @@ void fadePostEndRegion(int endRangeBorderX, Graphics& g) {
 void SampleViewer::mouseDrag(const MouseEvent &event)
 {
     auto position = event.getPosition();
-    if (isIntersectWithRangeLine(position, startRangeX)) {
+
+    if (draggedLine == LEFT) {
 
         int rightBorderX = endRangeX - ((int) (Settings::RANGE_LINES_WIDTH*4));
         int leftBorderX = 0;
@@ -163,7 +165,7 @@ void SampleViewer::mouseDrag(const MouseEvent &event)
         notifySampleInfoListeners();
 
         repaint();
-    } else if (isIntersectWithRangeLine(position, endRangeX)) {
+    } else if (draggedLine == RIGHT) {
         int leftBorderX = startRangeX + ((int) (Settings::RANGE_LINES_WIDTH*4));
 
         if (position.getX() < leftBorderX) {
@@ -181,6 +183,33 @@ void SampleViewer::mouseDrag(const MouseEvent &event)
     }
 }
 
+void SampleViewer::mouseMove(const MouseEvent &event)
+{
+    Component::mouseMove(event);
+
+    auto position = event.getPosition();
+    if (isIntersectWithRangeLine(position, startRangeX) || isIntersectWithRangeLine(position, endRangeX)) {
+        setMouseCursor(MouseCursor::PointingHandCursor);
+    } else {
+        setMouseCursor(MouseCursor::NormalCursor);
+    }
+}
+
+void SampleViewer::mouseDown(const MouseEvent &event)
+{
+    auto position = event.getPosition();
+    if (isIntersectWithRangeLine(position, startRangeX)) {
+        draggedLine = LEFT;
+    } else if (isIntersectWithRangeLine(position, endRangeX)) {
+        draggedLine = RIGHT;
+    }
+}
+
+void SampleViewer::mouseUp(const MouseEvent &event)
+{
+    draggedLine = NONE;
+}
+
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos)
 {
     static Rectangle<int> rangeLine;
@@ -195,6 +224,8 @@ bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos)
 void SampleViewer::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
 {
     this->currentSample = info;
+    endRangeX = calculateCoordBySample(currentSample->endSample);
+    startRangeX = calculateCoordBySample(currentSample->startSample);
 
     calculateEndRangeX();
 }
@@ -215,7 +246,10 @@ void SampleViewer::calculateEndRangeX()
 
     notifySampleInfoListeners();
 
-    endRangeX = (partOfSampleAllowed * Settings::THUMBNAIL_BOUNDS.getWidth());
+    // end range of sample may be changed from end of sample allready,
+    // so we need to respect these changes
+    auto newEndRangeX = (partOfSampleAllowed * Settings::THUMBNAIL_BOUNDS.getWidth());
+    endRangeX = std::min((int) newEndRangeX, endRangeX);
     maxRangeX = endRangeX;
 }
 
@@ -226,22 +260,20 @@ void SampleViewer::notifySampleInfoListeners()
 
 int64 SampleViewer::calculateSampleByCoords(int coordOnThumbnail)
 {
-    double conversionsError = 0;
-    auto percentOfLength = coordOnThumbnail * 1.0 / Settings::THUMBNAIL_BOUNDS.getWidth() - conversionsError;
+    auto percentOfLength = coordOnThumbnail * 1.0 / Settings::THUMBNAIL_BOUNDS.getWidth();
     return ((int64) (percentOfLength * currentSample->lengthInSamples));
+}
+
+int SampleViewer::calculateCoordBySample(int64 sample)
+{
+    auto percentOfLength = sample * 1.0 / currentSample->lengthInSamples;
+    return getWidth() * percentOfLength;
 }
 
 void SampleViewer::resized()
 {
-    //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
 
-    //[UserResized] Add your own custom resize handling here..
-    //[/UserResized]
 }
-
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-//[/MiscUserCode]
 
 
 //==============================================================================

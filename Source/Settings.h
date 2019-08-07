@@ -17,6 +17,7 @@ const auto VOLUME_KNOB_POSITION = Rectangle<int>(70, 210, 50, 50);
 const auto THUMBNAIL_COLOR = Colour(23, 54, 38);
 const auto THUMBNAIL_HEADER_COLOR = Colour((uint8) 255, 128, 128, 0.7f);
 const auto THUMBNAIL_BOUNDS_COLOR = Colour(255, 128, 128);
+const auto THUMBNAIL_RESOLUTION_SAMPLES = 256;
 const auto SAMPLE_NAME_COLOR = THUMBNAIL_COLOR;
 const auto POSITION_LINE_COLOR = THUMBNAIL_HEADER_COLOR;
 const auto RANGE_LINES_COLOR = Colour((uint8) 246, (uint8) 66, (uint8) 66, (uint8) 200);
@@ -83,12 +84,12 @@ constexpr auto GUI_EDITOR_SIZE_STEP_COEFF_INCR = 1.05;
 constexpr auto GUI_EDITOR_SIZE_STEP_COEFF_DECR = 0.95;
 
 // GUI ADSR
-constexpr auto MAX_ATTACK_TIME = 5;
+constexpr auto MAX_ATTACK_TIME = 2;
 constexpr auto MAX_DECAY_TIME = 5;
 constexpr auto MAX_RELEASE_TIME = 5;
 
 constexpr auto DEFAULT_ATTACK_TIME = 0.0f;
-constexpr auto DEFAULT_DECAY_TIME = 0.1f;
+constexpr auto DEFAULT_DECAY_TIME = 0.0f;
 constexpr auto DEFAULT_RELEASE_TIME = 0.0f;
 constexpr auto DEFAULT_SUSTAIN_LEVEL = 1.0f;
     

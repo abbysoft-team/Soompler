@@ -22,16 +22,17 @@ ExtendedSound::ExtendedSound (const String& soundName,
     : name (soundName),
     sourceSampleRate (source.sampleRate),
     midiNotes (notes),
-    midiRootNote (midiNoteForNormalPitch)
+    midiRootNote (midiNoteForNormalPitch),
+    reversed(false)
 {
     if (sourceSampleRate > 0 && source.lengthInSamples > 0)
     {
         length = jmin ((int) source.lengthInSamples,
                        (int) (maxSampleLengthSeconds * sourceSampleRate));
 
-        data.reset (new AudioBuffer<float> (jmin (2, (int) source.numChannels), length + 4));
+        data.reset (new AudioBuffer<float> (jmin (2, (int) source.numChannels), length));
 
-        source.read (data.get(), 0, length + 4, 0, true, true);
+        source.read (data.get(), 0, length, 0, true, true);
 
         params.attack  = static_cast<float> (attackTimeSecs);
         params.release = static_cast<float> (releaseTimeSecs);
@@ -53,9 +54,17 @@ void ExtendedSound::setAdsrParams(ADSR::Parameters adsr)
     this->params = adsr;
 }
 
-void ExtendedSound::reverse()
+ADSR::Parameters &ExtendedSound::getAdsrParams()
 {
-    this->data->reverse(0, data->getNumSamples());
+    return params;
+}
+
+void ExtendedSound::setReversed(bool reversed)
+{
+    if (this->reversed != reversed) {
+        this->data->reverse(0, data->getNumSamples());
+        this->reversed = reversed;
+    }
 }
 
 void ExtendedSound::setRootNote(int rootNote)
@@ -69,7 +78,7 @@ void ExtendedSound::setMidiRange(const BigInteger &midiNotes)
 }
 
 //==============================================================================
-    ExtendedVoice::ExtendedVoice(ChangeListener* listener) : volume(0), loopingEnabled(false), eventListener(listener)
+    ExtendedVoice::ExtendedVoice(ChangeListener* listener) : volume(1), loopingEnabled(false), eventListener(listener)
 {
 }
 
@@ -218,6 +227,9 @@ void ExtendedVoice::setVolume(float volume)
 {
     jassert(volume <= 1.0f && volume >= .0f);
     this->volume = volume;
+
+    this->lgain = volume;
+    this->rgain = volume;
 }
 
 void ExtendedVoice::removeListener()
@@ -227,6 +239,11 @@ void ExtendedVoice::removeListener()
     
     void ExtendedVoice::enableLooping(bool enable) {
         this->loopingEnabled = enable;
+    }
+
+    void ExtendedVoice::setAdsrParams(ADSR::Parameters &params)
+    {
+        adsr.setParameters(params);
     }
 
 }

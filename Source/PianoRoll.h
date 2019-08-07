@@ -43,6 +43,8 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
+    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
+
 private:
     static constexpr auto MAX_KEYS = 120;
     static constexpr auto FIRST_VISIBLE_KEY = 48;
@@ -70,6 +72,7 @@ private:
     void mouseDown(const MouseEvent& event) override;
     void mouseUp(const MouseEvent& event) override;
     void mouseDrag(const MouseEvent& event) override;
+    void mouseMove(const MouseEvent& event) override;
 
     void fireNoteOn(int noteNumber);
     void fireNoteOff(int noteNumber);
@@ -79,8 +82,6 @@ private:
     Path createMarker(int noteNum, bool root);
 
     void drawDisabledNotesMask(Graphics& g);
-
-    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
 
     void rootMarkerDragged(Point<int> position);
     void minMarkerDragged(Point<int> position);

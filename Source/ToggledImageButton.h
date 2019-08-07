@@ -17,12 +17,14 @@ public:
     ~ToggledImageButton() = default;
     
     bool isToggled() const;
+    void setToggled(bool toggled);
     
 protected:
     
     void paintButton (Graphics&, bool, bool) override;
     void mouseDown(const MouseEvent &event) override;
-    
+    void mouseMove(const MouseEvent &event) override;
+
 private:
     
     bool toggled;

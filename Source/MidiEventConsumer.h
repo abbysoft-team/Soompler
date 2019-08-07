@@ -17,7 +17,7 @@ public:
     virtual void noteOff(int noteNumber) = 0;
 
     virtual void setRootNote(int rootNote) = 0;
-    virtual void setNoteRange(const BigInteger& notes) = 0;
+    virtual void setNoteRange(int min, int max) = 0;
     
     virtual ~MidiEventConsumer() = default;
 };
