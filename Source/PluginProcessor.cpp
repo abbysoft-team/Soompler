@@ -400,6 +400,9 @@ void SoomplerAudioProcessor::loadSample(File sampleFile)
     auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
     sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName());
 
+    setSampleReversed(false);
+    setLoopEnabled(false);
+
     notifySampleInfoListeners();
 }
 
