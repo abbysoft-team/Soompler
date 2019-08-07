@@ -181,6 +181,8 @@ void SoomplerAudioProcessor::setSampleStartPosition(int64 sample)
 
     auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
     voice->setStartSample(sample);
+
+    stateManager.state.setProperty("startSample", startSample, nullptr);
 }
 
 void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
@@ -189,6 +191,8 @@ void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
 
     auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
     voice->setEndSample(sample);
+
+    stateManager.state.setProperty("endSample", endSample, nullptr);
 }
 
 void SoomplerAudioProcessor::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
@@ -304,15 +308,11 @@ void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
     ValueTree loadedSampleLengthValue = ValueTree("loadedSampleLength");
     ValueTree startSampleValue = ValueTree("startSample");
     ValueTree endSampleValue = ValueTree("endSample");
-//    ValueTree reverseValue = ValueTree("reverse");
-//    ValueTree loopModeValue = ValueTree("loopMode");
 
     stateManager.state.appendChild(loadedSampleNameValue, nullptr);
     stateManager.state.appendChild(loadedSampleLengthValue, nullptr);
     stateManager.state.appendChild(startSampleValue, nullptr);
     stateManager.state.appendChild(endSampleValue, nullptr);
-//    stateManager.state.appendChild(loopModeValue, nullptr);
-//    stateManager.state.appendChild(reverseValue, nullptr);
 
     if (loadedSample != nullptr) {
         stateManager.state.setProperty("loadedSampleName", loadedSample->getFileName(), nullptr);
@@ -323,8 +323,6 @@ void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
     
     stateManager.state.setProperty("startSample", startSample, nullptr);
     stateManager.state.setProperty("endSample", endSample, nullptr);
-//    stateManager.state.setProperty("loopMode", loopMode, nullptr);
-//    stateManager.state.setProperty("reverse", reverse, nullptr);
 
     auto state = stateManager.copyState();
     std::unique_ptr<XmlElement> xml(state.createXml());
@@ -365,6 +363,9 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     sampleInfo->endSample = endSample;
     this->startSample = startSample;
     this->endSample = endSample;
+
+    setSampleStartPosition(startSample);
+    setSampleEndPosition(endSample);
 
     if (rootNote != 0) {
         sampleInfo->rootNote = rootNote;
