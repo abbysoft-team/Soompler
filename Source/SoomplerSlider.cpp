@@ -10,8 +10,13 @@
 
 #include "SoomplerSlider.h"
 
-SoomplerSlider::SoomplerSlider(String name) : Slider(name)
+SoomplerSlider::SoomplerSlider() : Slider(SliderStyle::Rotary, TextEntryBoxPosition::NoTextBox)
 {
+}
+
+SoomplerSlider::SoomplerSlider(Slider::SliderStyle style, Slider::TextEntryBoxPosition textBoxPosition) : Slider(style, textBoxPosition)
+{
+
 }
 
 void SoomplerSlider::mouseMove(const MouseEvent &event)

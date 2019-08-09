@@ -380,7 +380,7 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     notifySampleInfoListeners();
 }
 
-void SoomplerAudioProcessor::loadSample(File sampleFile)
+void SoomplerAudioProcessor::loadSample(const File& sampleFile)
 {
     this->loadedSample = std::make_shared<File>(sampleFile);
 
@@ -416,6 +416,11 @@ void SoomplerAudioProcessor::notifySampleInfoListeners()
 bool SoomplerAudioProcessor::isSampleLoaded()
 {
     return getThumbnail().getNumChannels() > 0;
+}
+
+void SoomplerAudioProcessor::fileRecieved(const File &file)
+{
+    loadSample(file);
 }
 
 void SoomplerAudioProcessor::playSample()

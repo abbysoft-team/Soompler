@@ -16,7 +16,8 @@ class SoomplerSlider : public Slider {
 
 public:
 
-    SoomplerSlider(String name);
+    SoomplerSlider();
+    SoomplerSlider(SliderStyle style, TextEntryBoxPosition textBoxPosition);
     ~SoomplerSlider() = default;
 
     void mouseMove(const MouseEvent &event) override;

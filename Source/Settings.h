@@ -5,11 +5,20 @@
 
 namespace Settings {
 
-constexpr int WINDOW_WIDTH = 500;
-constexpr int WINDOW_HEIGHT = 360;
+constexpr int MAIN_PANEL_WIDTH = 500;
+constexpr int MAIN_PANEL_HEIGHT = 360;
+constexpr int BROWSER_WIDTH = 320;
+constexpr auto SAMPLE_PREVIEW_WIDTH = 70;
+
+constexpr int WINDOW_WIDTH = BROWSER_WIDTH + MAIN_PANEL_WIDTH;
+constexpr int WINDOW_HEIGHT = MAIN_PANEL_HEIGHT;
+
+constexpr int MAIN_PANEL_X = BROWSER_WIDTH;
+constexpr int MAIN_PANEL_Y = 0;
+
 const auto BUTTON_OPEN_FILE_POSITION = Rectangle<int>(10, 10, 100, 40);
-const auto BUTTON_PLAY_SAMPLE_POSITION = Rectangle<int>(WINDOW_WIDTH/2 + 5, BUTTON_OPEN_FILE_POSITION.getY(), 100, 40);
-const auto THUMBNAIL_BOUNDS = Rectangle<int>(10, 100, WINDOW_WIDTH - 20, 100);
+const auto BUTTON_PLAY_SAMPLE_POSITION = Rectangle<int>(MAIN_PANEL_WIDTH/2 + 5, BUTTON_OPEN_FILE_POSITION.getY(), 100, 40);
+const auto THUMBNAIL_BOUNDS = Rectangle<int>(10, 100, MAIN_PANEL_WIDTH - 20, 100);
 constexpr auto THUMBNAIL_HEADER_HEIGHT = 20;
 const auto SAMPLE_VIEWER_BOUNDS = Rectangle<int>(10, 100, THUMBNAIL_BOUNDS.getWidth(), THUMBNAIL_BOUNDS.getHeight() + THUMBNAIL_HEADER_HEIGHT);
 const auto VOLUME_KNOB_POSITION = Rectangle<int>(70, 210, 50, 50);
@@ -44,7 +53,7 @@ const auto PIANO_ROLL_ACTIVE_KEY_MASK_COLOR = Colour((uint8) 220, (uint8) 128, (
 const auto PIANO_ROLL_DISABLED_MASK_COLOR = Colour((uint8) 0, (uint8) 0, (uint8) 0, (uint8) 156);
 const auto PIANO_ROLL_TIPS_FONT = Font(10);
 
-constexpr auto PIANO_ROLL_WIDTH = WINDOW_WIDTH;
+constexpr auto PIANO_ROLL_WIDTH = MAIN_PANEL_WIDTH;
 constexpr auto PIANO_ROLL_HEIGHT = 64;
 constexpr auto PIANO_ROLL_RANGE_MARKERS_HEIGHT = 15;
 constexpr auto PIANO_ROLL_WHITE_NOTE_WIDTH = 30;
@@ -55,7 +64,7 @@ constexpr auto PIANO_ROLL_TIPS_OFFSET_X = 5;
 constexpr auto PIANO_ROLL_TIPS_OFFSET_Y = PIANO_ROLL_HEIGHT - 10;
 constexpr auto PIANO_ROLL_MARKER_SIZE = 8;
 
-const auto PIANO_ROLL_BOUNDS = Rectangle<int>(0, WINDOW_HEIGHT - PIANO_ROLL_HEIGHT - PIANO_ROLL_RANGE_MARKERS_HEIGHT,
+const auto PIANO_ROLL_BOUNDS = Rectangle<int>(0, MAIN_PANEL_HEIGHT - PIANO_ROLL_HEIGHT - PIANO_ROLL_RANGE_MARKERS_HEIGHT,
                                               PIANO_ROLL_WIDTH, PIANO_ROLL_HEIGHT + PIANO_ROLL_RANGE_MARKERS_HEIGHT);
 
 const auto PIANO_ROLL_GRADIENT = ColourGradient(PIANO_ROLL_WHITE_COLOR, Point<float>(PIANO_ROLL_WIDTH / 2, PIANO_ROLL_HEIGHT - 1),
@@ -64,11 +73,11 @@ const auto PIANO_ROLL_GRADIENT = ColourGradient(PIANO_ROLL_WHITE_COLOR, Point<fl
 
 // Main Panel
 
-constexpr auto MAIN_PANEL_HEIGHT = 40;
-const auto MAIN_PANEL_GRADIENT = ColourGradient(Colour((uint8) 255, (uint8) 255, (uint8) 255, (uint8) 100),
-                                                Point<float>(WINDOW_WIDTH / 2, 0),
+constexpr auto MAIN_MENU_HEIGHT = 40;
+const auto MAIN_MENU_GRADIENT = ColourGradient(Colour((uint8) 255, (uint8) 255, (uint8) 255, (uint8) 100),
+                                                Point<float>(MAIN_PANEL_WIDTH / 2, 0),
                                                 Colour((uint8) 150, (uint8) 170, (uint8) 150, (uint8) 100),
-                                                Point<float>(WINDOW_WIDTH / 2, MAIN_PANEL_HEIGHT),
+                                                Point<float>(MAIN_PANEL_WIDTH / 2, MAIN_MENU_HEIGHT),
                                                 false);
 
 // Buttons
@@ -105,6 +114,11 @@ const auto NOTE_ROOT_MARKER_COLOR = Colour(255, 128, 128);
 const auto NOTE_RANGE_MARKER_COLOR = Colour((uint8) 255, (uint8) 200, (uint8) 128, (uint8) 200);
     
 const auto SUPPORTED_FILE_FORMATS = {"wav", "mp3", "ogg"};
+
+// File Browser
+const auto INITIAL_DIRECTORY = File::getSpecialLocation(File::userHomeDirectory);
+const auto BROWSER_FILE_FILTER = std::make_shared<WildcardFileFilter>("*.wav, *.mp3, *.ogg", "*", "supported formats filter");
+const auto BROWSER_BOUNDS = Rectangle<int>(0, 0, BROWSER_WIDTH, WINDOW_HEIGHT);
 }
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H

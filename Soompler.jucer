@@ -11,6 +11,14 @@
               pluginAUExportPrefix="soompler_au">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="LAOZjd" name="SamplePreviewComponent.cpp" compile="1" resource="0"
+            file="Source/SamplePreviewComponent.cpp"/>
+      <FILE id="EExMAB" name="SamplePreviewComponent.h" compile="0" resource="0"
+            file="Source/SamplePreviewComponent.h"/>
+      <FILE id="lml4FD" name="FileListener.h" compile="0" resource="0" file="Source/FileListener.h"/>
+      <FILE id="cFGQfY" name="SampleBrowser.cpp" compile="1" resource="0"
+            file="Source/SampleBrowser.cpp"/>
+      <FILE id="X6GOXN" name="SampleBrowser.h" compile="0" resource="0" file="Source/SampleBrowser.h"/>
       <FILE id="fF5J5H" name="SAudioThumbnail.cpp" compile="1" resource="0"
             file="Source/SAudioThumbnail.cpp"/>
       <FILE id="PE79R0" name="SAudioThumbnail.h" compile="0" resource="0"

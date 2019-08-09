@@ -14,7 +14,7 @@
 
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), mainPanel(processor)
+    : AudioProcessorEditor (&p), processor (p), mainPanel(processor), sampleBrowser(processor)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
@@ -26,6 +26,11 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // set OpenGL renderer
     this->glContext.attachTo(*this);
 
+    // SampleBrowser
+    sampleBrowser.setBounds(Settings::BROWSER_BOUNDS);
+    mainPanel.setBounds(Settings::MAIN_PANEL_X, Settings::MAIN_PANEL_Y, mainPanel.getWidth(), mainPanel.getHeight());
+
+    addAndMakeVisible(sampleBrowser);
     addAndMakeVisible(mainPanel);
 
     // subscribe to all transport events from processor

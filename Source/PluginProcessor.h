@@ -17,6 +17,7 @@
 #include "TransportInfo.h"
 #include "SampleInfo.h"
 #include "SAudioThumbnail.h"
+#include "FileListener.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -30,7 +31,8 @@ class SoomplerAudioProcessor  :
         public MidiEventSupplier,
         public MidiEventConsumer,
         public TransportInfoOwner,
-        public SampleInfoListener
+        public SampleInfoListener,
+        public FileListener
 {
 public:
     
@@ -77,7 +79,7 @@ public:
         return thumbnail;
     }
 
-    void loadSample(File);
+    void loadSample(const File& file);
 
     void playSample();
 
@@ -131,6 +133,8 @@ public:
     bool isLoopModeOn() const;
 
     bool isSampleLoaded();
+
+    void fileRecieved(const File& file);
 
 private:
     //==============================================================================

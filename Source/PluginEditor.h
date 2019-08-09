@@ -15,6 +15,7 @@
 #include "TransportStateListener.h"
 #include "Settings.h"
 #include "MainPanel.h"
+#include "SampleBrowser.h"
 
 //==============================================================================
 /**
@@ -48,6 +49,7 @@ private:
     SoomplerAudioProcessor& processor;
 
     MainPanel mainPanel;
+    SampleBrowser sampleBrowser;
 
     Font mainFont;
 

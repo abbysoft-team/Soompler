@@ -6,12 +6,12 @@
 MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processor.getStateManager()),
     processor(processor), editor(this)
 {
-    setSize(Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
+    setSize(Settings::MAIN_PANEL_WIDTH, Settings::MAIN_PANEL_HEIGHT);
     setName("mainPanel");
 
     backgroundImage = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
 
-    volumeKnob.reset (new SoomplerSlider ("volume knob"));
+    volumeKnob.reset (new SoomplerSlider ());
     addAndMakeVisible(volumeKnob.get());
     editor.addToGuiEditor(volumeKnob.get());
     volumeKnob->setTooltip (TRANS("volume"));
@@ -104,7 +104,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     editor.addToGuiEditor (pianoRoll.get());
 
     // ADSR controls
-    attackKnob.reset (new SoomplerSlider ("attack knob"));
+    attackKnob.reset (new SoomplerSlider ());
     addAndMakeVisible(attackKnob.get());
     editor.addToGuiEditor(attackKnob.get());
     attackKnob->setTooltip (TRANS("Attack"));
@@ -124,7 +124,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     attackKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     attackKnobLabel->setBounds (150, 215, 64, 24);
 
-    decayKnob.reset (new SoomplerSlider ("decay knob"));
+    decayKnob.reset (new SoomplerSlider ());
     addAndMakeVisible(decayKnob.get());
     editor.addToGuiEditor(decayKnob.get());
     decayKnob->setTooltip (TRANS("Decay"));
@@ -144,7 +144,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     decayKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     decayKnobLabel->setBounds (200, 215, 64, 24);
 
-    sustainKnob.reset (new SoomplerSlider ("sustain knob"));
+    sustainKnob.reset (new SoomplerSlider ());
     addAndMakeVisible(sustainKnob.get());
     editor.addToGuiEditor(sustainKnob.get());
     sustainKnob->setTooltip (TRANS("Sustain"));
@@ -164,7 +164,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     sustainKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     sustainKnobLabel->setBounds (250, 215, 64, 24);
 
-    releaseKnob.reset (new SoomplerSlider ("release knob"));
+    releaseKnob.reset (new SoomplerSlider ());
     addAndMakeVisible(releaseKnob.get());
     editor.addToGuiEditor(releaseKnob.get());
     releaseKnob->setTooltip (TRANS("Release"));
@@ -252,8 +252,8 @@ void MainPanel::paint (Graphics& g)
     editor.paintBackOverlay(g);
 
     // draw menu panel
-    g.setGradientFill(Settings::MAIN_PANEL_GRADIENT);
-    g.fillRect(0, 0, this->getWidth(), Settings::MAIN_PANEL_HEIGHT);
+    g.setGradientFill(Settings::MAIN_MENU_GRADIENT);
+    g.fillRect(0, 0, this->getWidth(), Settings::MAIN_MENU_HEIGHT);
 
 }
 
