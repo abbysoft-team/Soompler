@@ -14,7 +14,7 @@
 
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), mainPanel(processor), sampleBrowser(processor)
+    : AudioProcessorEditor (&p), processor (p), mainPanel(processor), sampleBrowser(processor, processor)
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.

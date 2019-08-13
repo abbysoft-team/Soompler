@@ -12,10 +12,11 @@
 #include "Settings.h"
 #include "SamplePreviewComponent.h"
 
-SampleBrowser::SampleBrowser(FileListener& listener) : Component("SampleBrowser"), fileListener(listener)
+SampleBrowser::SampleBrowser(FileListener& listener, SoomplerAudioProcessor &processor) : Component("SampleBrowser"),
+    FileBrowserListener(), fileListener(listener)
 {
     background = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
-    previewComponent.reset(new SamplePreviewComponent());
+    previewComponent.reset(new SamplePreviewComponent(processor));
     browser.reset(new FileBrowserComponent(FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
                                            Settings::INITIAL_DIRECTORY, Settings::BROWSER_FILE_FILTER.get(), nullptr));
     browser->addListener(this);
@@ -38,12 +39,14 @@ void SampleBrowser::resized()
 
 void SampleBrowser::selectionChanged()
 {
-
+    auto selected = browser->getSelectedFile(0);
+    if (!selected.isDirectory()) {
+        previewComponent->selectedFileChanged(selected);
+    }
 }
 
 void SampleBrowser::fileClicked(const File &file, const MouseEvent &e)
 {
-
 }
 
 void SampleBrowser::fileDoubleClicked(const File &file)

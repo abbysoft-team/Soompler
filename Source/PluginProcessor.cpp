@@ -124,11 +124,17 @@ void SoomplerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     transportSource.prepareToPlay(samplesPerBlock, sampleRate);
     synth.setCurrentPlaybackSampleRate(sampleRate);
+    if (previewSource != nullptr) {
+        previewSource->prepareToPlay(sampleRate, samplesPerBlock);
+    }
 }
 
 void SoomplerAudioProcessor::releaseResources()
 {
     transportSource.releaseResources();
+    if (previewSource != nullptr) {
+        previewSource->releaseResources();
+    }
 }
 
 bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -457,9 +463,9 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
     if (sampleFile == nullptr) {
         return nullptr;
     }
-    
+
     //auto* soundBuffer = sampleFile->createInputStream();
-    AudioFormat* format = getFormatForFileOrNullptr(sampleFile);
+    AudioFormat* format = getFormatForFileOrNullptr(*(sampleFile.get()));
     if (format == nullptr)
     {
         return nullptr;
@@ -476,12 +482,44 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
                                        Settings::DEFAULT_ATTACK_TIME, Settings::DEFAULT_RELEASE_TIME, Settings::MAX_SAMPLE_LENGTH);
 }
 
-AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile)
+//void SoomplerAudioProcessor::setFileAsTransportSource(AudioTransportSource &source, File &file)
+//{
+//    auto reader = getAudioFormatReader(file);
+//    if (reader == nullptr) {
+//        DBG("Cannot load preview file!");
+//        return;
+//    }
+
+//    setTransportSource(reader, source);
+//}
+
+void SoomplerAudioProcessor::setSamplePreviewSource(SamplePreviewSource* source)
 {
-    AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile->getFileExtension());
+    this->previewSource = std::shared_ptr<SamplePreviewSource>(source);
+}
+
+//AudioFormatReader *SoomplerAudioProcessor::getAudioFormatReader(File &file)
+//{
+////    if (file == nullptr) {
+////        return nullptr;
+////    }
+
+//    //auto* soundBuffer = sampleFile->createInputStream();
+//    AudioFormat* format = getFormatForFileOrNullptr(file);
+//    if (format == nullptr)
+//    {
+//        return nullptr;
+//    }
+
+//    return formatManager.createReaderFor(file);
+//}
+
+AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File &sampleFile)
+{
+    AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile.getFileExtension());
 
     if (format == nullptr) {
-        DBG(sampleFile->getFileExtension());
+        DBG(sampleFile.getFileExtension());
         NativeMessageBox::showMessageBox(
                     AlertWindow::AlertIconType::WarningIcon,
                     Strings::UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE,
@@ -533,6 +571,7 @@ void SoomplerAudioProcessor::changeTransportState(TransportState newState)
             break;
    }
 }
+
 
 void SoomplerAudioProcessor::setTransportSource(AudioFormatReader* reader)
 {

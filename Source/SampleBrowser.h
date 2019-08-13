@@ -9,13 +9,14 @@
 */
 #include <JuceHeader.h>
 #include "FileListener.h"
+#include "PluginProcessor.h"
 
 #pragma once
 
-class SampleBrowser : public Component, FileBrowserListener {
+class SampleBrowser : public Component, public FileBrowserListener {
 
 public:
-    SampleBrowser(FileListener& listener);
+    SampleBrowser(FileListener& listener, SoomplerAudioProcessor &processor);
     ~SampleBrowser() = default;
 
 private:
@@ -30,10 +31,10 @@ public:
 
         // FileBrowserListener interface
 public:
-        void selectionChanged();
-        void fileClicked(const File &file, const MouseEvent &e);
-        void fileDoubleClicked(const File &file);
-        void browserRootChanged(const File &newRoot);
+        void selectionChanged() override;
+        void fileClicked(const File &file, const MouseEvent &e) override;
+        void fileDoubleClicked(const File &file) override;
+        void browserRootChanged(const File &newRoot) override;
 
         // Component interface
 public:

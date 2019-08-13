@@ -18,6 +18,7 @@
 #include "SampleInfo.h"
 #include "SAudioThumbnail.h"
 #include "FileListener.h"
+#include "SamplePreviewSource.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -136,6 +137,10 @@ public:
 
     void fileRecieved(const File& file);
 
+    void setFileAsTransportSource(AudioTransportSource &source, File &file);
+
+    void setSamplePreviewSource(SamplePreviewSource *source);
+
 private:
     //==============================================================================
 
@@ -164,16 +169,20 @@ private:
     std::shared_ptr<SampleInfo> sampleInfo;
     std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
 
+    std::shared_ptr<SamplePreviewSource> previewSource;
+
     AudioProcessorValueTreeState::ParameterLayout createParametersLayout();
 
     SynthesiserSound::Ptr getSampleData(std::shared_ptr<File> sampleFile);
-    AudioFormat* getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile);
+    AudioFormat* getFormatForFileOrNullptr(File &sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);
     double getSynthCurrentPosition();
     MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel);
     void notifySampleInfoListeners();
+
+    AudioFormatReader* getAudioFormatReader(File &file);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 };
