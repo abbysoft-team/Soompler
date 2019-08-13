@@ -12,7 +12,7 @@
 
 SamplePreviewComponent::SamplePreviewComponent() : FilePreviewComponent()
 {
-    volume.reset(new SoomplerSlider(Slider::SliderStyle::LinearBarVertical, Slider::NoTextBox));
+    volume.reset(new SoomplerSlider(Slider::SliderStyle::LinearHorizontal, Slider::NoTextBox));
     autoplayButton.reset(new SoomplerToggleButton(TRANS("autoplay")));
     playButton.reset(new SoomplerImageButton(TRANS("playButton")));
     stopButton.reset(new SoomplerImageButton(TRANS("stopButton")));
@@ -51,20 +51,16 @@ void SamplePreviewComponent::resized()
 {
     FlexBox fb;
 
-    fb.flexDirection = FlexBox::Direction::column;
-    fb.justifyContent = FlexBox::JustifyContent::center;
+    fb.flexDirection = FlexBox::Direction::row;
 
-    FlexItem::Margin topMargin;
-    topMargin.top = 10.f;
-
-    fb.items.add(FlexItem(*(volume.get())).withFlex(1).withMaxWidth(20).withMargin(topMargin));
+    fb.items.add(FlexItem(*(volume.get())).withFlex(3));
     if (stopButton->isVisible()) {
-        fb.items.add(FlexItem(*(stopButton.get())).withMinHeight(20).withMaxWidth(20).withMargin(topMargin));
+        fb.items.add(FlexItem(*(stopButton.get())).withFlex(1));
     }
     if (playButton->isVisible()) {
-        fb.items.add(FlexItem(*(playButton.get())).withMinHeight(20).withMaxWidth(20).withMargin(topMargin));
+        fb.items.add(FlexItem(*(playButton.get())).withFlex(1).withMaxHeight(30).withMaxWidth(30));
     }
-    fb.items.add(FlexItem(*(autoplayButton.get())).withMinHeight(20).withMargin(FlexItem::Margin(10.0f, 0.0f, 10.0f, 0.0f)));
+    fb.items.add(FlexItem(*(autoplayButton.get())).withFlex(1).withMargin(FlexItem::Margin(.0f, 20.0f, .0f, .0f)));
 
     fb.performLayout(getLocalBounds());
 }

@@ -28,10 +28,10 @@ void SampleBrowser::resized()
 {
     FlexBox fb;
 
-    fb.flexDirection = FlexBox::Direction::row;
+    fb.flexDirection = FlexBox::Direction::column;
 
     fb.items.add(FlexItem(*(browser.get())).withFlex(3));
-    fb.items.add(FlexItem(*(previewComponent.get())).withFlex(1));
+    fb.items.add(FlexItem(*(previewComponent.get())).withMinHeight(Settings::SAMPLE_PREVIEW_HEIGHT));
 
     fb.performLayout(getLocalBounds().toFloat());
 }

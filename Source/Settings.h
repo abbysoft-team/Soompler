@@ -8,7 +8,7 @@ namespace Settings {
 constexpr int MAIN_PANEL_WIDTH = 500;
 constexpr int MAIN_PANEL_HEIGHT = 360;
 constexpr int BROWSER_WIDTH = 320;
-constexpr auto SAMPLE_PREVIEW_WIDTH = 70;
+constexpr auto SAMPLE_PREVIEW_HEIGHT = 30;
 
 constexpr int WINDOW_WIDTH = BROWSER_WIDTH + MAIN_PANEL_WIDTH;
 constexpr int WINDOW_HEIGHT = MAIN_PANEL_HEIGHT;
