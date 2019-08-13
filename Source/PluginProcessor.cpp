@@ -125,7 +125,7 @@ void SoomplerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
     transportSource.prepareToPlay(samplesPerBlock, sampleRate);
     synth.setCurrentPlaybackSampleRate(sampleRate);
     if (previewSource != nullptr) {
-        previewSource->prepareToPlay(sampleRate, samplesPerBlock);
+        previewSource->prepareToPlay(samplesPerBlock, sampleRate);
     }
 }
 
@@ -152,6 +152,11 @@ void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
 {
     if (readerSource.get() == nullptr) {
         buffer.clear();
+        return;
+    }
+
+    if (previewSource != nullptr && previewSource->isReady()) {
+        previewSource->getNextAudioBlock(buffer);
         return;
     }
 
@@ -464,16 +469,10 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
         return nullptr;
     }
 
-    //auto* soundBuffer = sampleFile->createInputStream();
-    AudioFormat* format = getFormatForFileOrNullptr(*(sampleFile.get()));
-    if (format == nullptr)
-    {
-        return nullptr;
-    }
-
-    auto formatReader = formatManager.createReaderFor(*sampleFile);
+    auto formatReader = getAudioFormatReader(*(sampleFile.get()));
 
     setTransportSource(formatReader);
+
     thumbnail.setSource(new FileInputSource(*sampleFile));
 
     BigInteger midiNotes;
@@ -482,39 +481,34 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
                                        Settings::DEFAULT_ATTACK_TIME, Settings::DEFAULT_RELEASE_TIME, Settings::MAX_SAMPLE_LENGTH);
 }
 
-//void SoomplerAudioProcessor::setFileAsTransportSource(AudioTransportSource &source, File &file)
-//{
-//    auto reader = getAudioFormatReader(file);
-//    if (reader == nullptr) {
-//        DBG("Cannot load preview file!");
-//        return;
-//    }
-
-//    setTransportSource(reader, source);
-//}
-
 void SoomplerAudioProcessor::setSamplePreviewSource(SamplePreviewSource* source)
 {
     this->previewSource = std::shared_ptr<SamplePreviewSource>(source);
+    previewSource->prepareToPlay(getBlockSize(), getSampleRate());
 }
 
-//AudioFormatReader *SoomplerAudioProcessor::getAudioFormatReader(File &file)
-//{
-////    if (file == nullptr) {
-////        return nullptr;
-////    }
+AudioFormatManager &SoomplerAudioProcessor::getFormatManager()
+{
+    return formatManager;
+}
 
-//    //auto* soundBuffer = sampleFile->createInputStream();
-//    AudioFormat* format = getFormatForFileOrNullptr(file);
-//    if (format == nullptr)
-//    {
+AudioFormatReader *SoomplerAudioProcessor::getAudioFormatReader(const File &file)
+{
+//    if (file == nullptr) {
 //        return nullptr;
 //    }
 
-//    return formatManager.createReaderFor(file);
-//}
+    //auto* soundBuffer = sampleFile->createInputStream();
+    AudioFormat* format = getFormatForFileOrNullptr(file);
+    if (format == nullptr)
+    {
+        return nullptr;
+    }
 
-AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(File &sampleFile)
+    return formatManager.createReaderFor(file);
+}
+
+AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(const File &sampleFile)
 {
     AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile.getFileExtension());
 

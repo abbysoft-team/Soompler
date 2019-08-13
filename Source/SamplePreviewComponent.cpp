@@ -34,6 +34,8 @@ SamplePreviewComponent::SamplePreviewComponent(SoomplerAudioProcessor &processor
 
     playButton->onClick = [this] { playButtonClicked(); };
     stopButton->onClick = [this] { stopButtonClicked(); };
+    autoplayButton->onClick = [this] { setAutoplay(autoplayButton->isToggle());};
+    volume->addListener(this);
 
     volume->setRange(0.0, 1.0);
     volume->setValue(0.5);
@@ -47,6 +49,7 @@ SamplePreviewComponent::SamplePreviewComponent(SoomplerAudioProcessor &processor
 
     // transport source configuration
     transportSource.addChangeListener(this);
+    transportSource.setGain(volume->getValue());
 
     // connect to processor
     processor.setSamplePreviewSource(this);
@@ -55,7 +58,14 @@ SamplePreviewComponent::SamplePreviewComponent(SoomplerAudioProcessor &processor
 void SamplePreviewComponent::selectedFileChanged(const File &newSelectedFile)
 {
     currentFile = std::make_unique<File>(File(newSelectedFile));
-    //processor.setFileAsTransportSource(transportSource, *(currentFile.get()));
+
+    auto reader = processor.getAudioFormatReader(File(newSelectedFile));
+    if (reader == nullptr) {
+        DBG("Cannot load preview file!");
+        return;
+    }
+
+    //setTransportSource(reader, source, false);
 
     if (autoplay) {
         playButtonClicked();
@@ -70,7 +80,7 @@ void SamplePreviewComponent::resized()
 
     fb.items.add(FlexItem(*(volume.get())).withFlex(3));
     if (stopButton->isVisible()) {
-        fb.items.add(FlexItem(*(stopButton.get())).withFlex(1));
+        fb.items.add(FlexItem(*(stopButton.get())).withFlex(1).withMaxHeight(30).withMaxWidth(30));
     }
     if (playButton->isVisible()) {
         fb.items.add(FlexItem(*(playButton.get())).withFlex(1).withMaxHeight(30).withMaxWidth(30));
@@ -110,29 +120,52 @@ void SamplePreviewComponent::changeState (TransportState newState)
         switch (transportState)
         {
             case Stopped:
+                transportSource.setPosition(0.0);      
                 stopButton->setVisible(false);
                 playButton->setVisible(true);
-                transportSource.setPosition(0.0);
                 break;
 
             case Starting:
                 playButton->setVisible(false);
+                stopButton->setVisible(true);
                 transportSource.start();
                 break;
 
             case Playing:
-                stopButton->setVisible(true);
                 break;
 
             case Stopping:
+                stopButton->setVisible(false);
+                playButton->setVisible(true);
                 transportSource.stop();
                 break;
         }
 
         resized();
+
     }
 }
 
+void SamplePreviewComponent::setFileAsTransportSource(File &file)
+{
+    auto reader = processor.getAudioFormatReader(file);
+
+    if (reader == nullptr) {
+        DBG("Cannot load preview file!");
+        return;
+    }
+
+    auto newSource = std::make_unique<AudioFormatReaderSource>(reader, true);
+    transportSource.setSource(newSource.get(), 0, nullptr, reader->sampleRate);
+    readerSource.reset(newSource.release());
+}
+
+void SamplePreviewComponent::sliderValueChanged(Slider *slider)
+{
+    if (slider == volume.get()) {
+        transportSource.setGain(volume->getValue());
+    }
+}
 
 void SamplePreviewComponent::setAutoplay(bool autoplay)
 {
@@ -146,6 +179,10 @@ bool SamplePreviewComponent::isReady()
 
 void SamplePreviewComponent::getNextAudioBlock(AudioBuffer<float> &buffer)
 {
+    if (currentFile == nullptr || !transportSource.isPlaying()) {
+        return;
+    }
+
     AudioSourceChannelInfo audioSource;
     audioSource.buffer = &buffer;
     audioSource.startSample = 0;
@@ -157,6 +194,7 @@ void SamplePreviewComponent::getNextAudioBlock(AudioBuffer<float> &buffer)
 void SamplePreviewComponent::playButtonClicked()
 {
     if (currentFile != nullptr) {
+        setFileAsTransportSource(*(currentFile.get()));
         changeState(Starting);
     }
 }

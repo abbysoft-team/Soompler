@@ -16,7 +16,7 @@
 
 #pragma once
 
-class SamplePreviewComponent : public FilePreviewComponent, ChangeListener, SamplePreviewSource {
+class SamplePreviewComponent : public FilePreviewComponent, ChangeListener, SamplePreviewSource, Slider::Listener {
 public:
     SamplePreviewComponent(SoomplerAudioProcessor &processor);
     ~SamplePreviewComponent() = default;
@@ -42,6 +42,7 @@ public:
     void getNextAudioBlock (AudioBuffer<float>& buffer) override;
 
 private:
+    std::unique_ptr<AudioFormatReaderSource> readerSource;
     SoomplerAudioProcessor &processor;
 
     std::shared_ptr<SoomplerSlider> volume;
@@ -59,4 +60,7 @@ private:
 
     void changeState (TransportState newState);
 
+    void setFileAsTransportSource(File &file);
+
+    void sliderValueChanged(Slider *slider) override;
 };
