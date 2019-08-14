@@ -55,17 +55,26 @@ SamplePreviewComponent::SamplePreviewComponent(SoomplerAudioProcessor &processor
     processor.setSamplePreviewSource(this);
 }
 
+SamplePreviewComponent::~SamplePreviewComponent()
+{
+    if (transportStopThread != nullptr) {
+        transportStopThread->join();
+    }
+    if (readerSource != nullptr) {
+        readerSource->releaseResources();
+    }
+    transportSource.releaseResources();
+}
+
 void SamplePreviewComponent::selectedFileChanged(const File &newSelectedFile)
 {
-    currentFile = std::make_unique<File>(File(newSelectedFile));
-
-    auto reader = processor.getAudioFormatReader(File(newSelectedFile));
-    if (reader == nullptr) {
-        DBG("Cannot load preview file!");
+    // check if file is directory
+    if (newSelectedFile.isDirectory()  || !newSelectedFile.exists()) {
+        stopButtonClicked();
         return;
     }
 
-    //setTransportSource(reader, source, false);
+    currentFile = std::make_unique<File>(File(newSelectedFile));
 
     if (autoplay) {
         playButtonClicked();
@@ -137,7 +146,7 @@ void SamplePreviewComponent::changeState (TransportState newState)
             case Stopping:
                 stopButton->setVisible(false);
                 playButton->setVisible(true);
-                transportSource.stop();
+                stopTransportAsync();
                 break;
         }
 
@@ -151,7 +160,6 @@ void SamplePreviewComponent::setFileAsTransportSource(File &file)
     auto reader = processor.getAudioFormatReader(file);
 
     if (reader == nullptr) {
-        DBG("Cannot load preview file!");
         return;
     }
 
@@ -165,6 +173,15 @@ void SamplePreviewComponent::sliderValueChanged(Slider *slider)
     if (slider == volume.get()) {
         transportSource.setGain(volume->getValue());
     }
+}
+
+void SamplePreviewComponent::stopTransportAsync()
+{
+    // join previous thread
+    if (transportStopThread != nullptr) {
+        transportStopThread->join();
+    }
+    transportStopThread = std::make_unique<std::thread>([this] {transportSource.stop();});
 }
 
 void SamplePreviewComponent::setAutoplay(bool autoplay)

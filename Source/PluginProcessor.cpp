@@ -23,7 +23,8 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    thumbnail(Settings::THUMBNAIL_RESOLUTION_SAMPLES, formatManager, thumbnailCache),
                                                    startSample(0),
                                                    endSample(0),
-                                                   transportStateListener(nullptr)
+                                                   transportStateListener(nullptr),
+                                                   previewSource(nullptr)
 {    
     synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
@@ -65,6 +66,10 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
+    if (previewSource != nullptr) {
+        previewSource->releaseResources();
+    }
+
     transportSource.releaseResources();
     transportStateListener = nullptr;
 }
@@ -483,7 +488,7 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
 
 void SoomplerAudioProcessor::setSamplePreviewSource(SamplePreviewSource* source)
 {
-    this->previewSource = std::shared_ptr<SamplePreviewSource>(source);
+    this->previewSource = source;
     previewSource->prepareToPlay(getBlockSize(), getSampleRate());
 }
 

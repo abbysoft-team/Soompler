@@ -173,7 +173,7 @@ private:
     std::shared_ptr<SampleInfo> sampleInfo;
     std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
 
-    std::shared_ptr<SamplePreviewSource> previewSource;
+    SamplePreviewSource *previewSource;
 
     AudioProcessorValueTreeState::ParameterLayout createParametersLayout();
 

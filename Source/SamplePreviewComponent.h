@@ -13,13 +13,14 @@
 #include "SoomplerToggleButton.h"
 #include "PluginProcessor.h"
 #include "SamplePreviewSource.h"
+#include <thread>
 
 #pragma once
 
 class SamplePreviewComponent : public FilePreviewComponent, ChangeListener, SamplePreviewSource, Slider::Listener {
 public:
     SamplePreviewComponent(SoomplerAudioProcessor &processor);
-    ~SamplePreviewComponent() = default;
+    ~SamplePreviewComponent();
 
     // FilePreviewComponent interface
 public:
@@ -55,6 +56,7 @@ private:
     bool autoplay;
     std::unique_ptr<File> currentFile;
 
+    std::unique_ptr<std::thread> transportStopThread;
     void playButtonClicked();
     void stopButtonClicked();
 
@@ -63,4 +65,6 @@ private:
     void setFileAsTransportSource(File &file);
 
     void sliderValueChanged(Slider *slider) override;
+
+    void stopTransportAsync();
 };

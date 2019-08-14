@@ -40,9 +40,7 @@ void SampleBrowser::resized()
 void SampleBrowser::selectionChanged()
 {
     auto selected = browser->getSelectedFile(0);
-    if (!selected.isDirectory()) {
-        previewComponent->selectedFileChanged(selected);
-    }
+    previewComponent->selectedFileChanged(selected);
 }
 
 void SampleBrowser::fileClicked(const File &file, const MouseEvent &e)
