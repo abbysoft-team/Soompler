@@ -17,7 +17,7 @@
 
 #pragma once
 
-class SamplePreviewComponent : public FilePreviewComponent, ChangeListener, SamplePreviewSource, Slider::Listener {
+class SamplePreviewComponent : public FilePreviewComponent, ChangeListener, SamplePreviewSource, Slider::Listener, public SaveableState {
 public:
     SamplePreviewComponent(SoomplerAudioProcessor &processor);
     ~SamplePreviewComponent();
@@ -67,4 +67,7 @@ private:
     void sliderValueChanged(Slider *slider) override;
 
     void stopTransportAsync();
+
+    void saveStateToMemory(StateBundle &bundle);
+    void getStateFromMemory(StateBundle &bundle);
 };

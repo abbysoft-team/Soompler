@@ -49,7 +49,7 @@ private:
     SoomplerAudioProcessor& processor;
 
     MainPanel mainPanel;
-    SampleBrowser sampleBrowser;
+    std::shared_ptr<SampleBrowser> sampleBrowser;
 
     Font mainFont;
 

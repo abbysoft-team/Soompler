@@ -10,17 +10,19 @@
 #include <JuceHeader.h>
 #include "FileListener.h"
 #include "PluginProcessor.h"
+#include "SaveableState.h"
+#include "SamplePreviewComponent.h"
 
 #pragma once
 
-class SampleBrowser : public Component, public FileBrowserListener {
+class SampleBrowser : public Component, public FileBrowserListener, public SaveableState {
 
 public:
     SampleBrowser(FileListener& listener, SoomplerAudioProcessor &processor);
     ~SampleBrowser() = default;
 
 private:
-        std::shared_ptr<FilePreviewComponent> previewComponent;
+        std::shared_ptr<SamplePreviewComponent> previewComponent;
         std::unique_ptr<FileBrowserComponent> browser;
         FileListener& fileListener;
         Image background;
@@ -39,4 +41,9 @@ public:
         // Component interface
 public:
         void paint(Graphics &g);
+
+        // SaveableState interface
+public:
+        void saveStateToMemory(StateBundle &bundle);
+        void getStateFromMemory(StateBundle &bundle);
 };

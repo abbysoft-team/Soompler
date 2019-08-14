@@ -319,6 +319,8 @@ AudioProcessorEditor* SoomplerAudioProcessor::createEditor()
 //==============================================================================
 void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
+    saveState();
+
     // save state
     ValueTree loadedSampleNameValue = ValueTree("loadedSampleName");
     ValueTree loadedSampleLengthValue = ValueTree("loadedSampleLength");
@@ -355,6 +357,12 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
     if (xmlState->hasTagName(stateManager.state.getType())) {
         stateManager.replaceState(ValueTree::fromXml(*xmlState));
+    }
+
+    auto bundle = StateBundle(stateManager.state);
+    // Restore saveable objects
+    for (auto saveable : objectsToSave) {
+        saveable->getStateFromMemory(bundle);
     }
 
     // restore variables
@@ -511,6 +519,22 @@ AudioFormatReader *SoomplerAudioProcessor::getAudioFormatReader(const File &file
     }
 
     return formatManager.createReaderFor(file);
+}
+
+void SoomplerAudioProcessor::addNewSaveableObject(SaveableState *saveable)
+{
+    objectsToSave.push_back(saveable);
+    StateBundle bundle(stateManager.state);
+    saveable->getStateFromMemory(bundle);
+}
+
+void SoomplerAudioProcessor::saveState()
+{
+    auto bundle = StateBundle(stateManager.state);
+    // Save saveable objects
+    for (auto saveable : objectsToSave) {
+        saveable->saveStateToMemory(bundle);
+    }
 }
 
 AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(const File &sampleFile)

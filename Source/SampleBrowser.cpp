@@ -21,6 +21,9 @@ SampleBrowser::SampleBrowser(FileListener& listener, SoomplerAudioProcessor &pro
                                            Settings::INITIAL_DIRECTORY, Settings::BROWSER_FILE_FILTER.get(), nullptr));
     browser->addListener(this);
 
+    // configure preview component persistent state
+    processor.addNewSaveableObject(previewComponent.get());
+
     addAndMakeVisible(browser.get());
     addAndMakeVisible(previewComponent.get());
 }
@@ -54,11 +57,25 @@ void SampleBrowser::fileDoubleClicked(const File &file)
 
 void SampleBrowser::browserRootChanged(const File &newRoot)
 {
-
 }
 
 void SampleBrowser::paint(Graphics &g)
 {
    //g.drawImage(background, Rectangle<float>(this->getX(), this->getY(), this->getWidth(), this->getHeight()));
     Component::paint(g);
+}
+
+void SampleBrowser::saveStateToMemory(StateBundle &bundle)
+{
+    bundle.addProperty(var(browser->getRoot().getFullPathName()), "currentRoot");
+}
+
+void SampleBrowser::getStateFromMemory(StateBundle &bundle)
+{
+    String restoredRoot = bundle.getProperty("currentRoot");
+    if (restoredRoot.isEmpty()) {
+        return;
+    }
+
+    browser->setRoot(File(restoredRoot));
 }

@@ -19,6 +19,7 @@
 #include "SAudioThumbnail.h"
 #include "FileListener.h"
 #include "SamplePreviewSource.h"
+#include "SaveableState.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -145,8 +146,14 @@ public:
     AudioFormat* getFormatForFileOrNullptr(const File &sampleFile);
     AudioFormatReader* getAudioFormatReader(const File &file);
 
+    void addNewSaveableObject(SaveableState *saveable);
+
+    void saveState();
+
 private:
     //==============================================================================
+
+    std::vector<SaveableState*> objectsToSave;
 
     AudioProcessorValueTreeState stateManager;
 

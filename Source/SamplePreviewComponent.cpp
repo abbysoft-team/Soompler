@@ -184,6 +184,19 @@ void SamplePreviewComponent::stopTransportAsync()
     transportStopThread = std::make_unique<std::thread>([this] {transportSource.stop();});
 }
 
+void SamplePreviewComponent::saveStateToMemory(StateBundle &bundle)
+{
+    bundle.addProperty(volume->getValue(), "previewVolume");
+}
+
+void SamplePreviewComponent::getStateFromMemory(StateBundle &bundle)
+{
+    if (bundle.hasProperty("previewVolume")) {
+        auto volume = bundle.getProperty("previewVolume");
+        this->volume->setValue(volume);
+    }
+}
+
 void SamplePreviewComponent::setAutoplay(bool autoplay)
 {
     this->autoplay = autoplay;

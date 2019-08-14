@@ -14,8 +14,10 @@
 
 //==============================================================================
 SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p), mainPanel(processor), sampleBrowser(processor, processor)
+    : AudioProcessorEditor (&p), processor (p), mainPanel(processor)
 {
+    sampleBrowser.reset(new SampleBrowser(processor, processor));
+
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
     setSize (Settings::WINDOW_WIDTH, Settings::WINDOW_HEIGHT);
@@ -27,10 +29,10 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     this->glContext.attachTo(*this);
 
     // SampleBrowser
-    sampleBrowser.setBounds(Settings::BROWSER_BOUNDS);
+    sampleBrowser->setBounds(Settings::BROWSER_BOUNDS);
     mainPanel.setBounds(Settings::MAIN_PANEL_X, Settings::MAIN_PANEL_Y, mainPanel.getWidth(), mainPanel.getHeight());
 
-    addAndMakeVisible(sampleBrowser);
+    addAndMakeVisible(sampleBrowser.get());
     addAndMakeVisible(mainPanel);
 
     // subscribe to all transport events from processor
@@ -38,11 +40,15 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // subscribe to thumbnail events, to catch thumbnail fully loaded time
     processor.getThumbnail().addChangeListener(this);
 
+    // StateSaving
+    processor.addNewSaveableObject(sampleBrowser.get());
+
     LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface(typeface);
 }
 
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
 {
+    processor.saveState();
     processor.getThumbnail().removeChangeListener(this);
 }
 
