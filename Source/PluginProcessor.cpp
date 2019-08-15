@@ -66,9 +66,9 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
-    if (previewSource != nullptr) {
-        previewSource->releaseResources();
-    }
+//    if (previewSource != nullptr) {
+//        previewSource->releaseResources();
+//    }
 
     transportSource.releaseResources();
     transportStateListener = nullptr;
@@ -137,9 +137,9 @@ void SoomplerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 void SoomplerAudioProcessor::releaseResources()
 {
     transportSource.releaseResources();
-    if (previewSource != nullptr) {
-        previewSource->releaseResources();
-    }
+//    if (previewSource != nullptr) {
+//        previewSource->releaseResources();
+//    }
 }
 
 bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -377,6 +377,11 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     int minNote = stateManager.state.getPropertyAsValue("minNote", nullptr).getValue();
     int maxNote = stateManager.state.getPropertyAsValue("maxNote", nullptr).getValue();
 
+    // sample wasn't loaded
+    if (sampleInfo == nullptr) {
+        return;
+    }
+    
     if (!isSampleLoaded() && fullSamplePath.isNotEmpty()) {
         loadSample(File(fullSamplePath));
         setSampleReversed(reverse);

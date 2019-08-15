@@ -187,6 +187,7 @@ void SamplePreviewComponent::stopTransportAsync()
 void SamplePreviewComponent::saveStateToMemory(StateBundle &bundle)
 {
     bundle.addProperty(volume->getValue(), "previewVolume");
+    bundle.addProperty(autoplayButton->isToggle(), "autoplayMode");
 }
 
 void SamplePreviewComponent::getStateFromMemory(StateBundle &bundle)
@@ -194,6 +195,11 @@ void SamplePreviewComponent::getStateFromMemory(StateBundle &bundle)
     if (bundle.hasProperty("previewVolume")) {
         auto volume = bundle.getProperty("previewVolume");
         this->volume->setValue(volume);
+    }
+    if (bundle.hasProperty("autoplayMode")) {
+        auto autoplay = bundle.getProperty("autoplayMode");
+        this->autoplayButton->setToggled(autoplay);
+        this->autoplay = autoplay;
     }
 }
 
