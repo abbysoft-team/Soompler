@@ -411,14 +411,15 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
 void SoomplerAudioProcessor::loadSample(const File& sampleFile)
 {
+    auto sound = getSampleData(std::make_shared<File>(sampleFile));
+    if (sound == nullptr) {
+        return;
+    }
+    
     this->loadedSample = std::make_shared<File>(sampleFile);
 
-    auto sound = getSampleData(loadedSample);
-    if (sound != nullptr)
-    {
-        synth.removeSound(0);
-        synth.addSound(sound);
-    }
+    synth.removeSound(0);
+    synth.addSound(sound);
 
     setSampleStartPosition(0);
     setSampleEndPosition(transportSource.getTotalLength());
@@ -488,6 +489,17 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
     }
 
     auto formatReader = getAudioFormatReader(*(sampleFile.get()));
+    
+    // check sample is not too long
+    auto length = formatReader->lengthInSamples / formatReader->sampleRate;
+    if (length >= Settings::MAX_SAMPLE_LENGTH) {
+        AlertWindow dialog("Warning", Strings::SAMPLE_LENGTH_TOO_LONG, AlertWindow::AlertIconType::WarningIcon, this->getActiveEditor());
+        dialog.addButton("Ok", 0);
+        dialog.runModalLoop();
+        delete formatReader;
+        
+        return nullptr;
+    }
 
     setTransportSource(formatReader);
 

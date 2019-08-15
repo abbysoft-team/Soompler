@@ -62,6 +62,7 @@ SamplePreviewComponent::~SamplePreviewComponent()
     }
     if (readerSource != nullptr) {
         readerSource->releaseResources();
+        //readerSource = nullptr;
     }
     transportSource.releaseResources();
 }
@@ -117,7 +118,7 @@ void SamplePreviewComponent::prepareToPlay(int samplesPerBlockExpected, double s
 
 void SamplePreviewComponent::releaseResources()
 {
-    transportSource.releaseResources();
+    //transportSource.releaseResources();
 }
 
 void SamplePreviewComponent::changeState (TransportState newState)

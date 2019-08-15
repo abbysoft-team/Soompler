@@ -11,4 +11,5 @@ namespace Strings {
   constexpr const char *NO_SAMPLE_LOADED_TEXT = "Choose sample in the left side of the window to start\n";
   constexpr const char *UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE = "Error";
   constexpr const char *UNSUPPORTED_FILE_EXTENSION_ERROR_MESSAGE = "Cannot read this type of file";
+  constexpr const char *SAMPLE_LENGTH_TOO_LONG = "Sample is too long. Soompler supports samples up to 30 sec";
 }
