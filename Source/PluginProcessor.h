@@ -146,14 +146,14 @@ public:
     AudioFormat* getFormatForFileOrNullptr(const File &sampleFile);
     AudioFormatReader* getAudioFormatReader(const File &file);
 
-    void addNewSaveableObject(SaveableState *saveable);
-
+    void addNewSaveableObject(std::shared_ptr<SaveableState> saveable);
     void saveState();
-
+    void saveStateAndReleaseObjects();
+    
 private:
     //==============================================================================
 
-    std::vector<SaveableState*> objectsToSave;
+    std::vector<std::shared_ptr<SaveableState>> objectsToSave;
 
     AudioProcessorValueTreeState stateManager;
 

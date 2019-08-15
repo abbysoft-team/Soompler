@@ -507,11 +507,6 @@ AudioFormatManager &SoomplerAudioProcessor::getFormatManager()
 
 AudioFormatReader *SoomplerAudioProcessor::getAudioFormatReader(const File &file)
 {
-//    if (file == nullptr) {
-//        return nullptr;
-//    }
-
-    //auto* soundBuffer = sampleFile->createInputStream();
     AudioFormat* format = getFormatForFileOrNullptr(file);
     if (format == nullptr)
     {
@@ -521,11 +516,18 @@ AudioFormatReader *SoomplerAudioProcessor::getAudioFormatReader(const File &file
     return formatManager.createReaderFor(file);
 }
 
-void SoomplerAudioProcessor::addNewSaveableObject(SaveableState *saveable)
+void SoomplerAudioProcessor::addNewSaveableObject(std::shared_ptr<SaveableState> saveable)
 {
     objectsToSave.push_back(saveable);
     StateBundle bundle(stateManager.state);
     saveable->getStateFromMemory(bundle);
+}
+
+void SoomplerAudioProcessor::saveStateAndReleaseObjects() {
+    saveState();
+    // delete objects from saveStateList cos they gonna be destroyed
+    // for some reason std::shared_ptr doesn't resolve problem at all
+    objectsToSave.clear();
 }
 
 void SoomplerAudioProcessor::saveState()
@@ -678,7 +680,6 @@ bool SoomplerAudioProcessor::isLoopModeOn() const {
 bool SoomplerAudioProcessor::isSampleReversed() {
     return stateManager.state.getPropertyAsValue("reverse", nullptr).getValue();
 }
-
 
 //==============================================================================
 // This creates new instances of the plugin..

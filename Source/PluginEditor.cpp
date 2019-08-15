@@ -41,14 +41,14 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     processor.getThumbnail().addChangeListener(this);
 
     // StateSaving
-    processor.addNewSaveableObject(sampleBrowser.get());
+    processor.addNewSaveableObject(sampleBrowser);
 
     LookAndFeel::getDefaultLookAndFeel().setDefaultSansSerifTypeface(typeface);
 }
 
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
 {
-    processor.saveState();
+    processor.saveStateAndReleaseObjects();
     processor.getThumbnail().removeChangeListener(this);
 }
 

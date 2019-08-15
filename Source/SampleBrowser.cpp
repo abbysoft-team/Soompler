@@ -22,7 +22,7 @@ SampleBrowser::SampleBrowser(FileListener& listener, SoomplerAudioProcessor &pro
     browser->addListener(this);
 
     // configure preview component persistent state
-    processor.addNewSaveableObject(previewComponent.get());
+    processor.addNewSaveableObject(previewComponent);
 
     addAndMakeVisible(browser.get());
     addAndMakeVisible(previewComponent.get());
