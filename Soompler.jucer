@@ -11,6 +11,8 @@
               pluginAUExportPrefix="soompler_au">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="KYFWVb" name="AboutSplash.cpp" compile="1" resource="0" file="Source/AboutSplash.cpp"/>
+      <FILE id="QAUsY2" name="AboutSplash.h" compile="0" resource="0" file="Source/AboutSplash.h"/>
       <FILE id="kgpTvt" name="StateBundle.cpp" compile="1" resource="0" file="Source/StateBundle.cpp"/>
       <FILE id="nQgQbI" name="StateBundle.h" compile="0" resource="0" file="Source/StateBundle.h"/>
       <FILE id="Vktkem" name="SaveableState.h" compile="0" resource="0" file="Source/SaveableState.h"/>

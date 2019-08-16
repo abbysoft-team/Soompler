@@ -1,6 +1,7 @@
 #include "MainPanel.h"
 #include "Settings.h"
 #include "Strings.h"
+#include "PluginEditor.h"
 
 //==============================================================================
 MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processor.getStateManager()),
@@ -58,7 +59,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
                                1.000f, Colour (0x00000000),
                                Image(), 1.000f, Colour (0x00000000),
                                Image(), 1.000f, Colour (0x00000000));
-    aboutButton->setBounds (52, 8, 39, 32);
+    aboutButton->setBounds (8, 8, 39, 32);
     
     loopButton.reset (new ToggledImageButton ("loop button"));
     addAndMakeVisible (loopButton.get());
@@ -205,7 +206,6 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     loopButton->setVisible(false);
     
     // hide deprecated buttons
-    aboutButton->setVisible(false);
     openFileButton->setVisible(false);
 
     // connect knobs to listener
@@ -334,7 +334,8 @@ void MainPanel::openFileButtonClicked()
 
 void MainPanel::aboutButtonClicked()
 {
-    // show about dialog
+    auto editor = static_cast<SoomplerAudioProcessorEditor*>(processor.getActiveEditor());
+    editor->showAboutSplash();
 }
 
 void MainPanel::playSampleButtonClicked()

@@ -31,9 +31,13 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // SampleBrowser
     sampleBrowser->setBounds(Settings::BROWSER_BOUNDS);
     mainPanel.setBounds(Settings::MAIN_PANEL_X, Settings::MAIN_PANEL_Y, mainPanel.getWidth(), mainPanel.getHeight());
+    aboutSplash.setBounds(0, 0, getWidth(), getHeight());
 
     addAndMakeVisible(sampleBrowser.get());
     addAndMakeVisible(mainPanel);
+    addAndMakeVisible(aboutSplash);
+    
+    aboutSplash.setVisible(false);
 
     // subscribe to all transport events from processor
     processor.setTransportStateListener(this);
@@ -93,4 +97,12 @@ void SoomplerAudioProcessorEditor::thumbnailChanged(SAudioThumbnail &thumbnail)
     // sample loaded
     processor.setVolume(mainPanel.getVolume());
     repaint();
+}
+
+void SoomplerAudioProcessorEditor::showAboutSplash() {
+    aboutSplash.setVisible(true);
+}
+
+void SoomplerAudioProcessorEditor::hideAboutSplash() {
+    aboutSplash.setVisible(false);
 }

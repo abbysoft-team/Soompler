@@ -16,6 +16,7 @@
 #include "Settings.h"
 #include "MainPanel.h"
 #include "SampleBrowser.h"
+#include "AboutSplash.h"
 
 //==============================================================================
 /**
@@ -32,6 +33,9 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+    
+    void showAboutSplash();
+    void hideAboutSplash();
 
 private:
     void transportStateChanged(TransportState state) override;
@@ -50,6 +54,7 @@ private:
 
     MainPanel mainPanel;
     std::shared_ptr<SampleBrowser> sampleBrowser;
+    AboutSplash aboutSplash;
 
     Font mainFont;
 
