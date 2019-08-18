@@ -190,6 +190,20 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     editor.addToGuiEditor(reverseButton.get());
     reverseButton->setBounds(380, 230, 100, 50);
     reverseButton->addListener(this);
+    
+//    // adsr panel
+//    adsrPanel.reset(new LinearPanel(Orientation::HORIZONTAL));
+//    adsrPanel->addAndMakeVisible(attackKnob.get());
+//    adsrPanel->addAndMakeVisible(decayKnob.get());
+//    adsrPanel->addAndMakeVisible(sustainKnob.get());
+//    adsrPanel->addAndMakeVisible(releaseKnob.get());
+//    adsrPanel->setBounds(0, 0, 200, 50);
+//    addAndMakeVisible(adsrPanel.get());
+    
+//    // test knob
+//    testKnob.reset(new SoomplerKnob(TRANS("Glide")));
+//    testKnob->setPosition(50, 50);
+//    addAndMakeVisible(testKnob.get());
 
     // hide some controls until sample is loaded
     attackKnob->setVisible(false);

@@ -29,7 +29,7 @@ AboutSplash::AboutSplash() : Component() {
 void AboutSplash::paint(Graphics &g) {
     g.drawImage(background, getLocalBounds().toFloat());
     
-    g.setColour(Colour((uint8) 20, (uint8) 20, (uint8) 20, (uint8) 128));
+    g.setColour(Settings::PANEL_BACKGROUND_COLOR);
     g.fillRect(Rectangle<int>(50, 70, getWidth() - 100, getHeight() - 150));
     
     g.setColour(Colour(240, 240, 240));

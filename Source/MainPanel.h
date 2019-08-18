@@ -9,6 +9,8 @@
 #include "SoomplerSlider.h"
 #include "SoomplerImageButton.h"
 #include "SoomplerToggleButton.h"
+#include "LinearPanel.h"
+#include "SoomplerKnob.h"
 
 class MainPanel  : public Component,
                    public Slider::Listener,
@@ -46,6 +48,8 @@ private:
     std::unique_ptr<SoomplerSlider> decayKnob;
     std::unique_ptr<SoomplerSlider> sustainKnob;
     std::unique_ptr<SoomplerSlider> releaseKnob;
+    
+    std::unique_ptr<LinearPanel> adsrPanel;
 
     std::unique_ptr<Label> volumeKnobLabel;
     std::unique_ptr<Label> attackKnobLabel;
@@ -63,7 +67,7 @@ private:
     std::unique_ptr<ToggledImageButton> loopButton;
 
     std::unique_ptr<SoomplerToggleButton> reverseButton;
-
+    
     ADSR::Parameters adsrParams;
 
     Image backgroundImage;

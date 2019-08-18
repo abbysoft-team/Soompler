@@ -119,6 +119,8 @@ const auto SUPPORTED_FILE_FORMATS = {"wav", "mp3", "ogg"};
 const auto INITIAL_DIRECTORY = File::getSpecialLocation(File::userHomeDirectory);
 const auto BROWSER_FILE_FILTER = std::make_shared<WildcardFileFilter>("*.wav, *.mp3, *.ogg", "*", "supported formats filter");
 const auto BROWSER_BOUNDS = Rectangle<int>(0, 0, BROWSER_WIDTH, WINDOW_HEIGHT);
+    
+    const auto PANEL_BACKGROUND_COLOR = Colour((uint8) 25, (uint8) 25, (uint8) 25, (uint8) 150);
 }
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H

@@ -11,6 +11,11 @@
               pluginAUExportPrefix="soompler_au">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="koY6MA" name="SoomplerKnob.cpp" compile="1" resource="0"
+            file="Source/SoomplerKnob.cpp"/>
+      <FILE id="wOSpmP" name="SoomplerKnob.h" compile="0" resource="0" file="Source/SoomplerKnob.h"/>
+      <FILE id="zY4S6V" name="LinearPanel.cpp" compile="1" resource="0" file="Source/LinearPanel.cpp"/>
+      <FILE id="Tg6QT9" name="LinearPanel.h" compile="0" resource="0" file="Source/LinearPanel.h"/>
       <FILE id="KYFWVb" name="AboutSplash.cpp" compile="1" resource="0" file="Source/AboutSplash.cpp"/>
       <FILE id="QAUsY2" name="AboutSplash.h" compile="0" resource="0" file="Source/AboutSplash.h"/>
       <FILE id="kgpTvt" name="StateBundle.cpp" compile="1" resource="0" file="Source/StateBundle.cpp"/>
@@ -21,7 +26,7 @@
       <FILE id="KerxK9" name="SamplePreviewSource.h" compile="0" resource="0"
             file="Source/SamplePreviewSource.h"/>
       <FILE id="LAOZjd" name="SamplePreviewComponent.cpp" compile="1" resource="0"
-            file="Source/SamplePreviewComponent.cpp"/>
+            file="Source/SamplePreviewComponent.cpp" xcodeResource="1"/>
       <FILE id="EExMAB" name="SamplePreviewComponent.h" compile="0" resource="0"
             file="Source/SamplePreviewComponent.h"/>
       <FILE id="lml4FD" name="FileListener.h" compile="0" resource="0" file="Source/FileListener.h"/>
