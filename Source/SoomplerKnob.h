@@ -12,6 +12,7 @@
 
 #include <JuceHeader.h>
 #include "SoomplerSlider.h"
+#include "PluginProcessor.h"
 
 class SoomplerKnob : public Component {
     
@@ -23,7 +24,16 @@ public:
     
     void setPosition(int x, int y);
     
+    void addListener(Slider::Listener *listener);
+    
+    double getValue() const;
+    
+    Slider* getSlider();
+    
+    void attachTo(const String &parameter, AudioProcessorValueTreeState &stateManager);
+    
 private:
-    SoomplerSlider slider;
+    std::shared_ptr<SoomplerSlider> slider;
     Label label;
+    std::shared_ptr<SliderAttachment> attachment;
 };

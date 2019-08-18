@@ -35,28 +35,22 @@ public:
 private:
 
     AudioProcessorValueTreeState& stateManager;
-
-    std::unique_ptr<SliderAttachment> volumeAttachment;
-    std::unique_ptr<SliderAttachment> attackAttachment;
-    std::unique_ptr<SliderAttachment> decayAttachment;
-    std::unique_ptr<SliderAttachment> sustainAttachment;
-    std::unique_ptr<SliderAttachment> releaseAttachment;
+//
+//    std::unique_ptr<SliderAttachment> volumeAttachment;
+//    std::unique_ptr<SliderAttachment> attackAttachment;
+//    std::unique_ptr<SliderAttachment> decayAttachment;
+//    std::unique_ptr<SliderAttachment> sustainAttachment;
+//    std::unique_ptr<SliderAttachment> releaseAttachment;
     std::unique_ptr<ButtonAttachment> loopAttachment;
 
-    std::unique_ptr<SoomplerSlider> volumeKnob;
-    std::unique_ptr<SoomplerSlider> attackKnob;
-    std::unique_ptr<SoomplerSlider> decayKnob;
-    std::unique_ptr<SoomplerSlider> sustainKnob;
-    std::unique_ptr<SoomplerSlider> releaseKnob;
+    std::unique_ptr<SoomplerKnob> volumeKnob;
+    std::unique_ptr<SoomplerKnob> attackKnob;
+    std::unique_ptr<SoomplerKnob> decayKnob;
+    std::unique_ptr<SoomplerKnob> sustainKnob;
+    std::unique_ptr<SoomplerKnob> releaseKnob;
     
     std::unique_ptr<LinearPanel> adsrPanel;
-
-    std::unique_ptr<Label> volumeKnobLabel;
-    std::unique_ptr<Label> attackKnobLabel;
-    std::unique_ptr<Label> decayKnobLabel;
-    std::unique_ptr<Label> sustainKnobLabel;
-    std::unique_ptr<Label> releaseKnobLabel;
-
+    
     std::unique_ptr<Label> loadSampleTip;
 
     std::shared_ptr<SampleViewer> sampleViewer;

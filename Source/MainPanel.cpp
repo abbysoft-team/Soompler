@@ -12,28 +12,11 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
 
     backgroundImage = ImageCache::getFromMemory(BinaryData::background_png, BinaryData::background_pngSize);
 
-    volumeKnob.reset (new SoomplerSlider ());
+    volumeKnob.reset (new SoomplerKnob("Volume"));
     addAndMakeVisible(volumeKnob.get());
     editor.addToGuiEditor(volumeKnob.get());
-    volumeKnob->setTooltip (TRANS("volume"));
-    //volumeKnob->setRange (0.0, 1.0, 0.01);
-    //volumeKnob->setValue(0.5);
-    volumeKnob->setSliderStyle (Slider::Rotary);
-    volumeKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    //volumeKnob->addListener (this);
-    volumeKnob->setBounds (60, 230, 50, 50);
-    volumeAttachment.reset(new SliderAttachment(stateManager, "volume", *volumeKnob));
-
-    volumeKnobLabel.reset (new Label ("volume knob label",
-                                      TRANS("Volume\n")));
-    addAndMakeVisible(volumeKnobLabel.get());
-    editor.addToGuiEditor(volumeKnobLabel.get());
-    volumeKnobLabel->setFont (Font (15.00f, Font::plain));
-    volumeKnobLabel->setJustificationType (Justification::centredLeft);
-    volumeKnobLabel->setEditable (false, false, false);
-    volumeKnobLabel->setColour (TextEditor::textColourId, Colours::black);
-    volumeKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    volumeKnobLabel->setBounds (60, 215, 64, 24);
+    volumeKnob->setPosition(60, 230);
+    volumeKnob->attachTo("volume", stateManager);
 
     openFileButton.reset (new SoomplerImageButton ("open file button"));
     addAndMakeVisible (openFileButton.get());
@@ -104,86 +87,30 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     editor.addToGuiEditor (pianoRoll.get());
 
     // ADSR controls
-    attackKnob.reset (new SoomplerSlider ());
+    attackKnob.reset (new SoomplerKnob ("Attack"));
     addAndMakeVisible(attackKnob.get());
     editor.addToGuiEditor(attackKnob.get());
-    attackKnob->setTooltip (TRANS("Attack"));
-    attackKnob->setSliderStyle (Slider::Rotary);
-    attackKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    attackKnob->setBounds (150, 230, 50, 50);
-    attackAttachment.reset(new SliderAttachment(stateManager, "attack", *attackKnob));
-
-    attackKnobLabel.reset (new Label ("attack knob label",
-                                      TRANS("Attack\n")));
-    addAndMakeVisible(attackKnobLabel.get());
-    editor.addToGuiEditor(attackKnobLabel.get());
-    attackKnobLabel->setFont (Font (15.00f, Font::plain));
-    attackKnobLabel->setJustificationType (Justification::centredLeft);
-    attackKnobLabel->setEditable (false, false, false);
-    attackKnobLabel->setColour (TextEditor::textColourId, Colours::black);
-    attackKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    attackKnobLabel->setBounds (150, 215, 64, 24);
-
-    decayKnob.reset (new SoomplerSlider ());
+    attackKnob->setPosition(150, 230);
+    attackKnob->attachTo("attack", stateManager);
+    
+    decayKnob.reset (new SoomplerKnob ("Decay"));
     addAndMakeVisible(decayKnob.get());
     editor.addToGuiEditor(decayKnob.get());
-    decayKnob->setTooltip (TRANS("Decay"));
-    decayKnob->setSliderStyle (Slider::Rotary);
-    decayKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    decayKnob->setBounds (200, 230, 50, 50);
-    decayAttachment.reset(new SliderAttachment(stateManager, "decay", *decayKnob));
-
-    decayKnobLabel.reset (new Label ("decay knob label",
-                                      TRANS("Decay\n")));
-    addAndMakeVisible(decayKnobLabel.get());
-    editor.addToGuiEditor(decayKnobLabel.get());
-    decayKnobLabel->setFont (Font (15.00f, Font::plain));
-    decayKnobLabel->setJustificationType (Justification::centredLeft);
-    decayKnobLabel->setEditable (false, false, false);
-    decayKnobLabel->setColour (TextEditor::textColourId, Colours::black);
-    decayKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    decayKnobLabel->setBounds (200, 215, 64, 24);
-
-    sustainKnob.reset (new SoomplerSlider ());
+    decayKnob->setPosition(200, 230);
+    decayKnob->attachTo("decay", stateManager);
+    
+    sustainKnob.reset (new SoomplerKnob ("Sustain"));
     addAndMakeVisible(sustainKnob.get());
     editor.addToGuiEditor(sustainKnob.get());
-    sustainKnob->setTooltip (TRANS("Sustain"));
-    sustainKnob->setSliderStyle (Slider::Rotary);
-    sustainKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    sustainKnob->setBounds (250, 230, 50, 50);
-    sustainAttachment.reset(new SliderAttachment(stateManager, "sustain", *sustainKnob));
-
-    sustainKnobLabel.reset (new Label ("sustain knob label",
-                                      TRANS("Sustain\n")));
-    addAndMakeVisible(sustainKnobLabel.get());
-    editor.addToGuiEditor(sustainKnobLabel.get());
-    sustainKnobLabel->setFont (Font (15.00f, Font::plain));
-    sustainKnobLabel->setJustificationType (Justification::centredLeft);
-    sustainKnobLabel->setEditable (false, false, false);
-    sustainKnobLabel->setColour (TextEditor::textColourId, Colours::black);
-    sustainKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    sustainKnobLabel->setBounds (250, 215, 64, 24);
-
-    releaseKnob.reset (new SoomplerSlider ());
+    sustainKnob->setPosition(250, 230);
+    sustainKnob->attachTo("sustain", stateManager);
+    
+    releaseKnob.reset (new SoomplerKnob ("Release"));
     addAndMakeVisible(releaseKnob.get());
     editor.addToGuiEditor(releaseKnob.get());
-    releaseKnob->setTooltip (TRANS("Release"));
-    releaseKnob->setSliderStyle (Slider::Rotary);
-    releaseKnob->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    releaseKnob->setBounds (300, 230, 50, 50);
-    releaseAttachment.reset(new SliderAttachment(stateManager, "release", *releaseKnob));
-
-    releaseKnobLabel.reset (new Label ("release knob label",
-                                      TRANS("Release\n")));
-    addAndMakeVisible(releaseKnobLabel.get());
-    editor.addToGuiEditor(releaseKnobLabel.get());
-    releaseKnobLabel->setFont (Font (15.00f, Font::plain));
-    releaseKnobLabel->setJustificationType (Justification::centredLeft);
-    releaseKnobLabel->setEditable (false, false, false);
-    releaseKnobLabel->setColour (TextEditor::textColourId, Colours::black);
-    releaseKnobLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    releaseKnobLabel->setBounds (300, 215, 64, 24);
-
+    releaseKnob->setPosition(300, 230);
+    releaseKnob->attachTo("release", stateManager);
+    
     // Reverse sample
     reverseButton.reset(new SoomplerToggleButton(TRANS("Reverse\n")));
     addAndMakeVisible(reverseButton.get());
@@ -199,23 +126,13 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
 //    adsrPanel->addAndMakeVisible(releaseKnob.get());
 //    adsrPanel->setBounds(0, 0, 200, 50);
 //    addAndMakeVisible(adsrPanel.get());
-    
-//    // test knob
-//    testKnob.reset(new SoomplerKnob(TRANS("Glide")));
-//    testKnob->setPosition(50, 50);
-//    addAndMakeVisible(testKnob.get());
 
     // hide some controls until sample is loaded
     attackKnob->setVisible(false);
-    attackKnobLabel->setVisible(false);
     decayKnob->setVisible(false);
-    decayKnobLabel->setVisible(false);
     sustainKnob->setVisible(false);
-    sustainKnobLabel->setVisible(false);
     releaseKnob->setVisible(false);
-    releaseKnobLabel->setVisible(false);
     volumeKnob->setVisible(false);
-    volumeKnobLabel->setVisible(false);
     reverseButton->setVisible(false);
     loopButton->setVisible(false);
     
@@ -238,11 +155,6 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
 
 MainPanel::~MainPanel()
 {
-    volumeAttachment = nullptr;
-    attackAttachment = nullptr;
-    decayAttachment = nullptr;
-    sustainAttachment = nullptr;
-    releaseAttachment = nullptr;
     loopAttachment = nullptr;
 
     attackKnob = nullptr;
@@ -250,7 +162,6 @@ MainPanel::~MainPanel()
     sustainKnob = nullptr;
     releaseKnob = nullptr;
     volumeKnob = nullptr;
-    volumeKnobLabel = nullptr;
     openFileButton = nullptr;
     aboutButton = nullptr;
     sampleViewer = nullptr;
@@ -280,23 +191,23 @@ void MainPanel::resized()
 
 void MainPanel::sliderValueChanged (Slider* sliderThatWasMoved)
 {
-    if (sliderThatWasMoved == volumeKnob.get())
+    if (sliderThatWasMoved == volumeKnob->getSlider())
     {
-        processor.setVolume(volumeKnob.get()->getValue());
+        processor.setVolume(volumeKnob->getValue());
     }
-    else if (sliderThatWasMoved == attackKnob.get())
+    else if (sliderThatWasMoved == attackKnob->getSlider())
     {
         adsrParams.attack = attackKnob->getValue();
     }
-    else if (sliderThatWasMoved == decayKnob.get())
+    else if (sliderThatWasMoved == decayKnob->getSlider())
     {
         adsrParams.decay = decayKnob->getValue();
     }
-    else if (sliderThatWasMoved == sustainKnob.get())
+    else if (sliderThatWasMoved == sustainKnob->getSlider())
     {
         adsrParams.sustain = sustainKnob->getValue();
     }
-    else if (sliderThatWasMoved == releaseKnob.get())
+    else if (sliderThatWasMoved == releaseKnob->getSlider())
     {
         adsrParams.release = releaseKnob->getValue();
     }
@@ -355,8 +266,6 @@ void MainPanel::aboutButtonClicked()
 void MainPanel::playSampleButtonClicked()
 {
     processor.playSample();
-    //playButton->setVisible(false);
-    //stopButton->setVisible(true);
 }
 
 void MainPanel::stopSampleButtonClicked()
@@ -377,15 +286,10 @@ void MainPanel::transportStateChanged(TransportState state)
 
         sampleViewer->setVisible(true);
         attackKnob->setVisible(true);
-        attackKnobLabel->setVisible(true);
         decayKnob->setVisible(true);
-        decayKnobLabel->setVisible(true);
         sustainKnob->setVisible(true);
-        sustainKnobLabel->setVisible(true);
         releaseKnob->setVisible(true);
-        releaseKnobLabel->setVisible(true);
         volumeKnob->setVisible(true);
-        volumeKnobLabel->setVisible(true);
         reverseButton->setVisible(true);
         loopButton->setVisible(true);
         
@@ -395,8 +299,6 @@ void MainPanel::transportStateChanged(TransportState state)
     case Starting:
         break;
     case Stopped:
-        //stopButton->setVisible(false);
-        //playButton->setVisible(true);
         break;
     default:
         break;
