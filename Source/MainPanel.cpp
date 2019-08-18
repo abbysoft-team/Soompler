@@ -88,44 +88,32 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
 
     // ADSR controls
     attackKnob.reset (new SoomplerKnob ("Attack"));
-    addAndMakeVisible(attackKnob.get());
-    editor.addToGuiEditor(attackKnob.get());
-    attackKnob->setPosition(150, 230);
     attackKnob->attachTo("attack", stateManager);
     
     decayKnob.reset (new SoomplerKnob ("Decay"));
-    addAndMakeVisible(decayKnob.get());
-    editor.addToGuiEditor(decayKnob.get());
-    decayKnob->setPosition(200, 230);
     decayKnob->attachTo("decay", stateManager);
     
     sustainKnob.reset (new SoomplerKnob ("Sustain"));
-    addAndMakeVisible(sustainKnob.get());
-    editor.addToGuiEditor(sustainKnob.get());
-    sustainKnob->setPosition(250, 230);
     sustainKnob->attachTo("sustain", stateManager);
     
     releaseKnob.reset (new SoomplerKnob ("Release"));
-    addAndMakeVisible(releaseKnob.get());
-    editor.addToGuiEditor(releaseKnob.get());
-    releaseKnob->setPosition(300, 230);
     releaseKnob->attachTo("release", stateManager);
     
+    // adsr panel
+    adsrPanel.reset(new LinearPanel(Orientation::HORIZONTAL));
+    adsrPanel->addAndMakeVisible(attackKnob.get());
+    adsrPanel->addAndMakeVisible(decayKnob.get());
+    adsrPanel->addAndMakeVisible(sustainKnob.get());
+    adsrPanel->addAndMakeVisible(releaseKnob.get());
+    adsrPanel->setBounds(150, 230, 200, 50);
+    addAndMakeVisible(adsrPanel.get());
+
     // Reverse sample
     reverseButton.reset(new SoomplerToggleButton(TRANS("Reverse\n")));
-    addAndMakeVisible(reverseButton.get());
     editor.addToGuiEditor(reverseButton.get());
+    addAndMakeVisible(reverseButton.get());
     reverseButton->setBounds(380, 230, 100, 50);
     reverseButton->addListener(this);
-    
-//    // adsr panel
-//    adsrPanel.reset(new LinearPanel(Orientation::HORIZONTAL));
-//    adsrPanel->addAndMakeVisible(attackKnob.get());
-//    adsrPanel->addAndMakeVisible(decayKnob.get());
-//    adsrPanel->addAndMakeVisible(sustainKnob.get());
-//    adsrPanel->addAndMakeVisible(releaseKnob.get());
-//    adsrPanel->setBounds(0, 0, 200, 50);
-//    addAndMakeVisible(adsrPanel.get());
 
     // hide some controls until sample is loaded
     attackKnob->setVisible(false);

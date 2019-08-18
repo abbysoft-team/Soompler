@@ -17,6 +17,8 @@ SoomplerKnob::SoomplerKnob(const String &name) : Component(name), label(name, na
     addAndMakeVisible(label);
     
     slider->setTooltip(name);
+    
+    setSize(50, 60);
 }
 
 void SoomplerKnob::resized() {
