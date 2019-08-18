@@ -15,7 +15,6 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     volumeKnob.reset (new SoomplerKnob("Volume"));
     addAndMakeVisible(volumeKnob.get());
     editor.addToGuiEditor(volumeKnob.get());
-    volumeKnob->setPosition(60, 230);
     volumeKnob->attachTo("volume", stateManager);
 
     openFileButton.reset (new SoomplerImageButton ("open file button"));
@@ -100,26 +99,27 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     releaseKnob->attachTo("release", stateManager);
     
     // adsr panel
-    adsrPanel.reset(new LinearPanel(Orientation::HORIZONTAL));
+    adsrPanel.reset(new LinearPanel(Orientation::HORIZONTAL, "ADSR"));
     adsrPanel->addAndMakeVisible(attackKnob.get());
     adsrPanel->addAndMakeVisible(decayKnob.get());
     adsrPanel->addAndMakeVisible(sustainKnob.get());
     adsrPanel->addAndMakeVisible(releaseKnob.get());
-    adsrPanel->setBounds(150, 230, 200, 50);
+    adsrPanel->setPosition(150, 225);
     addAndMakeVisible(adsrPanel.get());
 
     // Reverse sample
     reverseButton.reset(new SoomplerToggleButton(TRANS("Reverse\n")));
     editor.addToGuiEditor(reverseButton.get());
     addAndMakeVisible(reverseButton.get());
-    reverseButton->setBounds(380, 230, 100, 50);
     reverseButton->addListener(this);
+    
+    // place components like adsr panel
+    auto miscControllsBaseline = attackKnob->getY() + adsrPanel->getY();
+    volumeKnob->setPosition(60, miscControllsBaseline);
+    reverseButton->setBounds(380, miscControllsBaseline, 100, 50);
 
     // hide some controls until sample is loaded
-    attackKnob->setVisible(false);
-    decayKnob->setVisible(false);
-    sustainKnob->setVisible(false);
-    releaseKnob->setVisible(false);
+    adsrPanel->setVisible(false);
     volumeKnob->setVisible(false);
     reverseButton->setVisible(false);
     loopButton->setVisible(false);
@@ -273,10 +273,7 @@ void MainPanel::transportStateChanged(TransportState state)
         loadSampleTip->setVisible(false);
 
         sampleViewer->setVisible(true);
-        attackKnob->setVisible(true);
-        decayKnob->setVisible(true);
-        sustainKnob->setVisible(true);
-        releaseKnob->setVisible(true);
+        adsrPanel->setVisible(true);
         volumeKnob->setVisible(true);
         reverseButton->setVisible(true);
         loopButton->setVisible(true);

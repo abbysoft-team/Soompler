@@ -6,7 +6,7 @@
 namespace Settings {
 
 constexpr int MAIN_PANEL_WIDTH = 500;
-constexpr int MAIN_PANEL_HEIGHT = 360;
+constexpr int MAIN_PANEL_HEIGHT = 385;
 constexpr int BROWSER_WIDTH = 320;
 constexpr auto SAMPLE_PREVIEW_HEIGHT = 30;
 
@@ -120,7 +120,12 @@ const auto INITIAL_DIRECTORY = File::getSpecialLocation(File::userHomeDirectory)
 const auto BROWSER_FILE_FILTER = std::make_shared<WildcardFileFilter>("*.wav, *.mp3, *.ogg", "*", "supported formats filter");
 const auto BROWSER_BOUNDS = Rectangle<int>(0, 0, BROWSER_WIDTH, WINDOW_HEIGHT);
     
-    const auto PANEL_BACKGROUND_COLOR = Colour((uint8) 25, (uint8) 25, (uint8) 25, (uint8) 150);
+    const auto PANEL_BACKGROUND_COLOR = Colour((uint8) 25, (uint8) 25, (uint8) 25, (uint8) 100);
+    
+    // PANEL SETTINGS
+    const auto PANEL_BORDER_CORNER_RADIUS = 20.0f;
+    const auto PANEL_BORDER_THICKNESS = 2;
+    const auto PANEL_HEADER_HEIGHT = 20;
 }
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H
