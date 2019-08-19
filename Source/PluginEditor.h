@@ -36,6 +36,8 @@ public:
     
     void showAboutSplash();
     void hideAboutSplash();
+    
+    bool keyPressed (const KeyPress& key) override;
 
 private:
     void transportStateChanged(TransportState state) override;

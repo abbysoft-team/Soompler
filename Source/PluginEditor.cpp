@@ -106,3 +106,27 @@ void SoomplerAudioProcessorEditor::showAboutSplash() {
 void SoomplerAudioProcessorEditor::hideAboutSplash() {
     aboutSplash.setVisible(false);
 }
+
+bool SoomplerAudioProcessorEditor::keyPressed (const KeyPress& key) {
+    static String keys = "q2w3er5t6y7ui9o0p[azsxdcvgbhnmk,l.;/";
+    auto firstC = Settings::FIRST_KEY_ON_SCREEN;
+    
+    auto pressedChar = key.getTextCharacter();
+    auto nextChar = keys[0];
+    auto note = -1;
+    for (auto i = 0; i < keys.length(); i++) {
+        nextChar = keys[i];
+        if (nextChar == pressedChar) {
+            note = i + firstC;
+            break;
+        }
+    }
+    
+    if (note == -1) {
+        return false;
+    }
+    
+    processor.noteOn(note);
+    
+    return true;
+}

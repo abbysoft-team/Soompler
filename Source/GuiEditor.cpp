@@ -170,7 +170,7 @@ bool GuiEditor::keyPressed(const KeyPress &key, Component *originatingComponent)
         editableComponent->repaint();
     }
     
-    return true;
+    return false;
 }
 
 void GuiEditor::enableEditor(bool enabled)
