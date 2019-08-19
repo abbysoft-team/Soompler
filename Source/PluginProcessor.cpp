@@ -256,17 +256,10 @@ void SoomplerAudioProcessor::noteOn(int noteNumber)
     if (synth.getSound(0) == nullptr) {
         return;
     }
-    // set current adsr params
-    auto adsr = ADSR::Parameters();
-    adsr.attack = getFloatParameter("attack");
-    adsr.decay = getFloatParameter("decay");
-    adsr.sustain = getFloatParameter("sustain");
-    adsr.release = getFloatParameter("release");
+    
+    restoreKnobParameters();
 
-    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
-    sound->setAdsrParams(adsr);
-
-    synth.noteOn(0, noteNumber, getFloatParameter("volume"));
+    synth.noteOn(0, noteNumber, 1.0f);
 }
 
 void SoomplerAudioProcessor::noteOff(int noteNumber)
@@ -393,7 +386,7 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     int maxNote = stateManager.state.getPropertyAsValue("maxNote", nullptr).getValue();
 
     // sample wasn't loaded
-    if (sampleInfo == nullptr) {
+    if (fullSamplePath.isEmpty()) {
         return;
     }
     
@@ -420,8 +413,27 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
         setNoteRange(minNote, maxNote);
     }
+    
+    restoreKnobParameters();
 
     notifySampleInfoListeners();
+}
+
+void SoomplerAudioProcessor::restoreKnobParameters() {
+    if (synth.getSound(0) == nullptr) {
+        return;
+    }
+    // set current adsr params
+    auto adsr = ADSR::Parameters();
+    adsr.attack = getFloatParameter("attack");
+    adsr.decay = getFloatParameter("decay");
+    adsr.sustain = getFloatParameter("sustain");
+    adsr.release = getFloatParameter("release");
+    
+    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
+    sound->setAdsrParams(adsr);
+    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+    voice->setVolume(getFloatParameter("volume"));
 }
 
 void SoomplerAudioProcessor::loadSample(const File& sampleFile)
