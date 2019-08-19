@@ -158,7 +158,7 @@ Point<int> GuiEditor::getPositionWithRespectToGrid(Point<int> position, Rectangl
 
 bool GuiEditor::keyPressed(const KeyPress &key, Component *originatingComponent)
 {
-    if (key == KeyPress::F5Key) {
+    if (key == KeyPress::F8Key) {
         enableEditor(!isEnabled);
     } else if (key == KeyPress::F2Key) {
         printNewComponentPositions();
@@ -170,7 +170,7 @@ bool GuiEditor::keyPressed(const KeyPress &key, Component *originatingComponent)
         editableComponent->repaint();
     }
     
-    return true;
+    return false;
 }
 
 void GuiEditor::enableEditor(bool enabled)

@@ -15,6 +15,8 @@
 #include "TransportStateListener.h"
 #include "Settings.h"
 #include "MainPanel.h"
+#include "SampleBrowser.h"
+#include "AboutSplash.h"
 
 //==============================================================================
 /**
@@ -31,6 +33,11 @@ public:
     //==============================================================================
     void paint (Graphics&) override;
     void resized() override;
+    
+    void showAboutSplash();
+    void hideAboutSplash();
+    
+    bool keyPressed (const KeyPress& key) override;
 
 private:
     void transportStateChanged(TransportState state) override;
@@ -48,6 +55,8 @@ private:
     SoomplerAudioProcessor& processor;
 
     MainPanel mainPanel;
+    std::shared_ptr<SampleBrowser> sampleBrowser;
+    AboutSplash aboutSplash;
 
     Font mainFont;
 

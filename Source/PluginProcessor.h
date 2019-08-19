@@ -17,6 +17,9 @@
 #include "TransportInfo.h"
 #include "SampleInfo.h"
 #include "SAudioThumbnail.h"
+#include "FileListener.h"
+#include "SamplePreviewSource.h"
+#include "SaveableState.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -30,7 +33,8 @@ class SoomplerAudioProcessor  :
         public MidiEventSupplier,
         public MidiEventConsumer,
         public TransportInfoOwner,
-        public SampleInfoListener
+        public SampleInfoListener,
+        public FileListener
 {
 public:
     
@@ -77,7 +81,7 @@ public:
         return thumbnail;
     }
 
-    void loadSample(File);
+    void loadSample(const File& file);
 
     void playSample();
 
@@ -108,6 +112,7 @@ public:
 
     void noteOn(int noteNumber) override;
     void noteOff(int noteNumber) override;
+    void playOrStopRootNote();
     void setRootNote(int rootNote) override;
     void setNoteRange(int minNote, int maxNote) override;
 
@@ -132,8 +137,24 @@ public:
 
     bool isSampleLoaded();
 
+    void fileRecieved(const File& file);
+
+    void setFileAsTransportSource(AudioTransportSource &source, File &file);
+
+    void setSamplePreviewSource(SamplePreviewSource *source);
+
+    AudioFormatManager& getFormatManager();
+    AudioFormat* getFormatForFileOrNullptr(const File &sampleFile);
+    AudioFormatReader* getAudioFormatReader(const File &file);
+
+    void addNewSaveableObject(std::shared_ptr<SaveableState> saveable);
+    void saveState();
+    void saveStateAndReleaseObjects();
+    
 private:
     //==============================================================================
+
+    std::vector<std::shared_ptr<SaveableState>> objectsToSave;
 
     AudioProcessorValueTreeState stateManager;
 
@@ -160,10 +181,11 @@ private:
     std::shared_ptr<SampleInfo> sampleInfo;
     std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
 
+    SamplePreviewSource *previewSource;
+
     AudioProcessorValueTreeState::ParameterLayout createParametersLayout();
 
     SynthesiserSound::Ptr getSampleData(std::shared_ptr<File> sampleFile);
-    AudioFormat* getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);

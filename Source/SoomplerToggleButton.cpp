@@ -14,7 +14,6 @@ SoomplerToggleButton::SoomplerToggleButton(String buttonName) : ToggleButton(but
 {
 
 }
-
 bool SoomplerToggleButton::isToggle() const
 {
     return toggled;

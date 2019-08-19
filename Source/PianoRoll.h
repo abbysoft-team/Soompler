@@ -86,7 +86,7 @@ private:
     void rootMarkerDragged(Point<int> position);
     void minMarkerDragged(Point<int> position);
     void maxMarkerDragged(Point<int> position);
-
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoRoll)
 
 };

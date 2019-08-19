@@ -23,7 +23,8 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    thumbnail(Settings::THUMBNAIL_RESOLUTION_SAMPLES, formatManager, thumbnailCache),
                                                    startSample(0),
                                                    endSample(0),
-                                                   transportStateListener(nullptr)
+                                                   transportStateListener(nullptr),
+                                                   previewSource(nullptr)
 {    
     synth.addVoice(new soompler::ExtendedVoice(this));
     synth.setCurrentPlaybackSampleRate(44100);
@@ -65,6 +66,10 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
+//    if (previewSource != nullptr) {
+//        previewSource->releaseResources();
+//    }
+
     transportSource.releaseResources();
     transportStateListener = nullptr;
 }
@@ -124,11 +129,17 @@ void SoomplerAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlo
 {
     transportSource.prepareToPlay(samplesPerBlock, sampleRate);
     synth.setCurrentPlaybackSampleRate(sampleRate);
+    if (previewSource != nullptr) {
+        previewSource->prepareToPlay(samplesPerBlock, sampleRate);
+    }
 }
 
 void SoomplerAudioProcessor::releaseResources()
 {
     transportSource.releaseResources();
+//    if (previewSource != nullptr) {
+//        previewSource->releaseResources();
+//    }
 }
 
 bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -146,6 +157,11 @@ void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffe
 {
     if (readerSource.get() == nullptr) {
         buffer.clear();
+        return;
+    }
+
+    if (previewSource != nullptr && previewSource->isReady()) {
+        previewSource->getNextAudioBlock(buffer);
         return;
     }
 
@@ -237,6 +253,9 @@ std::vector<int> SoomplerAudioProcessor::getActiveNotes()
 
 void SoomplerAudioProcessor::noteOn(int noteNumber)
 {
+    if (synth.getSound(0) == nullptr) {
+        return;
+    }
     // set current adsr params
     auto adsr = ADSR::Parameters();
     adsr.attack = getFloatParameter("attack");
@@ -253,6 +272,18 @@ void SoomplerAudioProcessor::noteOn(int noteNumber)
 void SoomplerAudioProcessor::noteOff(int noteNumber)
 {
     synth.noteOff(0, noteNumber, getFloatParameter("volume"), true);
+}
+
+void SoomplerAudioProcessor::playOrStopRootNote()
+{
+    if (sampleInfo == nullptr) {
+        return;
+    }
+    if (synth.getVoice(0)->isVoiceActive()) {
+        synth.allNotesOff(0, 0);
+    } else {
+        synth.noteOn(0, sampleInfo->rootNote, getFloatParameter("volume"));
+    }
 }
 
 void SoomplerAudioProcessor::setRootNote(int rootNote)
@@ -303,6 +334,8 @@ AudioProcessorEditor* SoomplerAudioProcessor::createEditor()
 //==============================================================================
 void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
+    saveState();
+
     // save state
     ValueTree loadedSampleNameValue = ValueTree("loadedSampleName");
     ValueTree loadedSampleLengthValue = ValueTree("loadedSampleLength");
@@ -341,6 +374,12 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
         stateManager.replaceState(ValueTree::fromXml(*xmlState));
     }
 
+    auto bundle = StateBundle(stateManager.state);
+    // Restore saveable objects
+    for (auto saveable : objectsToSave) {
+        saveable->getStateFromMemory(bundle);
+    }
+
     // restore variables
     String sampleName = stateManager.state.getPropertyAsValue("loadedSampleName", nullptr).getValue();
     String fullSamplePath = stateManager.state.getPropertyAsValue("loadedSample", nullptr).getValue();
@@ -353,6 +392,11 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     int minNote = stateManager.state.getPropertyAsValue("minNote", nullptr).getValue();
     int maxNote = stateManager.state.getPropertyAsValue("maxNote", nullptr).getValue();
 
+    // sample wasn't loaded
+    if (sampleInfo == nullptr) {
+        return;
+    }
+    
     if (!isSampleLoaded() && fullSamplePath.isNotEmpty()) {
         loadSample(File(fullSamplePath));
         setSampleReversed(reverse);
@@ -380,16 +424,17 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     notifySampleInfoListeners();
 }
 
-void SoomplerAudioProcessor::loadSample(File sampleFile)
+void SoomplerAudioProcessor::loadSample(const File& sampleFile)
 {
+    auto sound = getSampleData(std::make_shared<File>(sampleFile));
+    if (sound == nullptr) {
+        return;
+    }
+    
     this->loadedSample = std::make_shared<File>(sampleFile);
 
-    auto sound = getSampleData(loadedSample);
-    if (sound != nullptr)
-    {
-        synth.removeSound(0);
-        synth.addSound(sound);
-    }
+    synth.removeSound(0);
+    synth.addSound(sound);
 
     setSampleStartPosition(0);
     setSampleEndPosition(transportSource.getTotalLength());
@@ -416,6 +461,11 @@ void SoomplerAudioProcessor::notifySampleInfoListeners()
 bool SoomplerAudioProcessor::isSampleLoaded()
 {
     return getThumbnail().getNumChannels() > 0;
+}
+
+void SoomplerAudioProcessor::fileRecieved(const File &file)
+{
+    loadSample(file);
 }
 
 void SoomplerAudioProcessor::playSample()
@@ -452,17 +502,22 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
     if (sampleFile == nullptr) {
         return nullptr;
     }
+
+    auto formatReader = getAudioFormatReader(*(sampleFile.get()));
     
-    //auto* soundBuffer = sampleFile->createInputStream();
-    AudioFormat* format = getFormatForFileOrNullptr(sampleFile);
-    if (format == nullptr)
-    {
+    // check sample is not too long
+    auto length = formatReader->lengthInSamples / formatReader->sampleRate;
+    if (length >= Settings::MAX_SAMPLE_LENGTH) {
+        AlertWindow dialog("Warning", Strings::SAMPLE_LENGTH_TOO_LONG, AlertWindow::AlertIconType::WarningIcon, this->getActiveEditor());
+        dialog.addButton("Ok", 0);
+        dialog.runModalLoop();
+        delete formatReader;
+        
         return nullptr;
     }
 
-    auto formatReader = formatManager.createReaderFor(*sampleFile);
-
     setTransportSource(formatReader);
+
     thumbnail.setSource(new FileInputSource(*sampleFile));
 
     BigInteger midiNotes;
@@ -471,12 +526,57 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
                                        Settings::DEFAULT_ATTACK_TIME, Settings::DEFAULT_RELEASE_TIME, Settings::MAX_SAMPLE_LENGTH);
 }
 
-AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(std::shared_ptr<File> sampleFile)
+void SoomplerAudioProcessor::setSamplePreviewSource(SamplePreviewSource* source)
 {
-    AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile->getFileExtension());
+    this->previewSource = source;
+    previewSource->prepareToPlay(getBlockSize(), getSampleRate());
+}
+
+AudioFormatManager &SoomplerAudioProcessor::getFormatManager()
+{
+    return formatManager;
+}
+
+AudioFormatReader *SoomplerAudioProcessor::getAudioFormatReader(const File &file)
+{
+    AudioFormat* format = getFormatForFileOrNullptr(file);
+    if (format == nullptr)
+    {
+        return nullptr;
+    }
+
+    return formatManager.createReaderFor(file);
+}
+
+void SoomplerAudioProcessor::addNewSaveableObject(std::shared_ptr<SaveableState> saveable)
+{
+    objectsToSave.push_back(saveable);
+    StateBundle bundle(stateManager.state);
+    saveable->getStateFromMemory(bundle);
+}
+
+void SoomplerAudioProcessor::saveStateAndReleaseObjects() {
+    saveState();
+    // delete objects from saveStateList cos they gonna be destroyed
+    // for some reason std::shared_ptr doesn't resolve problem at all
+    objectsToSave.clear();
+}
+
+void SoomplerAudioProcessor::saveState()
+{
+    auto bundle = StateBundle(stateManager.state);
+    // Save saveable objects
+    for (auto saveable : objectsToSave) {
+        saveable->saveStateToMemory(bundle);
+    }
+}
+
+AudioFormat *SoomplerAudioProcessor::getFormatForFileOrNullptr(const File &sampleFile)
+{
+    AudioFormat* format = formatManager.findFormatForFileExtension(sampleFile.getFileExtension());
 
     if (format == nullptr) {
-        DBG(sampleFile->getFileExtension());
+        DBG(sampleFile.getFileExtension());
         NativeMessageBox::showMessageBox(
                     AlertWindow::AlertIconType::WarningIcon,
                     Strings::UNSUPPORTED_FILE_EXTENSION_ERROR_TITLE,
@@ -528,6 +628,7 @@ void SoomplerAudioProcessor::changeTransportState(TransportState newState)
             break;
    }
 }
+
 
 void SoomplerAudioProcessor::setTransportSource(AudioFormatReader* reader)
 {
@@ -611,7 +712,6 @@ bool SoomplerAudioProcessor::isLoopModeOn() const {
 bool SoomplerAudioProcessor::isSampleReversed() {
     return stateManager.state.getPropertyAsValue("reverse", nullptr).getValue();
 }
-
 
 //==============================================================================
 // This creates new instances of the plugin..
