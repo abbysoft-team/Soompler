@@ -141,7 +141,8 @@ public:
 
     void setFileAsTransportSource(AudioTransportSource &source, File &file);
 
-    void setSamplePreviewSource(SamplePreviewSource *source);
+    void setSamplePreviewSource(SamplePreviewSource* source);
+    void removeSamplePreviewSource();
 
     AudioFormatManager& getFormatManager();
     AudioFormat* getFormatForFileOrNullptr(const File &sampleFile);

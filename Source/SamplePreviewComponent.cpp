@@ -57,6 +57,8 @@ SamplePreviewComponent::SamplePreviewComponent(SoomplerAudioProcessor &processor
 
 SamplePreviewComponent::~SamplePreviewComponent()
 {
+    processor.removeSamplePreviewSource();
+    
     if (transportStopThread != nullptr) {
         transportStopThread->join();
     }

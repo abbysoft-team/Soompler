@@ -713,6 +713,11 @@ bool SoomplerAudioProcessor::isSampleReversed() {
     return stateManager.state.getPropertyAsValue("reverse", nullptr).getValue();
 }
 
+void SoomplerAudioProcessor::removeSamplePreviewSource() {
+    previewSource = nullptr;
+}
+
+
 //==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
