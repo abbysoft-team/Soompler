@@ -253,6 +253,9 @@ std::vector<int> SoomplerAudioProcessor::getActiveNotes()
 
 void SoomplerAudioProcessor::noteOn(int noteNumber)
 {
+    if (synth.getSound(0) == nullptr) {
+        return;
+    }
     // set current adsr params
     auto adsr = ADSR::Parameters();
     adsr.attack = getFloatParameter("attack");
@@ -269,6 +272,18 @@ void SoomplerAudioProcessor::noteOn(int noteNumber)
 void SoomplerAudioProcessor::noteOff(int noteNumber)
 {
     synth.noteOff(0, noteNumber, getFloatParameter("volume"), true);
+}
+
+void SoomplerAudioProcessor::playOrStopRootNote()
+{
+    if (sampleInfo == nullptr) {
+        return;
+    }
+    if (synth.getVoice(0)->isVoiceActive()) {
+        synth.allNotesOff(0, 0);
+    } else {
+        synth.noteOn(0, sampleInfo->rootNote, getFloatParameter("volume"));
+    }
 }
 
 void SoomplerAudioProcessor::setRootNote(int rootNote)

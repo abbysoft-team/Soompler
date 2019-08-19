@@ -112,6 +112,7 @@ public:
 
     void noteOn(int noteNumber) override;
     void noteOff(int noteNumber) override;
+    void playOrStopRootNote();
     void setRootNote(int rootNote) override;
     void setNoteRange(int minNote, int maxNote) override;
 

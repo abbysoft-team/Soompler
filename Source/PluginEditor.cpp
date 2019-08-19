@@ -108,6 +108,11 @@ void SoomplerAudioProcessorEditor::hideAboutSplash() {
 }
 
 bool SoomplerAudioProcessorEditor::keyPressed (const KeyPress& key) {
+    if (key.getKeyCode() == KeyPress::spaceKey) {
+        processor.playOrStopRootNote();
+        return true;
+    }
+    
     static String keys = "q2w3er5t6y7ui9o0p[azsxdcvgbhnmk,l.;/";
     auto firstC = Settings::FIRST_KEY_ON_SCREEN;
     
