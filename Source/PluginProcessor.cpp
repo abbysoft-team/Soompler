@@ -36,15 +36,15 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
     volume = *(stateManager.getRawParameterValue("volume"));
 
     ValueTree loadedSampleFullNameValue = ValueTree("loadedSample");
-    ValueTree reverseValue = ValueTree("reverse");
-    ValueTree loopModeValue = ValueTree("loopMode");
+//    ValueTree reverseValue = ValueTree("reverse");
+//    ValueTree loopModeValue = ValueTree("loopMode");
     ValueTree rootNoteValue = ValueTree("rootNote");
     ValueTree minNoteValue = ValueTree("minNote");
     ValueTree maxNoteValue = ValueTree("maxNote");
 
     stateManager.state.appendChild(loadedSampleFullNameValue, nullptr);
-    stateManager.state.appendChild(loopModeValue, nullptr);
-    stateManager.state.appendChild(reverseValue, nullptr);
+//    stateManager.state.appendChild(loopModeValue, nullptr);
+//    stateManager.state.appendChild(reverseValue, nullptr);
     stateManager.state.appendChild(rootNoteValue, nullptr);
     stateManager.state.appendChild(minNoteValue, nullptr);
     stateManager.state.appendChild(maxNoteValue, nullptr);
@@ -59,6 +59,8 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
         std::make_unique<AudioParameterFloat>("decay", TRANS("Decay\n"), 0.0f, Settings::MAX_DECAY_TIME, 0.0f),
         std::make_unique<AudioParameterFloat>("sustain", TRANS("Sustain\n"), 0.0f, 1.0f, 1.0f),
         std::make_unique<AudioParameterFloat>("release", TRANS("Release\n"), 0.0f, Settings::MAX_RELEASE_TIME, 0.0f),
+        std::make_unique<AudioParameterBool>("reverse", TRANS("Reversed\n"), false),
+        std::make_unique<AudioParameterBool>("loopMode", TRANS("Looped\n"), false)
     };
     
     return parameterLayout;
@@ -391,7 +393,7 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     }
     
     if (!isSampleLoaded() && fullSamplePath.isNotEmpty()) {
-        loadSample(File(fullSamplePath));
+        loadSample(File(fullSamplePath), true);
         setSampleReversed(reverse);
         setLoopEnabled(looping);
     }
@@ -436,7 +438,7 @@ void SoomplerAudioProcessor::restoreKnobParameters() {
     voice->setVolume(getFloatParameter("volume"));
 }
 
-void SoomplerAudioProcessor::loadSample(const File& sampleFile)
+void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
 {
     auto sound = getSampleData(std::make_shared<File>(sampleFile));
     if (sound == nullptr) {
@@ -450,15 +452,18 @@ void SoomplerAudioProcessor::loadSample(const File& sampleFile)
 
     setSampleStartPosition(0);
     setSampleEndPosition(transportSource.getTotalLength());
+    
+    if (!reload) {
+        setSampleReversed(false);
+        setLoopEnabled(false);
+    }
+    
     notifyTransportStateChanged(TransportState::Ready);
 
     stateManager.state.setProperty("loadedSample", var(sampleFile.getFullPathName()), nullptr);
 
     auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
     sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName());
-
-    setSampleReversed(false);
-    setLoopEnabled(false);
 
     notifySampleInfoListeners();
 }
@@ -698,6 +703,12 @@ void SoomplerAudioProcessor::setSampleReversed(bool reversed)
 
     thumbnail.setReversed(reversed);
 
+    if (stateManager.state.getPropertyAsValue("reverse", nullptr).getValue()) {
+        DBG("REVERSED");
+    } else {
+        DBG("NOT REVERSED");
+    }
+    
     stateManager.state.setProperty("reverse", reversed, nullptr);
 }
 

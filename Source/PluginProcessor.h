@@ -81,7 +81,7 @@ public:
         return thumbnail;
     }
 
-    void loadSample(const File& file);
+    void loadSample(const File& file, bool reload = false);
 
     void playSample();
 

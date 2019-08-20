@@ -6,6 +6,7 @@ enum TransportState
     Starting,
     Playing,
     Stopping,
+    NewFile,
     Ready
 };
 
