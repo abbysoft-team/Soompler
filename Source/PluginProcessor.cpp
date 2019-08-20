@@ -36,15 +36,11 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
     volume = *(stateManager.getRawParameterValue("volume"));
 
     ValueTree loadedSampleFullNameValue = ValueTree("loadedSample");
-//    ValueTree reverseValue = ValueTree("reverse");
-//    ValueTree loopModeValue = ValueTree("loopMode");
     ValueTree rootNoteValue = ValueTree("rootNote");
     ValueTree minNoteValue = ValueTree("minNote");
     ValueTree maxNoteValue = ValueTree("maxNote");
 
     stateManager.state.appendChild(loadedSampleFullNameValue, nullptr);
-//    stateManager.state.appendChild(loopModeValue, nullptr);
-//    stateManager.state.appendChild(reverseValue, nullptr);
     stateManager.state.appendChild(rootNoteValue, nullptr);
     stateManager.state.appendChild(minNoteValue, nullptr);
     stateManager.state.appendChild(maxNoteValue, nullptr);
@@ -68,10 +64,6 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
-//    if (previewSource != nullptr) {
-//        previewSource->releaseResources();
-//    }
-
     transportSource.releaseResources();
     transportStateListener = nullptr;
 }
@@ -157,13 +149,13 @@ bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    if (readerSource.get() == nullptr) {
-        buffer.clear();
-        return;
-    }
-
     if (previewSource != nullptr && previewSource->isReady()) {
         previewSource->getNextAudioBlock(buffer);
+        return;
+    }
+    
+    if (readerSource.get() == nullptr) {
+        buffer.clear();
         return;
     }
 
@@ -702,12 +694,6 @@ void SoomplerAudioProcessor::setSampleReversed(bool reversed)
     sound->setReversed(reversed);
 
     thumbnail.setReversed(reversed);
-
-    if (stateManager.state.getPropertyAsValue("reverse", nullptr).getValue()) {
-        DBG("REVERSED");
-    } else {
-        DBG("NOT REVERSED");
-    }
     
     stateManager.state.setProperty("reverse", reversed, nullptr);
 }
