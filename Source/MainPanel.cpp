@@ -55,7 +55,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
                             Image(), 1.000f, Colour (0x00000000),
                             Image(), 1.000f, Colour (0x00000000));
     loopButton->setBounds (450, 60, 30, 30);
-    loopAttachment.reset(new ButtonAttachment(stateManager, "loop", *loopButton));    
+    loopAttachment.reset(new ButtonAttachment(stateManager, "loopMode", *loopButton));
 
     sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor, processor));
     addAndMakeVisible (sampleViewer.get());
@@ -111,8 +111,9 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     reverseButton.reset(new SoomplerToggleButton(TRANS("Reverse\n")));
     editor.addToGuiEditor(reverseButton.get());
     addAndMakeVisible(reverseButton.get());
-    reverseButton->addListener(this);
-    
+    reverseButton->onClick = [this] {this->reverseButtonClicked();};
+    //reverseAttachment.reset(new ButtonAttachment(stateManager, "reverse", *reverseButton));
+
     // place components like adsr panel
     auto miscControllsBaseline = attackKnob->getY() + adsrPanel->getY();
     volumeKnob->setPosition(60, miscControllsBaseline);
@@ -182,25 +183,16 @@ void MainPanel::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == volumeKnob->getSlider())
     {
         processor.setVolume(volumeKnob->getValue());
+        return;
     }
-    else if (sliderThatWasMoved == attackKnob->getSlider())
+    else
     {
         adsrParams.attack = attackKnob->getValue();
-    }
-    else if (sliderThatWasMoved == decayKnob->getSlider())
-    {
         adsrParams.decay = decayKnob->getValue();
-    }
-    else if (sliderThatWasMoved == sustainKnob->getSlider())
-    {
         adsrParams.sustain = sustainKnob->getValue();
-    }
-    else if (sliderThatWasMoved == releaseKnob->getSlider())
-    {
         adsrParams.release = releaseKnob->getValue();
     }
 
-    processor.setAdsrParams(adsrParams);
 }
 
 void MainPanel::buttonClicked (Button* buttonThatWasClicked)
@@ -269,6 +261,9 @@ void MainPanel::timerCallback()
 void MainPanel::transportStateChanged(TransportState state)
 {
     switch (state) {
+    case NewFile:
+        reverseButton->setToggled(false);
+        loopButton->setToggled(false);
     case Ready:
         loadSampleTip->setVisible(false);
 
@@ -277,7 +272,8 @@ void MainPanel::transportStateChanged(TransportState state)
         volumeKnob->setVisible(true);
         reverseButton->setVisible(true);
         loopButton->setVisible(true);
-        
+        reverseButton->setToggled(processor.isSampleReversed());
+        loopButton->setToggled(processor.isLoopModeOn());
         // start gui updates
         startTimer(40);
         break;

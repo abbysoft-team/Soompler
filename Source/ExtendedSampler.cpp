@@ -9,6 +9,7 @@
 */
 
 #include "ExtendedSampler.h"
+#include "Settings.h"
 
 namespace soompler {
 
@@ -78,7 +79,9 @@ void ExtendedSound::setMidiRange(const BigInteger &midiNotes)
 }
 
 //==============================================================================
-    ExtendedVoice::ExtendedVoice(ChangeListener* listener) : volume(1), loopingEnabled(false), eventListener(listener)
+    ExtendedVoice::ExtendedVoice(ChangeListener* listener) : volume(1), loopingEnabled(false), eventListener(listener),
+    lastL(0),
+    lastR(0)
 {
 }
 
@@ -143,6 +146,8 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
         float* outL = outputBuffer.getWritePointer (0, startSample);
         float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
 
+        float diff = 0;
+        
         // whiling through of block of samples that need to be rendered
         // block is (128, 256, 512 etc) samples
         while (--numSamples >= 0)
@@ -162,10 +167,27 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
             // to l and r samples for both channels
             // mix envelopeValue, google ADSR envelope for more info
             auto envelopeValue = adsr.getNextSample();
+            
+            if (adsr.getParameters().attack > 0) {
+                DBG("attack > 0");
+            }
 
             l *= lgain * envelopeValue;
             r *= rgain * envelopeValue;
-
+    
+//            // anti-click system
+//            if (abs(lastL - l) >= Settings::MAX_SAMPLE_DIFF) {
+//                diff = lastL - l;
+//                l += diff * 0.6;
+//            }
+//            if (abs(lastR - r) >= Settings::MAX_SAMPLE_DIFF) {
+//                diff = lastR - r;
+//                r += diff * 0.6;
+//            }
+//
+//            lastR = r;
+//            lastL = l;
+            
             // if stereo
             if (outR != nullptr)
             {
@@ -177,7 +199,7 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
                 // mono is avg of l and r
                 *outL++ += (l + r) * 0.5f;
             }
-
+            
             // TODO what's that, why pitchratio being added
             sourceSamplePosition += pitchRatio;
 

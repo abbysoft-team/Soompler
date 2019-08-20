@@ -35,14 +35,10 @@ public:
 private:
 
     AudioProcessorValueTreeState& stateManager;
-//
-//    std::unique_ptr<SliderAttachment> volumeAttachment;
-//    std::unique_ptr<SliderAttachment> attackAttachment;
-//    std::unique_ptr<SliderAttachment> decayAttachment;
-//    std::unique_ptr<SliderAttachment> sustainAttachment;
-//    std::unique_ptr<SliderAttachment> releaseAttachment;
+    
     std::unique_ptr<ButtonAttachment> loopAttachment;
-
+    std::unique_ptr<ButtonAttachment> reverseAttachment;
+    
     std::unique_ptr<SoomplerKnob> volumeKnob;
     std::unique_ptr<SoomplerKnob> attackKnob;
     std::unique_ptr<SoomplerKnob> decayKnob;

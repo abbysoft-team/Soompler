@@ -527,7 +527,12 @@ private:
             for (int channelNum = 0; channelNum < numChannelsCached; ++channelNum)
             {
                 SThumbData* channelData = chans.getUnchecked (channelNum);
-                SMinMaxValue* cacheData = getData (channelNum, 0);
+                SMinMaxValue* cacheData;
+                if (reversed) {
+                    cacheData = getData (channelNum, numSamples - 1);
+                } else {
+                    cacheData = getData (channelNum, 0);
+                }
 
                 auto timeToThumbSampleFactor = rate / (double) sampsPerThumbSample;
 
@@ -540,7 +545,11 @@ private:
 
                     channelData->getMinMax (sample, nextSample, *cacheData);
 
-                    ++cacheData;
+                    if (reversed) {
+                        --cacheData;
+                    } else {
+                        ++cacheData;
+                    }
                     startTime += timePerPixel;
                     sample = nextSample;
                 }

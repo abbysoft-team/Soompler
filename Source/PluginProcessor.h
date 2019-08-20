@@ -81,7 +81,7 @@ public:
         return thumbnail;
     }
 
-    void loadSample(const File& file);
+    void loadSample(const File& file, bool reload = false);
 
     void playSample();
 
@@ -141,7 +141,8 @@ public:
 
     void setFileAsTransportSource(AudioTransportSource &source, File &file);
 
-    void setSamplePreviewSource(SamplePreviewSource *source);
+    void setSamplePreviewSource(SamplePreviewSource* source);
+    void removeSamplePreviewSource();
 
     AudioFormatManager& getFormatManager();
     AudioFormat* getFormatForFileOrNullptr(const File &sampleFile);
@@ -192,6 +193,7 @@ private:
     double getSynthCurrentPosition();
     MidiBuffer filterMidiMessagesForChannel(const MidiBuffer &input, int channel);
     void notifySampleInfoListeners();
+    void restoreKnobParameters();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SoomplerAudioProcessor)
 };

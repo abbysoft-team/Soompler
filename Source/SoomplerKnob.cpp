@@ -18,21 +18,21 @@ SoomplerKnob::SoomplerKnob(const String &name) : Component(name), label(name, na
     
     slider->setTooltip(name);
     
-    setSize(50, 60);
+    setSize(50, 65);
 }
 
 void SoomplerKnob::resized() {
     FlexBox fb;
     fb.flexDirection = FlexBox::Direction::column;
     
-    fb.items.add(FlexItem(label).withFlex(1).withMargin(FlexItem::Margin(0, 0, 0, 7.0f)));
-    fb.items.add(FlexItem(*(slider.get())).withFlex(6).withMargin(FlexItem::Margin(-10.0f, 0, 0, 0)));
+    fb.items.add(FlexItem(label).withFlex(3).withMargin(FlexItem::Margin(0, 0, 0, 7.0f)));
+    fb.items.add(FlexItem(*(slider.get())).withFlex(12).withMargin(FlexItem::Margin(-10.0f, 0, 0, 0)));
     
     fb.performLayout(getLocalBounds());
 }
 
 void SoomplerKnob::setPosition(int x, int y) {
-    setBounds(x, y, 50, 60);
+    setBounds(x, y, 50, 65);
 }
 
 void SoomplerKnob::addListener(Slider::Listener *listener) {

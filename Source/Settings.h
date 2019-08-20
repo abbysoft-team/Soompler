@@ -126,6 +126,9 @@ const auto BROWSER_BOUNDS = Rectangle<int>(0, 0, BROWSER_WIDTH, WINDOW_HEIGHT);
     const auto PANEL_BORDER_CORNER_RADIUS = 20.0f;
     const auto PANEL_BORDER_THICKNESS = 2;
     const auto PANEL_HEADER_HEIGHT = 20;
+    
+    // SYNTH CLASS
+    const auto MAX_SAMPLE_DIFF = 0.1f;
 }
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H

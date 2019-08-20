@@ -36,15 +36,11 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
     volume = *(stateManager.getRawParameterValue("volume"));
 
     ValueTree loadedSampleFullNameValue = ValueTree("loadedSample");
-    ValueTree reverseValue = ValueTree("reverse");
-    ValueTree loopModeValue = ValueTree("loopMode");
     ValueTree rootNoteValue = ValueTree("rootNote");
     ValueTree minNoteValue = ValueTree("minNote");
     ValueTree maxNoteValue = ValueTree("maxNote");
 
     stateManager.state.appendChild(loadedSampleFullNameValue, nullptr);
-    stateManager.state.appendChild(loopModeValue, nullptr);
-    stateManager.state.appendChild(reverseValue, nullptr);
     stateManager.state.appendChild(rootNoteValue, nullptr);
     stateManager.state.appendChild(minNoteValue, nullptr);
     stateManager.state.appendChild(maxNoteValue, nullptr);
@@ -59,6 +55,8 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
         std::make_unique<AudioParameterFloat>("decay", TRANS("Decay\n"), 0.0f, Settings::MAX_DECAY_TIME, 0.0f),
         std::make_unique<AudioParameterFloat>("sustain", TRANS("Sustain\n"), 0.0f, 1.0f, 1.0f),
         std::make_unique<AudioParameterFloat>("release", TRANS("Release\n"), 0.0f, Settings::MAX_RELEASE_TIME, 0.0f),
+        std::make_unique<AudioParameterBool>("reverse", TRANS("Reversed\n"), false),
+        std::make_unique<AudioParameterBool>("loopMode", TRANS("Looped\n"), false)
     };
     
     return parameterLayout;
@@ -66,10 +64,6 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
 
 SoomplerAudioProcessor::~SoomplerAudioProcessor()
 {
-//    if (previewSource != nullptr) {
-//        previewSource->releaseResources();
-//    }
-
     transportSource.releaseResources();
     transportStateListener = nullptr;
 }
@@ -155,13 +149,13 @@ bool SoomplerAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts)
 
 void SoomplerAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    if (readerSource.get() == nullptr) {
-        buffer.clear();
-        return;
-    }
-
     if (previewSource != nullptr && previewSource->isReady()) {
         previewSource->getNextAudioBlock(buffer);
+        return;
+    }
+    
+    if (readerSource.get() == nullptr) {
+        buffer.clear();
         return;
     }
 
@@ -256,17 +250,10 @@ void SoomplerAudioProcessor::noteOn(int noteNumber)
     if (synth.getSound(0) == nullptr) {
         return;
     }
-    // set current adsr params
-    auto adsr = ADSR::Parameters();
-    adsr.attack = getFloatParameter("attack");
-    adsr.decay = getFloatParameter("decay");
-    adsr.sustain = getFloatParameter("sustain");
-    adsr.release = getFloatParameter("release");
+    
+    restoreKnobParameters();
 
-    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
-    sound->setAdsrParams(adsr);
-
-    synth.noteOn(0, noteNumber, getFloatParameter("volume"));
+    synth.noteOn(0, noteNumber, 1.0f);
 }
 
 void SoomplerAudioProcessor::noteOff(int noteNumber)
@@ -393,12 +380,12 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
     int maxNote = stateManager.state.getPropertyAsValue("maxNote", nullptr).getValue();
 
     // sample wasn't loaded
-    if (sampleInfo == nullptr) {
+    if (fullSamplePath.isEmpty()) {
         return;
     }
     
     if (!isSampleLoaded() && fullSamplePath.isNotEmpty()) {
-        loadSample(File(fullSamplePath));
+        loadSample(File(fullSamplePath), true);
         setSampleReversed(reverse);
         setLoopEnabled(looping);
     }
@@ -420,11 +407,30 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 
         setNoteRange(minNote, maxNote);
     }
+    
+    restoreKnobParameters();
 
     notifySampleInfoListeners();
 }
 
-void SoomplerAudioProcessor::loadSample(const File& sampleFile)
+void SoomplerAudioProcessor::restoreKnobParameters() {
+    if (synth.getSound(0) == nullptr) {
+        return;
+    }
+    // set current adsr params
+    auto adsr = ADSR::Parameters();
+    adsr.attack = getFloatParameter("attack");
+    adsr.decay = getFloatParameter("decay");
+    adsr.sustain = getFloatParameter("sustain");
+    adsr.release = getFloatParameter("release");
+    
+    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
+    sound->setAdsrParams(adsr);
+    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+    voice->setVolume(getFloatParameter("volume"));
+}
+
+void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
 {
     auto sound = getSampleData(std::make_shared<File>(sampleFile));
     if (sound == nullptr) {
@@ -438,15 +444,18 @@ void SoomplerAudioProcessor::loadSample(const File& sampleFile)
 
     setSampleStartPosition(0);
     setSampleEndPosition(transportSource.getTotalLength());
+    
+    if (!reload) {
+        setSampleReversed(false);
+        setLoopEnabled(false);
+    }
+    
     notifyTransportStateChanged(TransportState::Ready);
 
     stateManager.state.setProperty("loadedSample", var(sampleFile.getFullPathName()), nullptr);
 
     auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
     sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName());
-
-    setSampleReversed(false);
-    setLoopEnabled(false);
 
     notifySampleInfoListeners();
 }
@@ -685,7 +694,7 @@ void SoomplerAudioProcessor::setSampleReversed(bool reversed)
     sound->setReversed(reversed);
 
     thumbnail.setReversed(reversed);
-
+    
     stateManager.state.setProperty("reverse", reversed, nullptr);
 }
 
@@ -712,6 +721,11 @@ bool SoomplerAudioProcessor::isLoopModeOn() const {
 bool SoomplerAudioProcessor::isSampleReversed() {
     return stateManager.state.getPropertyAsValue("reverse", nullptr).getValue();
 }
+
+void SoomplerAudioProcessor::removeSamplePreviewSource() {
+    previewSource = nullptr;
+}
+
 
 //==============================================================================
 // This creates new instances of the plugin..
