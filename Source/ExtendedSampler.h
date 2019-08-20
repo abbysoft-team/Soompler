@@ -130,6 +130,9 @@ private:
     float lgain = 0, rgain = 0;
     float volume;
     bool loopingEnabled;
+    
+    float lastL;
+    float lastR;
 
     int64 firstSampleToPlay = 0;
     int64 endSample = 0;

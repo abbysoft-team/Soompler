@@ -183,25 +183,16 @@ void MainPanel::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == volumeKnob->getSlider())
     {
         processor.setVolume(volumeKnob->getValue());
+        return;
     }
-    else if (sliderThatWasMoved == attackKnob->getSlider())
+    else
     {
         adsrParams.attack = attackKnob->getValue();
-    }
-    else if (sliderThatWasMoved == decayKnob->getSlider())
-    {
         adsrParams.decay = decayKnob->getValue();
-    }
-    else if (sliderThatWasMoved == sustainKnob->getSlider())
-    {
         adsrParams.sustain = sustainKnob->getValue();
-    }
-    else if (sliderThatWasMoved == releaseKnob->getSlider())
-    {
         adsrParams.release = releaseKnob->getValue();
     }
 
-    processor.setAdsrParams(adsrParams);
 }
 
 void MainPanel::buttonClicked (Button* buttonThatWasClicked)
