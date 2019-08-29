@@ -167,11 +167,7 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
             // to l and r samples for both channels
             // mix envelopeValue, google ADSR envelope for more info
             auto envelopeValue = adsr.getNextSample();
-            
-            if (adsr.getParameters().attack > 0) {
-                DBG("attack > 0");
-            }
-
+   
             l *= lgain * envelopeValue;
             r *= rgain * envelopeValue;
     

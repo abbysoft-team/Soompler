@@ -13,6 +13,9 @@
 #include "Strings.h"
 #include "ExtendedSampler.h"
 
+// Private def
+void createVoices(Synthesiser &synth, ChangeListener *listener);
+
 //==============================================================================
 SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperties()
                                                    .withOutput ("Output", AudioChannelSet::stereo(), true)),
@@ -25,8 +28,9 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    endSample(0),
                                                    transportStateListener(nullptr),
                                                    previewSource(nullptr)
-{    
-    synth.addVoice(new soompler::ExtendedVoice(this));
+{
+    createVoices(synth, this);
+    
     synth.setCurrentPlaybackSampleRate(44100);
 
     formatManager.registerBasicFormats();
@@ -44,6 +48,12 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
     stateManager.state.appendChild(rootNoteValue, nullptr);
     stateManager.state.appendChild(minNoteValue, nullptr);
     stateManager.state.appendChild(maxNoteValue, nullptr);
+}
+
+void createVoices(Synthesiser &synth, ChangeListener *listener) {
+    for (int i = 0; i < Settings::DEFAULT_SYNTH_VOICES; i++) {
+        synth.addVoice(new soompler::ExtendedVoice(listener));
+    }
 }
 
 AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createParametersLayout()

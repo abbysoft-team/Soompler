@@ -129,6 +129,8 @@ const auto BROWSER_BOUNDS = Rectangle<int>(0, 0, BROWSER_WIDTH, WINDOW_HEIGHT);
     
     // SYNTH CLASS
     const auto MAX_SAMPLE_DIFF = 0.1f;
+    
+    const auto DEFAULT_SYNTH_VOICES = 3;
 }
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H
