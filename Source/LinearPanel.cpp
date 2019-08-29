@@ -10,6 +10,7 @@
 
 #include "LinearPanel.h"
 #include "Settings.h"
+#include <assert.h>
 
 LinearPanel::LinearPanel(Orientation orientation, const String &name) : Component(), orientation(orientation), paddingX(10), paddingY(15) {
     panelLabel.reset(new Label());
