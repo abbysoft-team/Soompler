@@ -29,5 +29,7 @@ private:
     std::shared_ptr<SampleInfo> sample;
 
     void paintNextSampleHeader(int index, float width, std::shared_ptr<SampleInfo> info, Graphics& g);
-
+    void mouseMove(const MouseEvent &event) override;
+    void mouseDown(const MouseEvent &event) override;
+    std::shared_ptr<SampleInfo> getSampleUnderMouse(Point<int> position);
 };

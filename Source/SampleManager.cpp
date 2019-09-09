@@ -19,13 +19,13 @@ SampleManager::SampleManager()
 void SampleManager::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
 {
     activeSample = info;
+    notifySampleInfoListeners();
 
     if (contains(info)) {
         return;
     }
     samples.push_back(info);
 
-    notifySampleInfoListeners();
 }
 
 void SampleManager::addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener)

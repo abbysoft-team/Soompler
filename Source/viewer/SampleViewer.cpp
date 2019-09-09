@@ -42,6 +42,7 @@ SampleViewer::SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& tran
     draggedLine(NONE),
     header(manager)
 {
+    addAndMakeVisible(header);
 }
 
 SampleViewer::~SampleViewer()

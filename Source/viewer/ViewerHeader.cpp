@@ -62,3 +62,30 @@ void ViewerHeader::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
     sample = info;
 }
 
+void ViewerHeader::mouseMove(const MouseEvent &event)
+{
+    auto sampleUnderMouse = getSampleUnderMouse(event.getPosition());
+    if (sampleUnderMouse != manager.getActiveSample()) {
+        setMouseCursor(MouseCursor::PointingHandCursor);
+    } else {
+        setMouseCursor(MouseCursor::NormalCursor);
+    }
+}
+
+void ViewerHeader::mouseDown(const MouseEvent &event)
+{
+    auto sampleUnderMouse = getSampleUnderMouse(event.getPosition());
+    if (sampleUnderMouse != manager.getActiveSample()) {
+        manager.sampleInfoChanged(sampleUnderMouse);
+    }
+}
+
+std::shared_ptr<SampleInfo> ViewerHeader::getSampleUnderMouse(Point<int> position)
+{
+    auto samples = manager.getAllSamples();
+    auto sampleTabWidth = getWidth() / samples.size();
+
+    auto index = position.getX() / sampleTabWidth;
+    return samples.at(index);
+}
+
