@@ -16,10 +16,11 @@
 #include "MidiEventConsumer.h"
 #include "TransportInfo.h"
 #include "SampleInfo.h"
-#include "SAudioThumbnail.h"
+#include "gui/SAudioThumbnail.h"
 #include "FileListener.h"
-#include "SamplePreviewSource.h"
+#include "browser/SamplePreviewSource.h"
 #include "SaveableState.h"
+#include "synth/SoomplerSynth.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -160,7 +161,7 @@ private:
     AudioProcessorValueTreeState stateManager;
 
     std::shared_ptr<File> loadedSample;
-    Synthesiser synth;
+    SoomplerSynth synth;
     int currentSample;
 
     AudioFormatManager formatManager;

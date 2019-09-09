@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "SampleViewer.h"
-#include "PluginProcessor.h"
+#include "../viewer/SampleViewer.h"
+#include "../PluginProcessor.h"
 #include "PianoRoll.h"
 #include "GuiEditor.h"
 #include "ToggledImageButton.h"

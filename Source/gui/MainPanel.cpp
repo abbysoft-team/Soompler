@@ -1,7 +1,7 @@
 #include "MainPanel.h"
-#include "Settings.h"
-#include "Strings.h"
-#include "PluginEditor.h"
+#include "../Settings.h"
+#include "../Strings.h"
+#include "../PluginEditor.h"
 
 //==============================================================================
 MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processor.getStateManager()),

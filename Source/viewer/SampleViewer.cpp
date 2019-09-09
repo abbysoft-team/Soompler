@@ -21,7 +21,7 @@
 //[/Headers]
 
 #include "SampleViewer.h"
-#include "Settings.h"
+#include "../Settings.h"
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 

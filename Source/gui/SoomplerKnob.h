@@ -12,7 +12,7 @@
 
 #include <JuceHeader.h>
 #include "SoomplerSlider.h"
-#include "PluginProcessor.h"
+#include "../PluginProcessor.h"
 
 class SoomplerKnob : public Component {
     

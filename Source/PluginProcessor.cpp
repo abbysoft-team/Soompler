@@ -11,7 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "Strings.h"
-#include "ExtendedSampler.h"
+#include "synth/ExtendedSampler.h"
 
 // Private def
 void createVoices(Synthesiser &synth, ChangeListener *listener);

@@ -20,9 +20,9 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "SampleInfo.h"
-#include "TransportInfo.h"
-#include "SAudioThumbnail.h"
+#include "../TransportInfo.h"
+#include "../SampleInfo.h"
+#include "../gui/SAudioThumbnail.h"
 
 enum RangeLine {
     NONE,

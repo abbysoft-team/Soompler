@@ -9,7 +9,7 @@
 */
 
 #include "ExtendedSampler.h"
-#include "Settings.h"
+#include "../Settings.h"
 
 namespace soompler {
 

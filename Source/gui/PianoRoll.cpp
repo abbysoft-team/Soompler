@@ -1,5 +1,5 @@
 #include "PianoRoll.h"
-#include "Settings.h"
+#include "../Settings.h"
 
 void drawNoteTips(Graphics& g);
 void drawNoteDelimiters(Graphics& g);

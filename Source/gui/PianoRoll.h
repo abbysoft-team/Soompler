@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "MidiEventSupplier.h"
-#include "MidiEventConsumer.h"
+#include "../MidiEventSupplier.h"
+#include "../MidiEventConsumer.h"
 #include <array>
-#include "SampleInfo.h"
+#include "../SampleInfo.h"
 
 class KeyInfo
 {

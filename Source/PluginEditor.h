@@ -14,9 +14,9 @@
 #include "PluginProcessor.h"
 #include "TransportStateListener.h"
 #include "Settings.h"
-#include "MainPanel.h"
-#include "SampleBrowser.h"
-#include "AboutSplash.h"
+#include "gui/MainPanel.h"
+#include "browser/SampleBrowser.h"
+#include "gui/AboutSplash.h"
 
 //==============================================================================
 /**

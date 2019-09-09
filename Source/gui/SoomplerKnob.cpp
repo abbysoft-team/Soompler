@@ -9,7 +9,7 @@
 */
 
 #include "SoomplerKnob.h"
-#include "PluginProcessor.h"
+#include "../PluginProcessor.h"
 
 SoomplerKnob::SoomplerKnob(const String &name) : Component(name), label(name, name) {
     slider.reset(new SoomplerSlider());
