@@ -11,6 +11,9 @@
               pluginAUExportPrefix="soompler_au">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="heHSyY" name="SoomplerSynth.cpp" compile="1" resource="0"
+            file="../../../Pictures/SoomplerSynth.cpp"/>
+      <FILE id="fzRYE7" name="SoomplerSynth.h" compile="0" resource="0" file="../../../Pictures/SoomplerSynth.h"/>
       <FILE id="koY6MA" name="SoomplerKnob.cpp" compile="1" resource="0"
             file="Source/SoomplerKnob.cpp"/>
       <FILE id="wOSpmP" name="SoomplerKnob.h" compile="0" resource="0" file="Source/SoomplerKnob.h"/>

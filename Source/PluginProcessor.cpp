@@ -449,7 +449,6 @@ void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
     
     this->loadedSample = std::make_shared<File>(sampleFile);
 
-    synth.removeSound(0);
     synth.addSound(sound);
 
     setSampleStartPosition(0);
