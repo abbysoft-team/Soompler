@@ -43,7 +43,7 @@ private:
     void transportStateChanged(TransportState state) override;
 
     void changeListenerCallback(ChangeBroadcaster* source) override ;
-    void thumbnailChanged(SAudioThumbnail& thumbnail);
+    void thumbnailChanged();
     void drawSampleNameOrMessage(Graphics& graphics);
 
     int64 calculateSampleByCoords(int coord);

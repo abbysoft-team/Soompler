@@ -79,10 +79,6 @@ public:
 
     std::shared_ptr<File> getLoadedSample() const;
 
-    SAudioThumbnail& getThumbnail() {
-        return thumbnail;
-    }
-
     void loadSample(const File& file, bool reload = false);
 
     void playSample();
@@ -174,7 +170,7 @@ private:
     TransportStateListener* transportStateListener;
 
     AudioThumbnailCache thumbnailCache;
-    SAudioThumbnail thumbnail;
+    std::shared_ptr<SAudioThumbnail> thumbnail;
 
     int64 startSample;
     int64 endSample;

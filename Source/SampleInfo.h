@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Settings.h"
+#include "gui/SAudioThumbnail.h"
 
 /**
  * All required info about sample.
@@ -34,6 +35,8 @@ public:
         this->rootNote = Settings::DEFAULT_ROOT_NOTE;
         this->minNote = Settings::DEFAULT_MIN_NOTE;
         this->maxNote = Settings::DEFAULT_MAX_NOTE;
+
+        thumbnail = nullptr;
     }
 
     ~SampleInfo() = default;
@@ -54,6 +57,8 @@ public:
     int minNote;
     int maxNote;
 
+    std::shared_ptr<SAudioThumbnail> thumbnail;
+
     String getCroppedName(float width, int fontSize)
     {
         auto lettersCount = width / fontSize * 5 / 2;
@@ -66,6 +71,15 @@ public:
         result.append("...", 3);
 
         return result;
+    }
+
+    std::shared_ptr<SAudioThumbnail> getThumbnail() {
+        return thumbnail;
+    }
+
+
+    void setThumbnail(std::shared_ptr<SAudioThumbnail> thumbnail) {
+        this->thumbnail = thumbnail;
     }
 };
 

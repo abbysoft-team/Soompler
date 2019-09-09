@@ -26,6 +26,13 @@ void SampleManager::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
     }
     samples.push_back(info);
 
+    // update change listener
+    if (info->getThumbnail() == nullptr) {
+        return;
+    }
+    for (auto listener : changeListeners) {
+        info->getThumbnail()->addChangeListener(listener);
+    }
 }
 
 void SampleManager::addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener)
@@ -58,5 +65,22 @@ std::shared_ptr<SampleInfo> SampleManager::getActiveSample()
 std::vector<std::shared_ptr<SampleInfo> > SampleManager::getAllSamples()
 {
     return samples;
+}
+
+void SampleManager::addChangeListener(ChangeListener* listener)
+{
+    changeListeners.push_back(listener);
+    if (activeSample != nullptr && activeSample->getThumbnail() != nullptr) {
+        activeSample->getThumbnail()->addChangeListener(listener);
+    }
+}
+
+void SampleManager::removeChangeListener(ChangeListener *listener)
+{
+    for (auto sample : samples) {
+        if (sample->getThumbnail() != nullptr) {
+            sample->getThumbnail()->removeChangeListener(listener);
+        }
+    }
 }
 

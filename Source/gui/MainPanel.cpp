@@ -57,7 +57,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     loopButton->setBounds (450, 60, 30, 30);
     loopAttachment.reset(new ButtonAttachment(stateManager, "loopMode", *loopButton));
 
-    sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor, processor, processor.getSampleManager()));
+    sampleViewer.reset (new SampleViewer(processor, processor, processor.getSampleManager()));
     addAndMakeVisible (sampleViewer.get());
     editor.addToGuiEditor (sampleViewer.get());
     sampleViewer->setName ("SampleViewer");
@@ -317,7 +317,8 @@ void MainPanel::filesDropped(const juce::StringArray &files, int x, int y) {
 void MainPanel::restoreMainPanelState() {
     // check if sample already loaded
     // (plugin reopened)
-    if (processor.getThumbnail().getNumChannels() > 0) {
+    auto sample = processor.getSampleManager().getActiveSample();
+    if (sample != nullptr && sample->getThumbnail()->getNumChannels() > 0) {
         // load current sample
         sampleViewer->sampleInfoChanged(processor.getCurrentSampleInfo());
         pianoRoll->sampleInfoChanged(processor.getCurrentSampleInfo());

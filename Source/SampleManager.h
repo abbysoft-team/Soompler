@@ -23,11 +23,14 @@ public:
     void notifySampleInfoListeners();
     std::shared_ptr<SampleInfo> getActiveSample();
     std::vector<std::shared_ptr<SampleInfo>> getAllSamples();
+    void addChangeListener(ChangeListener* listener);
+    void removeChangeListener(ChangeListener* listener);
 
 private:
     std::vector<std::shared_ptr<SampleInfo>> samples;
     std::shared_ptr<SampleInfo> activeSample;
     std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
+    std::vector<ChangeListener*> changeListeners;
 
     bool contains(std::shared_ptr<SampleInfo> sample);
 };

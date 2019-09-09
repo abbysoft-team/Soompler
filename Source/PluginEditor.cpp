@@ -42,7 +42,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
     // subscribe to all transport events from processor
     processor.setTransportStateListener(this);
     // subscribe to thumbnail events, to catch thumbnail fully loaded time
-    processor.getThumbnail().addChangeListener(this);
+    processor.getSampleManager().addChangeListener(this);
 
     // StateSaving
     processor.addNewSaveableObject(sampleBrowser);
@@ -53,7 +53,7 @@ SoomplerAudioProcessorEditor::SoomplerAudioProcessorEditor (SoomplerAudioProcess
 SoomplerAudioProcessorEditor::~SoomplerAudioProcessorEditor()
 {
     processor.saveStateAndReleaseObjects();
-    processor.getThumbnail().removeChangeListener(this);
+    processor.getSampleManager().removeChangeListener(this);
 }
 
 //==============================================================================
@@ -87,12 +87,13 @@ void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
 
 void SoomplerAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster *source)
 {
-    if (source == &processor.getThumbnail()) {
-        thumbnailChanged(processor.getThumbnail());
+    auto thumbnail = processor.getSampleManager().getActiveSample()->getThumbnail();
+    if (source == thumbnail.get()) {
+        thumbnailChanged();
     }
 }
 
-void SoomplerAudioProcessorEditor::thumbnailChanged(SAudioThumbnail &thumbnail)
+void SoomplerAudioProcessorEditor::thumbnailChanged()
 {
     // sample loaded
     processor.setVolume(mainPanel.getVolume());

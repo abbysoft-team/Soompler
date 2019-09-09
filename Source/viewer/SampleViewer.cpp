@@ -31,16 +31,16 @@ void fadePreStartRegion(int startRangeBorderX, Graphics& g);
 void fadePostEndRegion(int endRangeBorderX, Graphics& g);
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos);
 
-SampleViewer::SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener, SampleManager& manager)
-    : thumbnail(thumbnail),
-    currentSample(new SampleInfo(0, 44100, "")),
+SampleViewer::SampleViewer (TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener, SampleManager& manager)
+    : currentSample(new SampleInfo(0, 44100, "")),
     transportInfoOwner(transportInfoOwner),
     sampleInfoListener(infoListener),
     startRangeX(0),
     endRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
     maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
     draggedLine(NONE),
-    header(manager)
+    header(manager),
+    manager(manager)
 {
     addAndMakeVisible(header);
 }
@@ -69,7 +69,8 @@ void SampleViewer::paint (Graphics& g)
 
 void SampleViewer::drawThumbnail(Graphics &g)
 {
-    if (thumbnail.getNumChannels() == 0)
+    auto thumbnail = manager.getActiveSample()->getThumbnail();
+    if (thumbnail->getNumChannels() == 0)
     {
         return;
     }
@@ -81,26 +82,16 @@ void SampleViewer::drawThumbnail(Graphics &g)
 
     g.setColour(Settings::THUMBNAIL_COLOR);
 
-    auto audioLength = thumbnail.getTotalLength();
+    auto audioLength = thumbnail->getTotalLength();
     auto thumbnailRect = Rectangle<int>(0, Settings::THUMBNAIL_HEADER_HEIGHT,
                                         Settings::THUMBNAIL_BOUNDS.getWidth(),
                                         Settings::THUMBNAIL_BOUNDS.getHeight());
 
-    thumbnail.drawChannels(g,
+    thumbnail->drawChannels(g,
                            thumbnailRect,
                            0.0,
                            audioLength,
                            1.0f);
-
-//    g.setColour(Settings::THUMBNAIL_HEADER_COLOR);
-//    g.fillRect(0, 0, Settings::THUMBNAIL_BOUNDS.getWidth(), Settings::THUMBNAIL_HEADER_HEIGHT);
-
-//    g.setColour(Settings::SAMPLE_NAME_COLOR);
-//    g.setFont(Settings::SAMPLE_NAME_FONT_SIZE);
-//    g.drawSingleLineText(getCroppedNameIfNeeded(),
-//                             Settings::SAMPLE_NAME_TEXT_X,
-//                             Settings::SAMPLE_NAME_TEXT_Y,
-//                             Justification::horizontallyCentred);
 }
 
 void SampleViewer::drawPositionLine(Graphics &g)

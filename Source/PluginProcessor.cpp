@@ -23,7 +23,6 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    stateManager(*this, nullptr, Identifier("SoomplerState"), createParametersLayout()),
                                                    currentSample(0),
                                                    thumbnailCache(5),
-                                                   thumbnail(Settings::THUMBNAIL_RESOLUTION_SAMPLES, formatManager, thumbnailCache),
                                                    startSample(0),
                                                    endSample(0),
                                                    transportStateListener(nullptr),
@@ -475,6 +474,7 @@ void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
     auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
 
     auto sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName());
+    sampleInfo->setThumbnail(thumbnail);
     sampleManager.sampleInfoChanged(sampleInfo);
 
     notifySampleInfoListeners();
@@ -482,7 +482,7 @@ void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
 
 bool SoomplerAudioProcessor::isSampleLoaded()
 {
-    return getThumbnail().getNumChannels() > 0;
+    return sampleManager.getActiveSample() != nullptr;
 }
 
 void SoomplerAudioProcessor::fileRecieved(const File &file)
@@ -540,7 +540,8 @@ SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File
 
     setTransportSource(formatReader);
 
-    thumbnail.setSource(new FileInputSource(*sampleFile));
+    thumbnail = std::make_shared<SAudioThumbnail>(Settings::THUMBNAIL_RESOLUTION_SAMPLES, formatManager, thumbnailCache);
+    thumbnail->setSource(new FileInputSource(*sampleFile));
 
     BigInteger midiNotes;
     midiNotes.setRange(Settings::DEFAULT_MIN_NOTE, Settings::DEFAULT_MAX_NOTE - Settings::DEFAULT_MIN_NOTE + 1, true);
@@ -711,7 +712,7 @@ void SoomplerAudioProcessor::setSampleReversed(bool reversed)
 
     sound->setReversed(reversed);
 
-    thumbnail.setReversed(reversed);
+    thumbnail->setReversed(reversed);
     
     stateManager.state.setProperty("reverse", reversed, nullptr);
 }
