@@ -50,6 +50,8 @@ SampleViewer::~SampleViewer()
 //==============================================================================
 void SampleViewer::paint (Graphics& g)
 {
+    header.paint(g);
+
     drawThumbnail(g);
     drawPositionLine(g);
 
@@ -88,29 +90,15 @@ void SampleViewer::drawThumbnail(Graphics &g)
                            audioLength,
                            1.0f);
 
-    g.setColour(Settings::THUMBNAIL_HEADER_COLOR);
-    g.fillRect(0, 0, Settings::THUMBNAIL_BOUNDS.getWidth(), Settings::THUMBNAIL_HEADER_HEIGHT);
+//    g.setColour(Settings::THUMBNAIL_HEADER_COLOR);
+//    g.fillRect(0, 0, Settings::THUMBNAIL_BOUNDS.getWidth(), Settings::THUMBNAIL_HEADER_HEIGHT);
 
-    g.setColour(Settings::SAMPLE_NAME_COLOR);
-    g.setFont(Settings::SAMPLE_NAME_FONT_SIZE);
-    g.drawSingleLineText(getCroppedNameIfNeeded(),
-                             Settings::SAMPLE_NAME_TEXT_X,
-                             Settings::SAMPLE_NAME_TEXT_Y,
-                             Justification::horizontallyCentred);
-}
-
-
-String SampleViewer::getCroppedNameIfNeeded()
-{
-  auto fileName = currentSample->sampleName;
-  if (fileName.length() <= Settings::MAX_SAMPLE_NAME_LENGTH) {
-    return fileName;
-  }
-
-  String result =  fileName.substring(0, Settings::MAX_SAMPLE_NAME_LENGTH - 4);
-  result.append("...", 3);
-
-  return result;
+//    g.setColour(Settings::SAMPLE_NAME_COLOR);
+//    g.setFont(Settings::SAMPLE_NAME_FONT_SIZE);
+//    g.drawSingleLineText(getCroppedNameIfNeeded(),
+//                             Settings::SAMPLE_NAME_TEXT_X,
+//                             Settings::SAMPLE_NAME_TEXT_Y,
+//                             Justification::horizontallyCentred);
 }
 
 void SampleViewer::drawPositionLine(Graphics &g)
@@ -228,6 +216,8 @@ void SampleViewer::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
     startRangeX = calculateCoordBySample(currentSample->startSample);
 
     calculateEndRangeX();
+
+    header.newSampleInfoRecieved(info);
 }
 
 void SampleViewer::calculateEndRangeX()
@@ -272,7 +262,7 @@ int SampleViewer::calculateCoordBySample(int64 sample)
 
 void SampleViewer::resized()
 {
-
+    header.setBounds(0, 0, getWidth(), Settings::THUMBNAIL_HEADER_HEIGHT);
 }
 
 

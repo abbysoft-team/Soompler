@@ -23,6 +23,7 @@
 #include "../TransportInfo.h"
 #include "../SampleInfo.h"
 #include "../gui/SAudioThumbnail.h"
+#include "ViewerHeader.h"
 
 enum RangeLine {
     NONE,
@@ -65,6 +66,8 @@ private:
 
     RangeLine draggedLine;
 
+    ViewerHeader header;
+
     //[/UserVariables]
 
     //==============================================================================
@@ -74,7 +77,6 @@ private:
     int calculateCoordBySample(int64 sample);
     void calculateEndRangeX();
     void notifySampleInfoListeners();
-    String getCroppedNameIfNeeded();
 
     void mouseDrag(const MouseEvent &event) override;
     void mouseMove(const MouseEvent &event) override;
