@@ -31,7 +31,7 @@ void fadePreStartRegion(int startRangeBorderX, Graphics& g);
 void fadePostEndRegion(int endRangeBorderX, Graphics& g);
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos);
 
-SampleViewer::SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener)
+SampleViewer::SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener, SampleManager& manager)
     : thumbnail(thumbnail),
     currentSample(new SampleInfo(0, 44100, "")),
     transportInfoOwner(transportInfoOwner),
@@ -39,7 +39,8 @@ SampleViewer::SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& tran
     startRangeX(0),
     endRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
     maxRangeX(Settings::THUMBNAIL_BOUNDS.getWidth()),
-    draggedLine(NONE)
+    draggedLine(NONE),
+    header(manager)
 {
 }
 
@@ -209,7 +210,7 @@ bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos)
     return rangeLine.contains(point);
 }
 
-void SampleViewer::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
+void SampleViewer::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
 {
     this->currentSample = info;
     endRangeX = calculateCoordBySample(currentSample->endSample);
@@ -217,7 +218,7 @@ void SampleViewer::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
 
     calculateEndRangeX();
 
-    header.newSampleInfoRecieved(info);
+    header.sampleInfoChanged(info);
 }
 
 void SampleViewer::calculateEndRangeX()
@@ -245,7 +246,7 @@ void SampleViewer::calculateEndRangeX()
 
 void SampleViewer::notifySampleInfoListeners()
 {
-    this->sampleInfoListener.newSampleInfoRecieved(currentSample);
+    this->sampleInfoListener.sampleInfoChanged(currentSample);
 }
 
 int64 SampleViewer::calculateSampleByCoords(int coordOnThumbnail)

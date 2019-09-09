@@ -57,7 +57,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     loopButton->setBounds (450, 60, 30, 30);
     loopAttachment.reset(new ButtonAttachment(stateManager, "loopMode", *loopButton));
 
-    sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor, processor));
+    sampleViewer.reset (new SampleViewer(processor.getThumbnail(), processor, processor, processor.getSampleManager()));
     addAndMakeVisible (sampleViewer.get());
     editor.addToGuiEditor (sampleViewer.get());
     sampleViewer->setName ("SampleViewer");
@@ -319,8 +319,8 @@ void MainPanel::restoreMainPanelState() {
     // (plugin reopened)
     if (processor.getThumbnail().getNumChannels() > 0) {
         // load current sample
-        sampleViewer->newSampleInfoRecieved(processor.getCurrentSampleInfo());
-        pianoRoll->newSampleInfoRecieved(processor.getCurrentSampleInfo());
+        sampleViewer->sampleInfoChanged(processor.getCurrentSampleInfo());
+        pianoRoll->sampleInfoChanged(processor.getCurrentSampleInfo());
         
         bool reversed = processor.isSampleReversed();
         bool looped = processor.isLoopModeOn();

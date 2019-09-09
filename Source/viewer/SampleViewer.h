@@ -40,12 +40,12 @@ enum RangeLine {
 class SampleViewer  : public Component, public SampleInfoListener
 {
 public:
-    SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& sampleInfoListener);
+    SampleViewer (SAudioThumbnail& thumbnail, TransportInfoOwner& transportInfoOwner, SampleInfoListener& sampleInfoListener, SampleManager& manager);
     ~SampleViewer();
 
     void paint (Graphics& g) override;
     void resized() override;
-    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
+    void sampleInfoChanged(std::shared_ptr<SampleInfo> info) override;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.

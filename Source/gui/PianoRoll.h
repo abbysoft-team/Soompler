@@ -43,7 +43,7 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
+    void sampleInfoChanged(std::shared_ptr<SampleInfo> info) override;
 
 private:
     static constexpr auto MAX_KEYS = 120;

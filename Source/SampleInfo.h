@@ -53,6 +53,20 @@ public:
     int rootNote;
     int minNote;
     int maxNote;
+
+    String getCroppedName(float width, int fontSize)
+    {
+        auto lettersCount = width / fontSize * 5 / 2;
+
+        if (sampleName.length() <= lettersCount) {
+          return sampleName;
+        }
+
+        String result =  sampleName.substring(0, lettersCount - 4);
+        result.append("...", 3);
+
+        return result;
+    }
 };
 
 /**
@@ -63,7 +77,7 @@ public:
 class SampleInfoListener
 {
 public:
-    virtual void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) = 0;
+    virtual void sampleInfoChanged(std::shared_ptr<SampleInfo> info) = 0;
     
     virtual ~SampleInfoListener() = default;
 };

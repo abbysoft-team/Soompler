@@ -215,9 +215,9 @@ void SoomplerAudioProcessor::setSampleEndPosition(int64 sample)
     stateManager.state.setProperty("endSample", endSample, nullptr);
 }
 
-void SoomplerAudioProcessor::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
+void SoomplerAudioProcessor::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
 {
-    this->sampleInfo = info;
+    sampleManager.sampleInfoChanged(info);
     setSampleStartPosition(info->startSample);
     setSampleEndPosition(info->endSample);
 }
@@ -273,13 +273,14 @@ void SoomplerAudioProcessor::noteOff(int noteNumber)
 
 void SoomplerAudioProcessor::playOrStopRootNote()
 {
-    if (sampleInfo == nullptr) {
+    auto activeSample = sampleManager.getActiveSample();
+    if (activeSample == nullptr) {
         return;
     }
     if (synth.getVoice(0)->isVoiceActive()) {
         synth.allNotesOff(0, 0);
     } else {
-        synth.noteOn(0, sampleInfo->rootNote, getFloatParameter("volume"));
+        synth.noteOn(0, activeSample->rootNote, getFloatParameter("volume"));
     }
 }
 
@@ -317,6 +318,11 @@ MidiBuffer SoomplerAudioProcessor::filterMidiMessagesForChannel(const MidiBuffer
     return output;
 }
 
+void SoomplerAudioProcessor::notifySampleInfoListeners()
+{
+    sampleManager.notifySampleInfoListeners();
+}
+
 //==============================================================================
 bool SoomplerAudioProcessor::hasEditor() const
 {
@@ -347,9 +353,11 @@ void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
     if (loadedSample != nullptr) {
         stateManager.state.setProperty("loadedSampleName", loadedSample->getFileName(), nullptr);
     }
-    if (sampleInfo != nullptr) {
-        stateManager.state.setProperty("loadedSampleLength", sampleInfo->lengthInSeconds, nullptr);
-    }
+
+
+//    if (sampleInfo != nullptr) {
+//        stateManager.state.setProperty("loadedSampleLength", sampleInfo->lengthInSeconds, nullptr);
+//    }
     
     stateManager.state.setProperty("startSample", startSample, nullptr);
     stateManager.state.setProperty("endSample", endSample, nullptr);
@@ -400,6 +408,7 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
         setLoopEnabled(looping);
     }
 
+    auto sampleInfo = sampleManager.getActiveSample();
     sampleInfo->startSample = startSample;
     sampleInfo->endSample = endSample;
     this->startSample = startSample;
@@ -464,16 +473,11 @@ void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
     stateManager.state.setProperty("loadedSample", var(sampleFile.getFullPathName()), nullptr);
 
     auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
-    sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName());
+
+    auto sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName());
+    sampleManager.sampleInfoChanged(sampleInfo);
 
     notifySampleInfoListeners();
-}
-
-void SoomplerAudioProcessor::notifySampleInfoListeners()
-{
-    for (auto sampleInfoListener : sampleInfoListeners) {
-        sampleInfoListener->newSampleInfoRecieved(sampleInfo);
-    }
 }
 
 bool SoomplerAudioProcessor::isSampleLoaded()
@@ -580,6 +584,16 @@ void SoomplerAudioProcessor::saveStateAndReleaseObjects() {
     objectsToSave.clear();
 }
 
+void SoomplerAudioProcessor::addSampleInfoListener(std::shared_ptr<SampleInfoListener> listener)
+{
+    sampleManager.addSampleInfoListener(listener);
+}
+
+SampleManager &SoomplerAudioProcessor::getSampleManager()
+{
+    return sampleManager;
+}
+
 void SoomplerAudioProcessor::saveState()
 {
     auto bundle = StateBundle(stateManager.state);
@@ -669,11 +683,6 @@ std::shared_ptr<TransportInfo> SoomplerAudioProcessor::getTransportInfo()
     return info;
 }
 
-void SoomplerAudioProcessor::addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener)
-{
-    this->sampleInfoListeners.push_back(sampleInfoListener);
-}
-
 void SoomplerAudioProcessor::setAdsrParams(ADSR::Parameters params)
 {
     auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
@@ -719,7 +728,7 @@ float SoomplerAudioProcessor::getFloatParameter(const String &paramId)
 
 std::shared_ptr<SampleInfo> SoomplerAudioProcessor::getCurrentSampleInfo()
 {
-    return sampleInfo;
+    return sampleManager.getActiveSample();
 }
 
 bool SoomplerAudioProcessor::isLoopModeOn() const {

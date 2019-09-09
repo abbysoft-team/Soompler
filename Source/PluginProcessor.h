@@ -21,6 +21,7 @@
 #include "browser/SamplePreviewSource.h"
 #include "SaveableState.h"
 #include "synth/SoomplerSynth.h"
+#include "SampleManager.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -103,7 +104,7 @@ public:
     // percent of a sample length
     void setSampleStartPosition(int64 sample);
     void setSampleEndPosition(int64 sample);
-    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
+    void sampleInfoChanged(std::shared_ptr<SampleInfo> info) override;
 
     void setVolume(double volume);
 
@@ -118,8 +119,6 @@ public:
     void setNoteRange(int minNote, int maxNote) override;
 
     std::shared_ptr<TransportInfo> getTransportInfo() override;
-
-    void addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener);
 
     void setAdsrParams(ADSR::Parameters params);
     
@@ -153,6 +152,10 @@ public:
     void saveState();
     void saveStateAndReleaseObjects();
     
+    void addSampleInfoListener(std::shared_ptr<SampleInfoListener> listener);
+
+    SampleManager& getSampleManager();
+
 private:
     //==============================================================================
 
@@ -180,8 +183,8 @@ private:
 
     float volume;
 
-    std::shared_ptr<SampleInfo> sampleInfo;
-    std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
+    SampleManager sampleManager;
+//    std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
 
     SamplePreviewSource *previewSource;
 

@@ -11,42 +11,54 @@
 #include "ViewerHeader.h"
 #include "../Settings.h"
 
-ViewerHeader::ViewerHeader()
+ViewerHeader::ViewerHeader(SampleManager& manager) : manager(manager)
 {
 
 }
 
 void ViewerHeader::paint(Graphics &g)
 {
-    g.setColour(Settings::THUMBNAIL_HEADER_COLOR);
+    auto samples = manager.getAllSamples().size();
+    auto sampleHeaderWidth = getWidth() / samples;
+
+    g.setColour(Settings::PANEL_BACKGROUND_COLOR);
     g.fillRect(0, 0, getWidth(), getHeight());
+
+    for (int i = samples - 1; i >= 0; i--) {
+        paintNextSampleHeader(i, sampleHeaderWidth, manager.getAllSamples().at(i), g);
+    }
+}
+
+
+void ViewerHeader::paintNextSampleHeader(int index, float width, std::shared_ptr<SampleInfo> info, Graphics &g)
+{
+    auto leftBorderX = index * width;
+    auto rightBorderX = leftBorderX + width;
+
+    g.setColour(Settings::PIANO_ROLL_WHITE_COLOR);
+    if (leftBorderX > 0) {
+        g.drawLine(leftBorderX, 0, leftBorderX, getHeight());
+    }
+    if (rightBorderX < getWidth()) {
+        g.drawLine(rightBorderX, 0, rightBorderX, getHeight());
+    }
+
+    // mark active sample header
+    if (info == sample) {
+        g.setColour(Settings::THUMBNAIL_HEADER_COLOR);
+        g.fillRect(leftBorderX, 0.0, width, getHeight() * 1.0);
+    }
 
     g.setColour(Settings::SAMPLE_NAME_COLOR);
     g.setFont(Settings::SAMPLE_NAME_FONT_SIZE);
-    g.drawSingleLineText(getCroppedNameIfNeeded(),
-                             Settings::SAMPLE_NAME_TEXT_X,
-                             Settings::SAMPLE_NAME_TEXT_Y,
+    g.drawSingleLineText(info->getCroppedName(width, Settings::SAMPLE_NAME_FONT_SIZE),
+                         leftBorderX + width / 2,
+                         (getHeight() + Settings::SAMPLE_NAME_FONT_SIZE) / 2 - 2,
                          Justification::horizontallyCentred);
 }
 
-void ViewerHeader::newSampleInfoRecieved(std::shared_ptr<SampleInfo> info)
+void ViewerHeader::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
 {
-    samples.push_back(info);
+    sample = info;
 }
 
-String ViewerHeader::getCroppedNameIfNeeded()
-{
-    if (samples.empty()) {
-        return "";
-    }
-
-    auto fileName = samples[0]->sampleName;
-    if (fileName.length() <= Settings::MAX_SAMPLE_NAME_LENGTH) {
-      return fileName;
-    }
-
-    String result =  fileName.substring(0, Settings::MAX_SAMPLE_NAME_LENGTH - 4);
-    result.append("...", 3);
-
-    return result;
-}

@@ -12,19 +12,22 @@
 
 #include <JuceHeader.h>
 #include "../SampleInfo.h"
+#include "../SampleManager.h"
 
 class ViewerHeader : public Component, public SampleInfoListener {
 
 public:
 
-    ViewerHeader();
+    ViewerHeader(SampleManager& manager);
     ~ViewerHeader() = default;
 
     void paint(Graphics &g) override;
-    void newSampleInfoRecieved(std::shared_ptr<SampleInfo> info) override;
+    void sampleInfoChanged(std::shared_ptr<SampleInfo> info) override;
 
 private:
-    std::vector<std::shared_ptr<SampleInfo>> samples;
-    String getCroppedNameIfNeeded();
+    SampleManager& manager;
+    std::shared_ptr<SampleInfo> sample;
+
+    void paintNextSampleHeader(int index, float width, std::shared_ptr<SampleInfo> info, Graphics& g);
 
 };
