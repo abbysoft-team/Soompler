@@ -35,6 +35,7 @@ public:
     float getVolume() const;
 
     void sampleChanged(std::shared_ptr<SampleInfo> info);
+    void noSamplesLeft() override;
 
 private:
 

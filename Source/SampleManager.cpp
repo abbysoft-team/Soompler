@@ -37,7 +37,18 @@ void SampleManager::sampleChanged(std::shared_ptr<SampleInfo> info)
 
 void SampleManager::removeSample(std::shared_ptr<SampleInfo> sample)
 {
+    // remove sample listeners
+    if (sample->thumbnail != nullptr) {
+        sample->thumbnail->removeAllChangeListeners();
+    }
+
     samples.erase(std::remove(samples.begin(), samples.end(), sample), samples.end());
+
+    if (samples.empty()) {
+        for (auto listener : sampleInfoListeners) {
+            listener->noSamplesLeft();
+        }
+    }
 }
 
 void SampleManager::addSampleInfoListener(SampleChangeListener* sampleInfoListener)
@@ -133,8 +144,28 @@ void SampleManager::loadSample(StateBundle &bundle, const String &property)
     String path = bundle.getProperty(property + "path");
     float length = bundle.getProperty(property + "length");
     float sampleRate = bundle.getProperty(property + "sampleRate");
+    int minNote = bundle.getProperty(property + "min");
+    int rootNote = bundle.getProperty(property + "root");
+    int maxNote = bundle.getProperty(property + "max");
+    float volume = bundle.getProperty(property + "volume");
+    float attack = bundle.getProperty(property + "attack");
+    float decay = bundle.getProperty(property + "decay");
+    float sustain = bundle.getProperty(property + "sustain");
+    float release = bundle.getProperty(property + "release");
+
+    auto adsr = ADSR::Parameters();
+    adsr.attack = attack;
+    adsr.decay = decay;
+    adsr.sustain = sustain;
+    adsr.release = release;
 
     auto sampleInfo = std::make_shared<SampleInfo>(length, sampleRate, name, path);
+    sampleInfo->minNote = minNote;
+    sampleInfo->maxNote = maxNote;
+    sampleInfo->rootNote = rootNote;
+    sampleInfo->setVolume(volume);
+    sampleInfo->setAdsr(adsr);
+
     samples.push_back(sampleInfo);
     activeSample = sampleInfo;
 }

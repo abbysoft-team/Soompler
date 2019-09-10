@@ -52,8 +52,6 @@ SampleViewer::~SampleViewer()
 //==============================================================================
 void SampleViewer::paint (Graphics& g)
 {
-    header.paint(g);
-
     drawThumbnail(g);
     drawPositionLine(g);
 

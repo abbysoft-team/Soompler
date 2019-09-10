@@ -44,6 +44,7 @@ public:
     void resized() override;
 
     void sampleChanged(std::shared_ptr<SampleInfo> info) override;
+    void noSamplesLeft();
 
 private:
     static constexpr auto MAX_KEYS = 120;

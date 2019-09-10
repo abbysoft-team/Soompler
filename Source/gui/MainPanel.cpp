@@ -196,6 +196,16 @@ void MainPanel::sampleChanged(std::shared_ptr<SampleInfo> info)
     volumeKnob->setValue(info->getVolume());
 }
 
+void MainPanel::noSamplesLeft()
+{
+    loadSampleTip->setVisible(true);
+    sampleViewer->setVisible(false);
+    adsrPanel->setVisible(false);
+    volumeKnob->setVisible(false);
+    reverseButton->setVisible(false);
+    loopButton->setVisible(false);
+}
+
 void MainPanel::openFileButtonClicked()
 {
     FileChooser chooser(Strings::OPEN_FILE_DIALOG_TEXT,

@@ -106,6 +106,7 @@
     <FILE id="SJMWVx" name="background.png" compile="1" resource="1" file="Resources/background.png"/>
     <FILE id="v8H9xB" name="RobotoCondensed-Regular.ttf" compile="0" resource="1"
           file="Resources/RobotoCondensed-Regular.ttf"/>
+    <FILE id="UQKMAA" name="&#1089;lose.png" compile="0" resource="1" file="Resources/&#1089;lose.png"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile">

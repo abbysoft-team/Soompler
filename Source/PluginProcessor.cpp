@@ -479,7 +479,7 @@ void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
 
     auto sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName(), sampleFile.getFullPathName());
     sampleInfo->thumbnail = thumbnail;
-    sampleInfo->sound = sound;
+    sampleInfo->sound = std::shared_ptr<soompler::ExtendedSound>(sound);
     sampleManager->sampleChanged(sampleInfo);
 
     notifySampleInfoListeners();
@@ -609,7 +609,7 @@ void SoomplerAudioProcessor::loadThumbnailAndSoundFor(std::shared_ptr<SampleInfo
         sampleManager->removeSample(sample);
         return;
     }
-    sample->sound = sound;
+    sample->sound = std::shared_ptr<soompler::ExtendedSound>(sound);
     sample->thumbnail = thumbnail;
 }
 

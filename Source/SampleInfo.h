@@ -68,7 +68,7 @@ public:
     int maxNote;
 
     std::shared_ptr<SAudioThumbnail> thumbnail;
-    soompler::ExtendedSound* sound;
+    std::shared_ptr<soompler::ExtendedSound> sound;
 
     String getCroppedName(float width, int fontSize)
     {
@@ -122,6 +122,7 @@ class SampleChangeListener
 {
 public:
     virtual void sampleChanged(std::shared_ptr<SampleInfo> info) = 0;
+    virtual void noSamplesLeft() {}
     
     virtual ~SampleChangeListener() = default;
 };

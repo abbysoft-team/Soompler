@@ -365,6 +365,11 @@ void PianoRoll::sampleChanged(std::shared_ptr<SampleInfo> info)
     createMarkers(info);
 }
 
+void PianoRoll::noSamplesLeft()
+{
+    this->sample = nullptr;
+}
+
 void PianoRoll::rootMarkerDragged(Point<int> position)
 {
     auto keyClicked = getKeyClicked(position);
