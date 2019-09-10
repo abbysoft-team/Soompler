@@ -18,14 +18,14 @@ class ViewerHeader : public Component, public SampleChangeListener {
 
 public:
 
-    ViewerHeader(SampleManager& manager);
+    ViewerHeader(std::shared_ptr<SampleManager> manager);
     ~ViewerHeader() = default;
 
     void paint(Graphics &g) override;
     void sampleChanged(std::shared_ptr<SampleInfo> info) override;
 
 private:
-    SampleManager& manager;
+    std::shared_ptr<SampleManager> manager;
     std::shared_ptr<SampleInfo> sample;
 
     void paintNextSampleHeader(int index, float width, std::shared_ptr<SampleInfo> info, Graphics& g);

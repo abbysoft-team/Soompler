@@ -151,8 +151,9 @@ public:
     
     void addSampleInfoListener(SampleChangeListener* listener);
 
-    SampleManager& getSampleManager();
+    std::shared_ptr<SampleManager> getSampleManager();
 
+    void loadThumbnailAndSoundFor(std::shared_ptr<SampleInfo> sample);
 private:
     //==============================================================================
 
@@ -180,7 +181,7 @@ private:
 
     float volume;
 
-    SampleManager sampleManager;
+    std::shared_ptr<SampleManager> sampleManager;
 //    std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
 
     SamplePreviewSource *previewSource;

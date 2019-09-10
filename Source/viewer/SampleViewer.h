@@ -40,7 +40,7 @@ enum RangeLine {
 class SampleViewer  : public Component, public SampleChangeListener
 {
 public:
-    SampleViewer (TransportInfoOwner& transportInfoOwner, SampleChangeListener& sampleInfoListener, SampleManager& manager);
+    SampleViewer (TransportInfoOwner& transportInfoOwner, SampleChangeListener& sampleInfoListener, std::shared_ptr<SampleManager> manager);
     ~SampleViewer();
 
     void paint (Graphics& g) override;
@@ -67,7 +67,7 @@ private:
 
     ViewerHeader header;
 
-    SampleManager& manager;
+    std::shared_ptr<SampleManager> manager;
 
     //[/UserVariables]
 

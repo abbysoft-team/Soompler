@@ -294,7 +294,7 @@ void MainPanel::filesDropped(const juce::StringArray &files, int x, int y) {
 void MainPanel::restoreMainPanelState() {
     // check if sample already loaded
     // (plugin reopened)
-    auto sample = processor.getSampleManager().getActiveSample();
+    auto sample = processor.getSampleManager()->getActiveSample();
     if (sample != nullptr && sample->thumbnail->getNumChannels() > 0) {
         // load current sample
         sampleViewer->sampleChanged(processor.getCurrentSampleInfo());

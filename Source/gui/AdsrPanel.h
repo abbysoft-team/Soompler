@@ -17,7 +17,7 @@
 class AdsrPanel : public LinearPanel, public Slider::Listener, public SampleChangeListener {
 
 public:
-    AdsrPanel(AudioProcessorValueTreeState& state, SampleManager& manager);
+    AdsrPanel(AudioProcessorValueTreeState& state, std::shared_ptr<SampleManager> manager);
     ~AdsrPanel() = default;
 
     void sliderValueChanged(Slider *slider) override;
@@ -33,5 +33,5 @@ private:
 
     ADSR::Parameters adsrParams;
 
-    SampleManager& manager;
+    std::shared_ptr<SampleManager> manager;
 };

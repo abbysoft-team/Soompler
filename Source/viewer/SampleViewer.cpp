@@ -31,8 +31,8 @@ void fadePreStartRegion(int startRangeBorderX, Graphics& g);
 void fadePostEndRegion(int endRangeBorderX, Graphics& g);
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos);
 
-SampleViewer::SampleViewer (TransportInfoOwner& transportInfoOwner, SampleChangeListener& infoListener, SampleManager& manager)
-    : currentSample(new SampleInfo(0, 44100, "")),
+SampleViewer::SampleViewer (TransportInfoOwner& transportInfoOwner, SampleChangeListener& infoListener, std::shared_ptr<SampleManager> manager)
+    : currentSample(new SampleInfo(0, 44100, "", "")),
     transportInfoOwner(transportInfoOwner),
     sampleInfoListener(infoListener),
     startRangeX(0),
@@ -69,7 +69,7 @@ void SampleViewer::paint (Graphics& g)
 
 void SampleViewer::drawThumbnail(Graphics &g)
 {
-    auto thumbnail = manager.getActiveSample()->thumbnail;
+    auto thumbnail = manager->getActiveSample()->thumbnail;
     if (thumbnail->getNumChannels() == 0)
     {
         return;

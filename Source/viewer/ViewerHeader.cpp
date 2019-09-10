@@ -11,21 +11,21 @@
 #include "ViewerHeader.h"
 #include "../Settings.h"
 
-ViewerHeader::ViewerHeader(SampleManager& manager) : manager(manager)
+ViewerHeader::ViewerHeader(std::shared_ptr<SampleManager> manager) : manager(manager)
 {
 
 }
 
 void ViewerHeader::paint(Graphics &g)
 {
-    auto samples = manager.getAllSamples().size();
+    auto samples = manager->getAllSamples().size();
     auto sampleHeaderWidth = getWidth() / samples;
 
     g.setColour(Settings::PANEL_BACKGROUND_COLOR);
     g.fillRect(0, 0, getWidth(), getHeight());
 
     for (int i = samples - 1; i >= 0; i--) {
-        paintNextSampleHeader(i, sampleHeaderWidth, manager.getAllSamples().at(i), g);
+        paintNextSampleHeader(i, sampleHeaderWidth, manager->getAllSamples().at(i), g);
     }
 }
 
@@ -65,7 +65,7 @@ void ViewerHeader::sampleChanged(std::shared_ptr<SampleInfo> info)
 void ViewerHeader::mouseMove(const MouseEvent &event)
 {
     auto sampleUnderMouse = getSampleUnderMouse(event.getPosition());
-    if (sampleUnderMouse != manager.getActiveSample()) {
+    if (sampleUnderMouse != manager->getActiveSample()) {
         setMouseCursor(MouseCursor::PointingHandCursor);
     } else {
         setMouseCursor(MouseCursor::NormalCursor);
@@ -75,14 +75,14 @@ void ViewerHeader::mouseMove(const MouseEvent &event)
 void ViewerHeader::mouseDown(const MouseEvent &event)
 {
     auto sampleUnderMouse = getSampleUnderMouse(event.getPosition());
-    if (sampleUnderMouse != manager.getActiveSample()) {
-        manager.sampleChanged(sampleUnderMouse);
+    if (sampleUnderMouse != manager->getActiveSample()) {
+        manager->sampleChanged(sampleUnderMouse);
     }
 }
 
 std::shared_ptr<SampleInfo> ViewerHeader::getSampleUnderMouse(Point<int> position)
 {
-    auto samples = manager.getAllSamples();
+    auto samples = manager->getAllSamples();
     auto sampleTabWidth = getWidth() / samples.size();
 
     auto index = position.getX() / sampleTabWidth;

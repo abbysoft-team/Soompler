@@ -25,7 +25,7 @@ class SampleInfo
 {
 public:
 
-    SampleInfo(float lengthInSeconds, float sampleRate, String sampleName)
+    SampleInfo(float lengthInSeconds, float sampleRate, String sampleName, String samplePath)
     {
         this->lengthInSeconds = lengthInSeconds;
         this->sampleRate = sampleRate;
@@ -33,6 +33,7 @@ public:
         this->startSample = 0;
         this->endSample = lengthInSamples;
         this->sampleName = sampleName;
+        this->samplePath = samplePath;
         this->rootNote = Settings::DEFAULT_ROOT_NOTE;
         this->minNote = Settings::DEFAULT_MIN_NOTE;
         this->maxNote = Settings::DEFAULT_MAX_NOTE;
@@ -59,6 +60,7 @@ public:
     int64 endSample;
 
     String sampleName;
+    String samplePath;
 
     // root note and range for this sample
     int rootNote;
