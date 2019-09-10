@@ -87,7 +87,7 @@ void SoomplerAudioProcessorEditor::transportStateChanged(TransportState state)
 
 void SoomplerAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster *source)
 {
-    auto thumbnail = processor.getSampleManager().getActiveSample()->getThumbnail();
+    auto thumbnail = processor.getSampleManager().getActiveSample()->thumbnail;
     if (source == thumbnail.get()) {
         thumbnailChanged();
     }

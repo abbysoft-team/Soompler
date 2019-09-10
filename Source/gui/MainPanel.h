@@ -11,6 +11,7 @@
 #include "SoomplerToggleButton.h"
 #include "LinearPanel.h"
 #include "SoomplerKnob.h"
+#include "AdsrPanel.h"
 
 class MainPanel  : public Component,
                    public Slider::Listener,
@@ -40,12 +41,8 @@ private:
     std::unique_ptr<ButtonAttachment> reverseAttachment;
     
     std::unique_ptr<SoomplerKnob> volumeKnob;
-    std::unique_ptr<SoomplerKnob> attackKnob;
-    std::unique_ptr<SoomplerKnob> decayKnob;
-    std::unique_ptr<SoomplerKnob> sustainKnob;
-    std::unique_ptr<SoomplerKnob> releaseKnob;
     
-    std::unique_ptr<LinearPanel> adsrPanel;
+    std::unique_ptr<AdsrPanel> adsrPanel;
     
     std::unique_ptr<Label> loadSampleTip;
 
@@ -58,8 +55,6 @@ private:
 
     std::unique_ptr<SoomplerToggleButton> reverseButton;
     
-    ADSR::Parameters adsrParams;
-
     Image backgroundImage;
 
     SoomplerAudioProcessor& processor;

@@ -69,7 +69,7 @@ void SampleViewer::paint (Graphics& g)
 
 void SampleViewer::drawThumbnail(Graphics &g)
 {
-    auto thumbnail = manager.getActiveSample()->getThumbnail();
+    auto thumbnail = manager.getActiveSample()->thumbnail;
     if (thumbnail->getNumChannels() == 0)
     {
         return;

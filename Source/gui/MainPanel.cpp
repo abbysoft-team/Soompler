@@ -84,26 +84,9 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
 
     addAndMakeVisible (pianoRoll.get());
     editor.addToGuiEditor (pianoRoll.get());
-
-    // ADSR controls
-    attackKnob.reset (new SoomplerKnob ("Attack"));
-    attackKnob->attachTo("attack", stateManager);
-    
-    decayKnob.reset (new SoomplerKnob ("Decay"));
-    decayKnob->attachTo("decay", stateManager);
-    
-    sustainKnob.reset (new SoomplerKnob ("Sustain"));
-    sustainKnob->attachTo("sustain", stateManager);
-    
-    releaseKnob.reset (new SoomplerKnob ("Release"));
-    releaseKnob->attachTo("release", stateManager);
     
     // adsr panel
-    adsrPanel.reset(new LinearPanel(Orientation::HORIZONTAL, "ADSR"));
-    adsrPanel->addAndMakeVisible(attackKnob.get());
-    adsrPanel->addAndMakeVisible(decayKnob.get());
-    adsrPanel->addAndMakeVisible(sustainKnob.get());
-    adsrPanel->addAndMakeVisible(releaseKnob.get());
+    adsrPanel.reset(new AdsrPanel(stateManager));
     adsrPanel->setPosition(150, 225);
     addAndMakeVisible(adsrPanel.get());
 
@@ -115,7 +98,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     //reverseAttachment.reset(new ButtonAttachment(stateManager, "reverse", *reverseButton));
 
     // place components like adsr panel
-    auto miscControllsBaseline = attackKnob->getY() + adsrPanel->getY();
+    auto miscControllsBaseline = adsrPanel->getY() + 25;
     volumeKnob->setPosition(60, miscControllsBaseline);
     reverseButton->setBounds(380, miscControllsBaseline, 100, 50);
 
@@ -129,10 +112,6 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     openFileButton->setVisible(false);
 
     // connect knobs to listener
-    attackKnob->addListener(this);
-    decayKnob->addListener(this);
-    sustainKnob->addListener(this);
-    releaseKnob->addListener(this);
     volumeKnob->addListener(this);
 
     // add GUI editor last
@@ -146,10 +125,6 @@ MainPanel::~MainPanel()
 {
     loopAttachment = nullptr;
 
-    attackKnob = nullptr;
-    decayKnob = nullptr;
-    sustainKnob = nullptr;
-    releaseKnob = nullptr;
     volumeKnob = nullptr;
     openFileButton = nullptr;
     aboutButton = nullptr;
@@ -184,13 +159,6 @@ void MainPanel::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         processor.setVolume(volumeKnob->getValue());
         return;
-    }
-    else
-    {
-        adsrParams.attack = attackKnob->getValue();
-        adsrParams.decay = decayKnob->getValue();
-        adsrParams.sustain = sustainKnob->getValue();
-        adsrParams.release = releaseKnob->getValue();
     }
 
 }
@@ -318,7 +286,7 @@ void MainPanel::restoreMainPanelState() {
     // check if sample already loaded
     // (plugin reopened)
     auto sample = processor.getSampleManager().getActiveSample();
-    if (sample != nullptr && sample->getThumbnail()->getNumChannels() > 0) {
+    if (sample != nullptr && sample->thumbnail->getNumChannels() > 0) {
         // load current sample
         sampleViewer->sampleInfoChanged(processor.getCurrentSampleInfo());
         pianoRoll->sampleInfoChanged(processor.getCurrentSampleInfo());

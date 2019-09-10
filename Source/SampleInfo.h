@@ -59,6 +59,9 @@ public:
 
     std::shared_ptr<SAudioThumbnail> thumbnail;
 
+    ADSR::Parameters adsr;
+    float volume;
+
     String getCroppedName(float width, int fontSize)
     {
         auto lettersCount = width / fontSize * 5 / 2;
@@ -71,15 +74,6 @@ public:
         result.append("...", 3);
 
         return result;
-    }
-
-    std::shared_ptr<SAudioThumbnail> getThumbnail() {
-        return thumbnail;
-    }
-
-
-    void setThumbnail(std::shared_ptr<SAudioThumbnail> thumbnail) {
-        this->thumbnail = thumbnail;
     }
 };
 

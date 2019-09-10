@@ -11,6 +11,8 @@
               pluginAUExportPrefix="soompler_au">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="fqii17" name="AdsrPanel.cpp" compile="1" resource="0" file="Source/gui/AdsrPanel.cpp"/>
+      <FILE id="qMnOJ1" name="AdsrPanel.h" compile="0" resource="0" file="Source/gui/AdsrPanel.h"/>
       <FILE id="aYf7ND" name="SampleManager.cpp" compile="1" resource="0"
             file="Source/SampleManager.cpp"/>
       <FILE id="yjY7x0" name="SampleManager.h" compile="0" resource="0" file="Source/SampleManager.h"/>

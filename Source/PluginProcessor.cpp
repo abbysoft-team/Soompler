@@ -352,11 +352,6 @@ void SoomplerAudioProcessor::getStateInformation (MemoryBlock& destData)
     if (loadedSample != nullptr) {
         stateManager.state.setProperty("loadedSampleName", loadedSample->getFileName(), nullptr);
     }
-
-
-//    if (sampleInfo != nullptr) {
-//        stateManager.state.setProperty("loadedSampleLength", sampleInfo->lengthInSeconds, nullptr);
-//    }
     
     stateManager.state.setProperty("startSample", startSample, nullptr);
     stateManager.state.setProperty("endSample", endSample, nullptr);
@@ -474,7 +469,7 @@ void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
     auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
 
     auto sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName());
-    sampleInfo->setThumbnail(thumbnail);
+    sampleInfo->thumbnail = thumbnail;
     sampleManager.sampleInfoChanged(sampleInfo);
 
     notifySampleInfoListeners();
@@ -690,10 +685,10 @@ void SoomplerAudioProcessor::setAdsrParams(ADSR::Parameters params)
     if (sound == nullptr) {
         return;
     }
-    auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
 
     sound->setAdsrParams(params);
-    voice->setAdsrParams(sound->getAdsrParams());
+
+    sampleManager.getActiveSample()->adsr = params;
 }
 
 void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
