@@ -258,6 +258,8 @@ void PianoRoll::mouseMove(const MouseEvent &event)
         setMouseCursor(MouseCursor::PointingHandCursor);
     } else if (maxMarker.contains(positionForMarkers)) {
         setMouseCursor(MouseCursor::PointingHandCursor);
+    } else if (position.y > Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT){
+        setMouseCursor(MouseCursor::PointingHandCursor);
     } else {
         setMouseCursor(MouseCursor::NormalCursor);
     }

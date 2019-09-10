@@ -611,6 +611,8 @@ void SoomplerAudioProcessor::loadThumbnailAndSoundFor(std::shared_ptr<SampleInfo
     }
     sample->sound = std::shared_ptr<soompler::ExtendedSound>(sound);
     sample->thumbnail = thumbnail;
+
+    synth.addSound(sound);
 }
 
 void SoomplerAudioProcessor::saveState()
