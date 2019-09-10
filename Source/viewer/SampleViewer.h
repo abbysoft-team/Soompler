@@ -37,15 +37,15 @@ enum RangeLine {
   Dont forget to set SampleInfoListener to be able to send updated sample start and end
   positions to some controller class.
 */
-class SampleViewer  : public Component, public SampleInfoListener
+class SampleViewer  : public Component, public SampleChangeListener
 {
 public:
-    SampleViewer (TransportInfoOwner& transportInfoOwner, SampleInfoListener& sampleInfoListener, SampleManager& manager);
+    SampleViewer (TransportInfoOwner& transportInfoOwner, SampleChangeListener& sampleInfoListener, SampleManager& manager);
     ~SampleViewer();
 
     void paint (Graphics& g) override;
     void resized() override;
-    void sampleInfoChanged(std::shared_ptr<SampleInfo> info) override;
+    void sampleChanged(std::shared_ptr<SampleInfo> info) override;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -54,7 +54,7 @@ private:
     TransportInfoOwner& transportInfoOwner;
     // this object can modify sample's start and end positions
     // with range lines, so some another object can use this new values
-    SampleInfoListener& sampleInfoListener;
+    SampleChangeListener& sampleInfoListener;
 
     // not active sample regions, before start line and after end lines
     int startRangeX;

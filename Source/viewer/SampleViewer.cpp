@@ -31,7 +31,7 @@ void fadePreStartRegion(int startRangeBorderX, Graphics& g);
 void fadePostEndRegion(int endRangeBorderX, Graphics& g);
 bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos);
 
-SampleViewer::SampleViewer (TransportInfoOwner& transportInfoOwner, SampleInfoListener& infoListener, SampleManager& manager)
+SampleViewer::SampleViewer (TransportInfoOwner& transportInfoOwner, SampleChangeListener& infoListener, SampleManager& manager)
     : currentSample(new SampleInfo(0, 44100, "")),
     transportInfoOwner(transportInfoOwner),
     sampleInfoListener(infoListener),
@@ -202,7 +202,7 @@ bool isIntersectWithRangeLine(Point<int>& point, int rangeLinePos)
     return rangeLine.contains(point);
 }
 
-void SampleViewer::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
+void SampleViewer::sampleChanged(std::shared_ptr<SampleInfo> info)
 {
     this->currentSample = info;
     endRangeX = calculateCoordBySample(currentSample->endSample);
@@ -210,7 +210,7 @@ void SampleViewer::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
 
     calculateEndRangeX();
 
-    header.sampleInfoChanged(info);
+    header.sampleChanged(info);
 }
 
 void SampleViewer::calculateEndRangeX()
@@ -238,7 +238,7 @@ void SampleViewer::calculateEndRangeX()
 
 void SampleViewer::notifySampleInfoListeners()
 {
-    this->sampleInfoListener.sampleInfoChanged(currentSample);
+    this->sampleInfoListener.sampleChanged(currentSample);
 }
 
 int64 SampleViewer::calculateSampleByCoords(int coordOnThumbnail)

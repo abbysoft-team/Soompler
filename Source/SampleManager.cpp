@@ -16,7 +16,7 @@ SampleManager::SampleManager()
 
 }
 
-void SampleManager::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
+void SampleManager::sampleChanged(std::shared_ptr<SampleInfo> info)
 {
     activeSample = info;
     notifySampleInfoListeners();
@@ -35,7 +35,7 @@ void SampleManager::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
     }
 }
 
-void SampleManager::addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener)
+void SampleManager::addSampleInfoListener(std::shared_ptr<SampleChangeListener> sampleInfoListener)
 {
     sampleInfoListeners.push_back(sampleInfoListener);
 }
@@ -53,7 +53,7 @@ bool SampleManager::contains(std::shared_ptr<SampleInfo> info) {
 void SampleManager::notifySampleInfoListeners()
 {
     for (auto sampleInfoListener : sampleInfoListeners) {
-        sampleInfoListener->sampleInfoChanged(activeSample);
+        sampleInfoListener->sampleChanged(activeSample);
     }
 }
 

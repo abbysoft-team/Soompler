@@ -37,6 +37,11 @@ public:
         this->maxNote = Settings::DEFAULT_MAX_NOTE;
 
         thumbnail = nullptr;
+
+        adsr.attack = 0;
+        adsr.decay = 0;
+        adsr.sustain = 1;
+        adsr.release = 0;
     }
 
     ~SampleInfo() = default;
@@ -59,7 +64,6 @@ public:
 
     std::shared_ptr<SAudioThumbnail> thumbnail;
 
-    ADSR::Parameters adsr;
     float volume;
 
     String getCroppedName(float width, int fontSize)
@@ -75,6 +79,18 @@ public:
 
         return result;
     }
+
+    void setAdsr(ADSR::Parameters params) {
+        adsr = params;
+    }
+
+    ADSR::Parameters getAdsr() {
+        return adsr;
+    }
+
+private:
+    ADSR::Parameters adsr;
+
 };
 
 /**
@@ -82,10 +98,10 @@ public:
  *
  * @brief The SampleInfoListener class
  */
-class SampleInfoListener
+class SampleChangeListener
 {
 public:
-    virtual void sampleInfoChanged(std::shared_ptr<SampleInfo> info) = 0;
+    virtual void sampleChanged(std::shared_ptr<SampleInfo> info) = 0;
     
-    virtual ~SampleInfoListener() = default;
+    virtual ~SampleChangeListener() = default;
 };

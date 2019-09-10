@@ -358,7 +358,7 @@ void PianoRoll::drawDisabledNotesMask(Graphics& g)
     }
 }
 
-void PianoRoll::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
+void PianoRoll::sampleChanged(std::shared_ptr<SampleInfo> info)
 {
     this->sample = info;
 

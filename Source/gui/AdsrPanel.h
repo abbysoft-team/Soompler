@@ -14,13 +14,16 @@
 #include "LinearPanel.h"
 #include "SoomplerKnob.h"
 
-class AdsrPanel : public LinearPanel, public Slider::Listener {
+class AdsrPanel : public LinearPanel, public Slider::Listener, public SampleChangeListener {
 
 public:
-    AdsrPanel(AudioProcessorValueTreeState& state);
+    AdsrPanel(AudioProcessorValueTreeState& state, SampleManager& manager);
     ~AdsrPanel() = default;
 
     void sliderValueChanged(Slider *slider) override;
+    void sampleChanged(std::shared_ptr<SampleInfo> info);
+
+    void setValue(ADSR::Parameters adsr);
 
 private:
     std::unique_ptr<SoomplerKnob> attackKnob;
@@ -29,4 +32,6 @@ private:
     std::unique_ptr<SoomplerKnob> releaseKnob;
 
     ADSR::Parameters adsrParams;
+
+    SampleManager& manager;
 };

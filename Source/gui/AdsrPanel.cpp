@@ -10,7 +10,7 @@
 
 #include "AdsrPanel.h"
 
-AdsrPanel::AdsrPanel(AudioProcessorValueTreeState& state) : LinearPanel(Orientation::HORIZONTAL, "ADSR")
+AdsrPanel::AdsrPanel(AudioProcessorValueTreeState& state, SampleManager& manager) : LinearPanel(Orientation::HORIZONTAL, "ADSR"), manager(manager)
 {
     // ADSR controls
     attackKnob.reset (new SoomplerKnob ("Attack"));
@@ -42,4 +42,20 @@ void AdsrPanel::sliderValueChanged(Slider *slider)
     adsrParams.decay = decayKnob->getValue();
     adsrParams.sustain = sustainKnob->getValue();
     adsrParams.release = releaseKnob->getValue();
+
+    manager.getActiveSample()->setAdsr(adsrParams);
+}
+
+void AdsrPanel::sampleChanged(std::shared_ptr<SampleInfo> info)
+{
+    setValue(info->getAdsr());
+}
+
+void AdsrPanel::setValue(ADSR::Parameters adsr)
+{
+    adsrParams = adsr;
+    attackKnob->setValue(adsr.attack);
+    decayKnob->setValue(adsr.decay);
+    sustainKnob->setValue(adsr.sustain);
+    releaseKnob->setValue(adsr.release);
 }

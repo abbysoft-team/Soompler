@@ -35,7 +35,7 @@ class SoomplerAudioProcessor  :
         public MidiEventSupplier,
         public MidiEventConsumer,
         public TransportInfoOwner,
-        public SampleInfoListener,
+        public SampleChangeListener,
         public FileListener
 {
 public:
@@ -100,7 +100,7 @@ public:
     // percent of a sample length
     void setSampleStartPosition(int64 sample);
     void setSampleEndPosition(int64 sample);
-    void sampleInfoChanged(std::shared_ptr<SampleInfo> info) override;
+    void sampleChanged(std::shared_ptr<SampleInfo> info) override;
 
     void setVolume(double volume);
 
@@ -148,7 +148,7 @@ public:
     void saveState();
     void saveStateAndReleaseObjects();
     
-    void addSampleInfoListener(std::shared_ptr<SampleInfoListener> listener);
+    void addSampleInfoListener(std::shared_ptr<SampleChangeListener> listener);
 
     SampleManager& getSampleManager();
 

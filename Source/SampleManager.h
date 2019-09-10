@@ -12,14 +12,14 @@
 
 #include "SampleInfo.h"
 
-class SampleManager : public SampleInfoListener {
+class SampleManager : public SampleChangeListener {
 
 public:
     SampleManager();
     ~SampleManager() = default;
 
-    void sampleInfoChanged(std::shared_ptr<SampleInfo> info) override;
-    void addSampleInfoListener(std::shared_ptr<SampleInfoListener> sampleInfoListener);
+    void sampleChanged(std::shared_ptr<SampleInfo> info) override;
+    void addSampleInfoListener(std::shared_ptr<SampleChangeListener> sampleInfoListener);
     void notifySampleInfoListeners();
     std::shared_ptr<SampleInfo> getActiveSample();
     std::vector<std::shared_ptr<SampleInfo>> getAllSamples();
@@ -29,7 +29,7 @@ public:
 private:
     std::vector<std::shared_ptr<SampleInfo>> samples;
     std::shared_ptr<SampleInfo> activeSample;
-    std::vector<std::shared_ptr<SampleInfoListener>> sampleInfoListeners;
+    std::vector<std::shared_ptr<SampleChangeListener>> sampleInfoListeners;
     std::vector<ChangeListener*> changeListeners;
 
     bool contains(std::shared_ptr<SampleInfo> sample);

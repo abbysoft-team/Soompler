@@ -86,9 +86,10 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     editor.addToGuiEditor (pianoRoll.get());
     
     // adsr panel
-    adsrPanel.reset(new AdsrPanel(stateManager));
+    adsrPanel.reset(new AdsrPanel(stateManager, processor.getSampleManager()));
     adsrPanel->setPosition(150, 225);
     addAndMakeVisible(adsrPanel.get());
+    processor.addSampleInfoListener(adsrPanel);
 
     // Reverse sample
     reverseButton.reset(new SoomplerToggleButton(TRANS("Reverse\n")));
@@ -288,8 +289,8 @@ void MainPanel::restoreMainPanelState() {
     auto sample = processor.getSampleManager().getActiveSample();
     if (sample != nullptr && sample->thumbnail->getNumChannels() > 0) {
         // load current sample
-        sampleViewer->sampleInfoChanged(processor.getCurrentSampleInfo());
-        pianoRoll->sampleInfoChanged(processor.getCurrentSampleInfo());
+        sampleViewer->sampleChanged(processor.getCurrentSampleInfo());
+        pianoRoll->sampleChanged(processor.getCurrentSampleInfo());
         
         bool reversed = processor.isSampleReversed();
         bool looped = processor.isLoopModeOn();

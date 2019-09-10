@@ -14,7 +14,7 @@
 #include "../SampleInfo.h"
 #include "../SampleManager.h"
 
-class ViewerHeader : public Component, public SampleInfoListener {
+class ViewerHeader : public Component, public SampleChangeListener {
 
 public:
 
@@ -22,7 +22,7 @@ public:
     ~ViewerHeader() = default;
 
     void paint(Graphics &g) override;
-    void sampleInfoChanged(std::shared_ptr<SampleInfo> info) override;
+    void sampleChanged(std::shared_ptr<SampleInfo> info) override;
 
 private:
     SampleManager& manager;

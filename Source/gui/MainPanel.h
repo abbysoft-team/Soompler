@@ -42,7 +42,7 @@ private:
     
     std::unique_ptr<SoomplerKnob> volumeKnob;
     
-    std::unique_ptr<AdsrPanel> adsrPanel;
+    std::shared_ptr<AdsrPanel> adsrPanel;
     
     std::unique_ptr<Label> loadSampleTip;
 

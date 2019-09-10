@@ -27,6 +27,7 @@ public:
     void addListener(Slider::Listener *listener);
     
     double getValue() const;
+    void setValue(double value);
     
     Slider* getSlider();
     

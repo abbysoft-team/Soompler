@@ -43,6 +43,11 @@ double SoomplerKnob::getValue() const {
     return slider->getValue();
 }
 
+void SoomplerKnob::setValue(double value)
+{
+    slider->setValue(value, NotificationType::sendNotification);
+}
+
 juce::Slider *SoomplerKnob::getSlider() {
     return slider.get();
 }

@@ -34,7 +34,7 @@ enum MarkerType
 /**
 
 */
-class PianoRoll  : public Component, public SampleInfoListener
+class PianoRoll  : public Component, public SampleChangeListener
 {
 public:
     PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer);
@@ -43,7 +43,7 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-    void sampleInfoChanged(std::shared_ptr<SampleInfo> info) override;
+    void sampleChanged(std::shared_ptr<SampleInfo> info) override;
 
 private:
     static constexpr auto MAX_KEYS = 120;

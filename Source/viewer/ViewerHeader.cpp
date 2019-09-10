@@ -57,7 +57,7 @@ void ViewerHeader::paintNextSampleHeader(int index, float width, std::shared_ptr
                          Justification::horizontallyCentred);
 }
 
-void ViewerHeader::sampleInfoChanged(std::shared_ptr<SampleInfo> info)
+void ViewerHeader::sampleChanged(std::shared_ptr<SampleInfo> info)
 {
     sample = info;
 }
@@ -76,7 +76,7 @@ void ViewerHeader::mouseDown(const MouseEvent &event)
 {
     auto sampleUnderMouse = getSampleUnderMouse(event.getPosition());
     if (sampleUnderMouse != manager.getActiveSample()) {
-        manager.sampleInfoChanged(sampleUnderMouse);
+        manager.sampleChanged(sampleUnderMouse);
     }
 }
 
