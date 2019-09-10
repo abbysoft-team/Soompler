@@ -22,6 +22,7 @@
 #include "SaveableState.h"
 #include "synth/SoomplerSynth.h"
 #include "SampleManager.h"
+#include "synth/ExtendedSampler.h"
 
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
@@ -186,7 +187,7 @@ private:
 
     AudioProcessorValueTreeState::ParameterLayout createParametersLayout();
 
-    SynthesiserSound::Ptr getSampleData(std::shared_ptr<File> sampleFile);
+    soompler::ExtendedSound* getSampleData(std::shared_ptr<File> sampleFile);
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void changeTransportState(TransportState newState);
     void setTransportSource(AudioFormatReader*);

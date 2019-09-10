@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Settings.h"
 #include "gui/SAudioThumbnail.h"
+#include "synth/ExtendedSampler.h"
 
 /**
  * All required info about sample.
@@ -65,7 +66,7 @@ public:
     int maxNote;
 
     std::shared_ptr<SAudioThumbnail> thumbnail;
-    float volume;
+    soompler::ExtendedSound* sound;
 
     String getCroppedName(float width, int fontSize)
     {
@@ -83,6 +84,21 @@ public:
 
     void setAdsr(ADSR::Parameters params) {
         adsr = params;
+        if (sound != nullptr) {
+            sound->setAdsrParams(adsr);
+        }
+    }
+
+    void setVolume(float volume) {
+        this->volume = volume;
+        if (sound != nullptr) {
+            // set volume here
+            sound->setVolume(volume);
+        }
+    }
+
+    float getVolume() {
+        return volume;
     }
 
     ADSR::Parameters getAdsr() {
@@ -91,6 +107,7 @@ public:
 
 private:
     ADSR::Parameters adsr;
+    float volume;
 
 };
 

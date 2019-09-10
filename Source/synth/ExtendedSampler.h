@@ -61,6 +61,9 @@ public:
     void setRootNote(int rootNote);
     void setMidiRange(const BigInteger& midiNotes);
 
+    void setVolume(float volume);
+    float getVolume();
+
 private:
     //==============================================================================
     friend class ExtendedVoice;
@@ -74,6 +77,8 @@ private:
     ADSR::Parameters params;
 
     bool reversed;
+
+    float volume;
 
     JUCE_LEAK_DETECTOR (ExtendedSound)
 };

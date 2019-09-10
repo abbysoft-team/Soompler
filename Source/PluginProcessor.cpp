@@ -229,7 +229,7 @@ void SoomplerAudioProcessor::setVolume(double volume)
     auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
     voice->setVolume(volume);
 
-    sampleManager.getActiveSample()->volume = volume;
+    sampleManager.getActiveSample()->setVolume(volume);
 }
 
 void SoomplerAudioProcessor::notifyTransportStateChanged(TransportState state)
@@ -260,8 +260,9 @@ void SoomplerAudioProcessor::noteOn(int noteNumber)
     if (synth.getSound(0) == nullptr) {
         return;
     }
-    
-    restoreKnobParameters();
+
+// TODO remove
+//    restoreKnobParameters();
 
     synth.noteOn(0, noteNumber, 1.0f);
 }
@@ -428,20 +429,22 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
 }
 
 void SoomplerAudioProcessor::restoreKnobParameters() {
-    if (synth.getSound(0) == nullptr) {
-        return;
-    }
-    // set current adsr params
-    auto adsr = ADSR::Parameters();
-    adsr.attack = getFloatParameter("attack");
-    adsr.decay = getFloatParameter("decay");
-    adsr.sustain = getFloatParameter("sustain");
-    adsr.release = getFloatParameter("release");
+//    if (synth.getSound(0) == nullptr) {
+//        return;
+//    }
+//    for (auto sample : sampleManager.getAllSamples()) {
+//        sample->sound->setAdsrParams(sample->getAdsr());
+//        sample->sound-
+//    }
+//    // set current adsr params
+//    auto adsr = ADSR::Parameters();
+//    adsr.attack = getFloatParameter("attack");
+//    adsr.decay = getFloatParameter("decay");
+//    adsr.sustain = getFloatParameter("sustain");
+//    adsr.release = getFloatParameter("release");
     
-    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
-    sound->setAdsrParams(adsr);
-    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
-    voice->setVolume(getFloatParameter("volume"));
+//    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
+//    sound->setAdsrParams(adsr);
 }
 
 void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
@@ -471,6 +474,7 @@ void SoomplerAudioProcessor::loadSample(const File& sampleFile, bool reload)
 
     auto sampleInfo = std::make_shared<SampleInfo>(transportSource.getLengthInSeconds(), voice->getSampleRate(), sampleFile.getFileName());
     sampleInfo->thumbnail = thumbnail;
+    sampleInfo->sound = sound;
     sampleManager.sampleChanged(sampleInfo);
 
     notifySampleInfoListeners();
@@ -515,7 +519,7 @@ double SoomplerAudioProcessor::getCurrentAudioPosition()
     return transportSource.getCurrentPosition();
 }
 
-SynthesiserSound::Ptr SoomplerAudioProcessor::getSampleData(std::shared_ptr<File> sampleFile)
+soompler::ExtendedSound* SoomplerAudioProcessor::getSampleData(std::shared_ptr<File> sampleFile)
 {
     if (sampleFile == nullptr) {
         return nullptr;

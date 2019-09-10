@@ -9,6 +9,7 @@
 */
 
 #include "SoomplerSynth.h"
+#include "ExtendedSampler.h"
 
 SoomplerSynth::SoomplerSynth() : Synthesiser()
 {
@@ -30,8 +31,10 @@ void SoomplerSynth::noteOn(int midiChannel, int midiNoteNumber, float velocity)
         if (sound->appliesToNote (midiNoteNumber) && sound->appliesToChannel (midiChannel))
         {
 
+            auto soomplerSound = dynamic_cast<soompler::ExtendedSound*> (sound);
+
              startVoice (findFreeVoice (sound, midiChannel, midiNoteNumber, true),
-                        sound, midiChannel, midiNoteNumber, velocity);
+                        sound, midiChannel, midiNoteNumber, soomplerSound->getVolume());
         }
     }
 }

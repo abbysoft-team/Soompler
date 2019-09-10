@@ -193,7 +193,7 @@ void MainPanel::sampleChanged(std::shared_ptr<SampleInfo> info)
 {
     adsrPanel->sampleChanged(info);
 
-    volumeKnob->setValue(info->volume);
+    volumeKnob->setValue(info->getVolume());
 }
 
 void MainPanel::openFileButtonClicked()

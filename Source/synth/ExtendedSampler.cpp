@@ -24,7 +24,8 @@ ExtendedSound::ExtendedSound (const String& soundName,
     sourceSampleRate (source.sampleRate),
     midiNotes (notes),
     midiRootNote (midiNoteForNormalPitch),
-    reversed(false)
+    reversed(false),
+    volume(1.0f)
 {
     if (sourceSampleRate > 0 && source.lengthInSamples > 0)
     {
@@ -76,6 +77,16 @@ void ExtendedSound::setRootNote(int rootNote)
 void ExtendedSound::setMidiRange(const BigInteger &midiNotes)
 {
     this->midiNotes = midiNotes;
+}
+
+void ExtendedSound::setVolume(float volume)
+{
+    this->volume = volume;
+}
+
+float ExtendedSound::getVolume()
+{
+    return volume;
 }
 
 //==============================================================================
