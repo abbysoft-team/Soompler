@@ -148,7 +148,7 @@ public:
     void saveState();
     void saveStateAndReleaseObjects();
     
-    void addSampleInfoListener(std::shared_ptr<SampleChangeListener> listener);
+    void addSampleInfoListener(SampleChangeListener* listener);
 
     SampleManager& getSampleManager();
 

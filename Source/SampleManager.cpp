@@ -35,7 +35,7 @@ void SampleManager::sampleChanged(std::shared_ptr<SampleInfo> info)
     }
 }
 
-void SampleManager::addSampleInfoListener(std::shared_ptr<SampleChangeListener> sampleInfoListener)
+void SampleManager::addSampleInfoListener(SampleChangeListener* sampleInfoListener)
 {
     sampleInfoListeners.push_back(sampleInfoListener);
 }

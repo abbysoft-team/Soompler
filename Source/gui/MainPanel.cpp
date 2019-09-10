@@ -64,7 +64,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     sampleViewer->setBounds(Settings::SAMPLE_VIEWER_BOUNDS);
     // not visible until sample is loaded
     sampleViewer->setVisible(false);
-    processor.addSampleInfoListener(sampleViewer);
+    processor.addSampleInfoListener(sampleViewer.get());
 
     loadSampleTip.reset (new Label ("no sample loaded label",
                                     TRANS(Strings::NO_SAMPLE_LOADED_TEXT)));
@@ -80,7 +80,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     pianoRoll.reset (new PianoRoll(processor, processor));
     pianoRoll->setBounds (Settings::PIANO_ROLL_BOUNDS);
     pianoRoll->setName ("piano roll component");
-    processor.addSampleInfoListener(pianoRoll);
+    processor.addSampleInfoListener(pianoRoll.get());
 
     addAndMakeVisible (pianoRoll.get());
     editor.addToGuiEditor (pianoRoll.get());
@@ -89,7 +89,6 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     adsrPanel.reset(new AdsrPanel(stateManager, processor.getSampleManager()));
     adsrPanel->setPosition(150, 225);
     addAndMakeVisible(adsrPanel.get());
-    processor.addSampleInfoListener(adsrPanel);
 
     // Reverse sample
     reverseButton.reset(new SoomplerToggleButton(TRANS("Reverse\n")));
@@ -118,6 +117,8 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     // add GUI editor last
     // it ensures that gui overlay will work properly
     editor.initOverlay();
+
+    processor.addSampleInfoListener(this);
     
     restoreMainPanelState();
 }
@@ -186,6 +187,13 @@ void MainPanel::buttonClicked (Button* buttonThatWasClicked)
 float MainPanel::getVolume() const
 {
     return volumeKnob.get()->getValue();
+}
+
+void MainPanel::sampleChanged(std::shared_ptr<SampleInfo> info)
+{
+    adsrPanel->sampleChanged(info);
+
+    volumeKnob->setValue(info->volume);
 }
 
 void MainPanel::openFileButtonClicked()

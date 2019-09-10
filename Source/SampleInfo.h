@@ -42,6 +42,8 @@ public:
         adsr.decay = 0;
         adsr.sustain = 1;
         adsr.release = 0;
+
+        volume = 1;
     }
 
     ~SampleInfo() = default;
@@ -63,7 +65,6 @@ public:
     int maxNote;
 
     std::shared_ptr<SAudioThumbnail> thumbnail;
-
     float volume;
 
     String getCroppedName(float width, int fontSize)

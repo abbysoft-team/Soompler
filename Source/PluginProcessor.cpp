@@ -221,7 +221,6 @@ void SoomplerAudioProcessor::sampleChanged(std::shared_ptr<SampleInfo> info)
     setSampleEndPosition(info->endSample);
 }
 
-//TODO remove
 void SoomplerAudioProcessor::setVolume(double volume)
 {
     this->volume = volume;
@@ -229,6 +228,8 @@ void SoomplerAudioProcessor::setVolume(double volume)
 
     auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
     voice->setVolume(volume);
+
+    sampleManager.getActiveSample()->volume = volume;
 }
 
 void SoomplerAudioProcessor::notifyTransportStateChanged(TransportState state)
@@ -580,7 +581,7 @@ void SoomplerAudioProcessor::saveStateAndReleaseObjects() {
     objectsToSave.clear();
 }
 
-void SoomplerAudioProcessor::addSampleInfoListener(std::shared_ptr<SampleChangeListener> listener)
+void SoomplerAudioProcessor::addSampleInfoListener(SampleChangeListener* listener)
 {
     sampleManager.addSampleInfoListener(listener);
 }

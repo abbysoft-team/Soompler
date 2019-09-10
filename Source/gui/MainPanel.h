@@ -18,6 +18,7 @@ class MainPanel  : public Component,
                    public Button::Listener,
                    public TransportStateListener,
                    public FileDragAndDropTarget,
+                   public SampleChangeListener,
                    private Timer
 
 {
@@ -32,6 +33,8 @@ public:
     void transportStateChanged(TransportState state) override;
 
     float getVolume() const;
+
+    void sampleChanged(std::shared_ptr<SampleInfo> info);
 
 private:
 
