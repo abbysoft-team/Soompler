@@ -10,7 +10,7 @@
 
 #include "AdsrPanel.h"
 
-AdsrPanel::AdsrPanel(AudioProcessorValueTreeState& state, std::shared_ptr<SampleManager> manager) : LinearPanel(Orientation::HORIZONTAL, "ADSR"), manager(manager)
+AdsrPanel::AdsrPanel(AudioProcessorValueTreeState& state, std::shared_ptr<SampleManager> manager) : LinearPanel(Orientation::HORIZONTAL, "ADSR envelope"), manager(manager)
 {
     // ADSR controls
     attackKnob.reset (new SoomplerKnob ("Attack"));

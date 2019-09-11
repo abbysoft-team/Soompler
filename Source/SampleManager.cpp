@@ -128,6 +128,7 @@ void SampleManager::saveSample(StateBundle &bundle, std::shared_ptr<SampleInfo> 
     bundle.addProperty(sample->getAdsr().decay, name + "decay");
     bundle.addProperty(sample->getAdsr().sustain, name + "sustain");
     bundle.addProperty(sample->getAdsr().release, name + "release");
+    bundle.addProperty(sample->reversed, name + "reversed");
 }
 
 void SampleManager::getStateFromMemory(StateBundle &bundle)
@@ -152,6 +153,7 @@ void SampleManager::loadSample(StateBundle &bundle, const String &property)
     float decay = bundle.getProperty(property + "decay");
     float sustain = bundle.getProperty(property + "sustain");
     float release = bundle.getProperty(property + "release");
+    bool reversed = bundle.getProperty(property + "reversed");
 
     auto adsr = ADSR::Parameters();
     adsr.attack = attack;
@@ -165,6 +167,7 @@ void SampleManager::loadSample(StateBundle &bundle, const String &property)
     sampleInfo->rootNote = rootNote;
     sampleInfo->setVolume(volume);
     sampleInfo->setAdsr(adsr);
+    sampleInfo->reversed = reversed;
 
     samples.push_back(sampleInfo);
     activeSample = sampleInfo;

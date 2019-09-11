@@ -38,6 +38,7 @@ public:
         this->minNote = Settings::DEFAULT_MIN_NOTE;
         this->maxNote = Settings::DEFAULT_MAX_NOTE;
 
+
         thumbnail = nullptr;
 
         adsr.attack = 0;
@@ -47,6 +48,7 @@ public:
 
         volume = 1;
         sound = nullptr;
+        reversed = false;
     }
 
     ~SampleInfo() = default;
@@ -67,6 +69,8 @@ public:
     int rootNote;
     int minNote;
     int maxNote;
+
+    bool reversed;
 
     std::shared_ptr<SAudioThumbnail> thumbnail;
     soompler::ExtendedSound* sound;

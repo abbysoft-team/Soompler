@@ -612,6 +612,12 @@ void SoomplerAudioProcessor::loadThumbnailAndSoundFor(std::shared_ptr<SampleInfo
     sample->sound = sound;
     sample->thumbnail = thumbnail;
 
+    // reverse if needed
+    if (sample->reversed) {
+        sample->sound->setReversed(true);
+        thumbnail->reverse();
+    }
+
     synth.addSound(sound);
 }
 
@@ -725,16 +731,19 @@ void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
 
 void SoomplerAudioProcessor::setSampleReversed(bool reversed)
 {
-    auto sound = static_cast<soompler::ExtendedSound*>(synth.getSound(0).get());
+    auto sample = sampleManager->getActiveSample();
+    if (sample == nullptr) {
+        return;
+    }
+    auto sound = sample->sound;
     if (sound == nullptr) {
         return;
     }
 
     sound->setReversed(reversed);
-
     thumbnail->setReversed(reversed);
-    
-    stateManager.state.setProperty("reverse", reversed, nullptr);
+
+    sample->reversed = reversed;
 }
 
 AudioProcessorValueTreeState &SoomplerAudioProcessor::getStateManager()
