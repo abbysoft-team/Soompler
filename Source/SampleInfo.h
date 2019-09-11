@@ -46,6 +46,7 @@ public:
         adsr.release = 0;
 
         volume = 1;
+        sound = nullptr;
     }
 
     ~SampleInfo() = default;
@@ -68,7 +69,7 @@ public:
     int maxNote;
 
     std::shared_ptr<SAudioThumbnail> thumbnail;
-    std::shared_ptr<soompler::ExtendedSound> sound;
+    soompler::ExtendedSound* sound;
 
     String getCroppedName(float width, int fontSize)
     {
