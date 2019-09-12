@@ -82,7 +82,7 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     pianoRoll->setName ("piano roll component");
     processor.addSampleInfoListener(pianoRoll.get());
 
-    pianoScroll.reset(new ScrollBar(false));
+    pianoScroll.reset(new SoomplerScrollbar(false));
     pianoScroll->setRangeLimits(0, 200);
     pianoScroll->setCurrentRangeStart(Settings::PIANO_ROLL_RANGE_START);
     pianoScroll->addListener(pianoRoll.get());

@@ -12,6 +12,7 @@
 #include "LinearPanel.h"
 #include "SoomplerKnob.h"
 #include "AdsrPanel.h"
+#include "SoomplerScrollbar.h"
 
 class MainPanel  : public Component,
                    public Slider::Listener,
@@ -52,7 +53,7 @@ private:
 
     std::shared_ptr<SampleViewer> sampleViewer;
     std::shared_ptr<PianoRoll> pianoRoll;
-    std::unique_ptr<ScrollBar> pianoScroll;
+    std::unique_ptr<SoomplerScrollbar> pianoScroll;
 
     std::unique_ptr<SoomplerImageButton> openFileButton;
     std::unique_ptr<SoomplerImageButton> aboutButton;

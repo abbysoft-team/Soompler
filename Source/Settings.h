@@ -137,6 +137,8 @@ const auto BROWSER_BOUNDS = Rectangle<int>(0, 0, BROWSER_WIDTH, WINDOW_HEIGHT);
     const auto DEFAULT_SYNTH_VOICES = 3;
 
     const auto CLOSE_SAMPLE_BUTTON_SIZE = 16;
+
+    const auto SCROLL_BAR_BACKGROUND_COLOR = Colour(50, 62, 68);
 }
 
 #endif //SOOMPLER_SOURCE_SETTINGS_H

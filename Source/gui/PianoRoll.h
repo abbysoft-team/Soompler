@@ -52,7 +52,8 @@ public:
 
 private:
     static constexpr auto MAX_KEYS = 120;
-    static constexpr auto FIRST_VISIBLE_KEY = 48;
+    static constexpr auto FIRST_C_INDEX = 48;
+    static constexpr auto C_0_INDEX = 12;
 
     MidiEventSupplier& midiSupplier;
     MidiEventConsumer& midiConsumer;
@@ -86,6 +87,9 @@ private:
     void mouseDrag(const MouseEvent& event) override;
     void mouseMove(const MouseEvent& event) override;
 
+    void drawBlackNotes(Graphics &g);
+    void drawNoteTips(Graphics& g);
+
     void fireNoteOn(int noteNumber);
     void fireNoteOff(int noteNumber);
 
@@ -94,6 +98,7 @@ private:
     Path createMarker(int noteNum, bool root);
 
     void drawDisabledNotesMask(Graphics& g);
+    void drawNoteDelimiters(Graphics& g);
 
     void rootMarkerDragged(Point<int> position);
     void minMarkerDragged(Point<int> position);
