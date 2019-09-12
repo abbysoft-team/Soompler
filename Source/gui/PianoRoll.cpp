@@ -11,31 +11,27 @@ PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiCo
     : midiSupplier(midiSupplier), midiConsumer(midiConsumer), offset(0)
 {
     draggedMarker = NO_MARKER;
-    setSize (Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
 
-    leftArrow.reset(new SoomplerImageButton("left"));
-    leftArrow->setTooltip (TRANS("Move to lower notes\n"));
-    leftArrow->addListener (this);
-    leftArrow->setImages (false, true, true,
-                               ImageCache::getFromMemory (BinaryData::left_png, BinaryData::left_pngSize),
-                               1.000f, Colour (0x00000000),
-                               Image(), 1.000f, Colour (0x00000000),
-                               Image(), 1.000f, Colour (0x00000000));
+//    leftArrow.reset(new SoomplerImageButton("left"));
+//    leftArrow->setTooltip (TRANS("Move to lower notes\n"));
+//    leftArrow->addListener (this);
+//    leftArrow->setImages (false, true, true,
+//                               ImageCache::getFromMemory (BinaryData::left_png, BinaryData::left_pngSize),
+//                               1.000f, Colour (0x00000000),
+//                               Image(), 1.000f, Colour (0x00000000),
+//                               Image(), 1.000f, Colour (0x00000000));
 
-    rightArrow.reset(new SoomplerImageButton("right"));
-    rightArrow->setTooltip (TRANS("Move to higher notes\n"));
-    rightArrow->addListener (this);
-    rightArrow->setImages (false, true, true,
-                               ImageCache::getFromMemory (BinaryData::right_png, BinaryData::right_pngSize),
-                               1.000f, Colour (0x00000000),
-                               Image(), 1.000f, Colour (0x00000000),
-                               Image(), 1.000f, Colour (0x00000000));
+//    rightArrow.reset(new SoomplerImageButton("right"));
+//    rightArrow->setTooltip (TRANS("Move to higher notes\n"));
+//    rightArrow->addListener (this);
+//    rightArrow->setImages (false, true, true,
+//                               ImageCache::getFromMemory (BinaryData::right_png, BinaryData::right_pngSize),
+//                               1.000f, Colour (0x00000000),
+//                               Image(), 1.000f, Colour (0x00000000),
+//                               Image(), 1.000f, Colour (0x00000000));
 
-    addAndMakeVisible(leftArrow.get());
-    addAndMakeVisible(rightArrow.get());
-
-    leftArrow->setBounds(5, getWidth() / 2 - Settings::PIANO_ROLL_ARROW_HEIGHT / 2, Settings::PIANO_ROLL_ARROW_WIDTH, Settings::PIANO_ROLL_ARROW_HEIGHT);
-    rightArrow->setBounds(getWidth() - Settings::PIANO_ROLL_ARROW_WIDTH - 5, getHeight() / 2 - Settings::PIANO_ROLL_ARROW_HEIGHT / 2, Settings::PIANO_ROLL_ARROW_WIDTH, Settings::PIANO_ROLL_ARROW_HEIGHT);
+//    addAndMakeVisible(leftArrow.get());
+//    addAndMakeVisible(rightArrow.get());
 
     calculateKeysInfo();
 }
@@ -420,11 +416,16 @@ void PianoRoll::noSamplesLeft()
 
 void PianoRoll::buttonClicked(Button *button)
 {
-    if (button == leftArrow.get()) {
-        offset--;
-    } else if (button == rightArrow.get()) {
-        offset++;
-    }
+//    if (button == leftArrow.get()) {
+//        offset--;
+//    } else if (button == rightArrow.get()) {
+//        offset++;
+    //    }
+}
+
+void PianoRoll::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart)
+{
+    offset = newRangeStart - Settings::PIANO_ROLL_RANGE_START;
 }
 
 void PianoRoll::rootMarkerDragged(Point<int> position)
@@ -496,7 +497,9 @@ void PianoRoll::maxMarkerDragged(Point<int> position)
 
 void PianoRoll::resized()
 {
-
+//    auto bounds = getLocalBounds();
+//    leftArrow->setBounds(5, bounds.getHeight() / 2 - Settings::PIANO_ROLL_ARROW_HEIGHT / 2, Settings::PIANO_ROLL_ARROW_WIDTH, Settings::PIANO_ROLL_ARROW_HEIGHT);
+//    rightArrow->setBounds(bounds.getWidth() - Settings::PIANO_ROLL_ARROW_WIDTH - 5, bounds.getHeight() / 2 - Settings::PIANO_ROLL_ARROW_HEIGHT / 2, Settings::PIANO_ROLL_ARROW_WIDTH, Settings::PIANO_ROLL_ARROW_HEIGHT);
 }
 
 std::vector<int> PianoRoll::getActiveMidiNotes()

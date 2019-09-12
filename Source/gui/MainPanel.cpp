@@ -82,9 +82,17 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     pianoRoll->setName ("piano roll component");
     processor.addSampleInfoListener(pianoRoll.get());
 
+    pianoScroll.reset(new ScrollBar(false));
+    pianoScroll->setRangeLimits(0, 200);
+    pianoScroll->setCurrentRangeStart(Settings::PIANO_ROLL_RANGE_START);
+    pianoScroll->addListener(pianoRoll.get());
+    pianoScroll->setBounds(0, Settings::MAIN_PANEL_HEIGHT - Settings::PIANO_ROLL_SCROLL_HEIGHT, pianoRoll->getWidth(), Settings::PIANO_ROLL_SCROLL_HEIGHT);
+
     addAndMakeVisible (pianoRoll.get());
+    addAndMakeVisible(pianoScroll.get());
     editor.addToGuiEditor (pianoRoll.get());
-    
+    editor.addToGuiEditor (pianoScroll.get());
+
     // adsr panel
     adsrPanel.reset(new AdsrPanel(stateManager, processor.getSampleManager()));
     adsrPanel->setPosition(150, 225);

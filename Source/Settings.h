@@ -6,7 +6,7 @@
 namespace Settings {
 
 constexpr int MAIN_PANEL_WIDTH = 500;
-constexpr int MAIN_PANEL_HEIGHT = 385;
+constexpr int MAIN_PANEL_HEIGHT = 400;
 constexpr int BROWSER_WIDTH = 320;
 constexpr auto SAMPLE_PREVIEW_HEIGHT = 30;
 
@@ -66,7 +66,10 @@ constexpr auto PIANO_ROLL_MARKER_SIZE = 8;
 constexpr auto PIANO_ROLL_ARROW_WIDTH = 64 / 4.0;
 constexpr auto PIANO_ROLL_ARROW_HEIGHT = 60 / 4.0;
 
-const auto PIANO_ROLL_BOUNDS = Rectangle<int>(0, MAIN_PANEL_HEIGHT - PIANO_ROLL_HEIGHT - PIANO_ROLL_RANGE_MARKERS_HEIGHT,
+constexpr auto PIANO_ROLL_SCROLL_HEIGHT = 15;
+constexpr auto PIANO_ROLL_RANGE_START = 100;
+
+const auto PIANO_ROLL_BOUNDS = Rectangle<int>(0, MAIN_PANEL_HEIGHT - PIANO_ROLL_SCROLL_HEIGHT - PIANO_ROLL_HEIGHT - PIANO_ROLL_RANGE_MARKERS_HEIGHT,
                                               PIANO_ROLL_WIDTH, PIANO_ROLL_HEIGHT + PIANO_ROLL_RANGE_MARKERS_HEIGHT);
 
 const auto PIANO_ROLL_GRADIENT = ColourGradient(PIANO_ROLL_WHITE_COLOR, Point<float>(PIANO_ROLL_WIDTH / 2, PIANO_ROLL_HEIGHT - 1),

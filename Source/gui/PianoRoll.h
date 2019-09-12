@@ -35,7 +35,7 @@ enum MarkerType
 /**
 
 */
-class PianoRoll  : public Component, public SampleChangeListener, Button::Listener
+class PianoRoll  : public Component, public SampleChangeListener, Button::Listener, public ScrollBar::Listener
 {
 public:
     PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer);
@@ -48,6 +48,7 @@ public:
     void noSamplesLeft();
 
     void buttonClicked(Button *);
+    void scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart);
 
 private:
     static constexpr auto MAX_KEYS = 120;
@@ -72,8 +73,8 @@ private:
     int offset;
 
     // Pianoroll window controls
-    std::unique_ptr<SoomplerImageButton> leftArrow;
-    std::unique_ptr<SoomplerImageButton> rightArrow;
+//    std::unique_ptr<SoomplerImageButton> leftArrow;
+//    std::unique_ptr<SoomplerImageButton> rightArrow;
 
     std::vector<int> getActiveMidiNotes();
     void calculateKeysInfo();

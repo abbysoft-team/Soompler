@@ -52,6 +52,7 @@ private:
 
     std::shared_ptr<SampleViewer> sampleViewer;
     std::shared_ptr<PianoRoll> pianoRoll;
+    std::unique_ptr<ScrollBar> pianoScroll;
 
     std::unique_ptr<SoomplerImageButton> openFileButton;
     std::unique_ptr<SoomplerImageButton> aboutButton;
