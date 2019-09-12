@@ -116,7 +116,7 @@ bool SoomplerAudioProcessorEditor::keyPressed (const KeyPress& key) {
 //    }
 //
     static String keys = "q2w3er5t6y7ui9o0p[azsxdcvgbhnmk,l.;/";
-    auto firstC = Settings::FIRST_KEY_ON_SCREEN;
+    auto firstC = Settings::DEFAULT_FIRST_KEY;
     
     auto pressedChar = key.getTextCharacter();
     auto nextChar = keys[0];

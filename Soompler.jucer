@@ -98,6 +98,8 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="xoPeua" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <FILE id="rNOuQH" name="left.png" compile="0" resource="1" file="Resources/left.png"/>
+    <FILE id="lZX2xy" name="right.png" compile="0" resource="1" file="Resources/right.png"/>
     <FILE id="A4HqCo" name="about.png" compile="0" resource="1" file="Resources/about.png"/>
     <FILE id="XCh1dc" name="play.png" compile="0" resource="1" file="Resources/play.png"/>
     <FILE id="Fpn4No" name="stop.png" compile="0" resource="1" file="Resources/stop.png"/>

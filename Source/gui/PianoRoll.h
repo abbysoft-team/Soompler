@@ -5,6 +5,7 @@
 #include "../MidiEventConsumer.h"
 #include <array>
 #include "../SampleInfo.h"
+#include "SoomplerImageButton.h"
 
 class KeyInfo
 {
@@ -34,7 +35,7 @@ enum MarkerType
 /**
 
 */
-class PianoRoll  : public Component, public SampleChangeListener
+class PianoRoll  : public Component, public SampleChangeListener, Button::Listener
 {
 public:
     PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer);
@@ -45,6 +46,8 @@ public:
 
     void sampleChanged(std::shared_ptr<SampleInfo> info) override;
     void noSamplesLeft();
+
+    void buttonClicked(Button *);
 
 private:
     static constexpr auto MAX_KEYS = 120;
@@ -64,6 +67,13 @@ private:
 
     // Which marker is dragged now
     MarkerType draggedMarker;
+
+    // Keys from DEFAULT_KEY
+    int offset;
+
+    // Pianoroll window controls
+    std::unique_ptr<SoomplerImageButton> leftArrow;
+    std::unique_ptr<SoomplerImageButton> rightArrow;
 
     std::vector<int> getActiveMidiNotes();
     void calculateKeysInfo();
@@ -87,8 +97,8 @@ private:
     void rootMarkerDragged(Point<int> position);
     void minMarkerDragged(Point<int> position);
     void maxMarkerDragged(Point<int> position);
-    
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoRoll)
 
+    int calculateIndexInPattern();
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PianoRoll)
 };
 

@@ -8,10 +8,34 @@ void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g);
 void drawBlackNote(int coord, Graphics& g);
 
 PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer)
-    : midiSupplier(midiSupplier), midiConsumer(midiConsumer)
+    : midiSupplier(midiSupplier), midiConsumer(midiConsumer), offset(0)
 {
     draggedMarker = NO_MARKER;
     setSize (Settings::PIANO_ROLL_WIDTH, Settings::PIANO_ROLL_HEIGHT);
+
+    leftArrow.reset(new SoomplerImageButton("left"));
+    leftArrow->setTooltip (TRANS("Move to lower notes\n"));
+    leftArrow->addListener (this);
+    leftArrow->setImages (false, true, true,
+                               ImageCache::getFromMemory (BinaryData::left_png, BinaryData::left_pngSize),
+                               1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000));
+
+    rightArrow.reset(new SoomplerImageButton("right"));
+    rightArrow->setTooltip (TRANS("Move to higher notes\n"));
+    rightArrow->addListener (this);
+    rightArrow->setImages (false, true, true,
+                               ImageCache::getFromMemory (BinaryData::right_png, BinaryData::right_pngSize),
+                               1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000));
+
+    addAndMakeVisible(leftArrow.get());
+    addAndMakeVisible(rightArrow.get());
+
+    leftArrow->setBounds(5, getWidth() / 2 - Settings::PIANO_ROLL_ARROW_HEIGHT / 2, Settings::PIANO_ROLL_ARROW_WIDTH, Settings::PIANO_ROLL_ARROW_HEIGHT);
+    rightArrow->setBounds(getWidth() - Settings::PIANO_ROLL_ARROW_WIDTH - 5, getHeight() / 2 - Settings::PIANO_ROLL_ARROW_HEIGHT / 2, Settings::PIANO_ROLL_ARROW_WIDTH, Settings::PIANO_ROLL_ARROW_HEIGHT);
 
     calculateKeysInfo();
 }
@@ -24,10 +48,10 @@ void PianoRoll::calculateKeysInfo()
     // structure of keys 0 - white key 1 - black
     bool blackKeyPattern[] = {0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0};
 
-    auto currentIndex = 0;
+    auto currentIndex = calculateIndexInPattern();
     auto nextWhiteKeyX = 0;
     // init only keys after first key on the screen
-    for (int i = Settings::FIRST_KEY_ON_SCREEN; i < MAX_KEYS; i++) {
+    for (int i = Settings::DEFAULT_FIRST_KEY + offset; i < MAX_KEYS + offset; i++) {
         // cycling through pattern array
         if (currentIndex == 12) {
             currentIndex = 0;
@@ -57,6 +81,28 @@ void PianoRoll::calculateKeysInfo()
         }
 
         currentIndex++;
+    }
+}
+
+int PianoRoll::calculateIndexInPattern()
+{
+    if (offset == 0) {
+        return 0;
+    }
+
+    if (offset > 0) {
+        return offset % 12;
+    }
+
+    int index = 0;
+    if (offset < 0) {
+        for (int i = 0; i < abs(offset); i++) {
+            index--;
+            if (index < 0) {
+                index == 11;
+            }
+        }
+        return index;
     }
 }
 
@@ -341,7 +387,7 @@ void PianoRoll::drawDisabledNotesMask(Graphics& g)
 {
     // keys on the left from active range
     auto key = keysInfo[0];
-    for (int i = sample->minNote - 1; i >= Settings::FIRST_KEY_ON_SCREEN; i--) {
+    for (int i = sample->minNote - 1; i >= Settings::DEFAULT_FIRST_KEY; i--) {
         key = keysInfo[i];
 
         g.setColour(Settings::PIANO_ROLL_DISABLED_MASK_COLOR);
@@ -370,6 +416,15 @@ void PianoRoll::sampleChanged(std::shared_ptr<SampleInfo> info)
 void PianoRoll::noSamplesLeft()
 {
     this->sample = nullptr;
+}
+
+void PianoRoll::buttonClicked(Button *button)
+{
+    if (button == leftArrow.get()) {
+        offset--;
+    } else if (button == rightArrow.get()) {
+        offset++;
+    }
 }
 
 void PianoRoll::rootMarkerDragged(Point<int> position)
@@ -404,7 +459,7 @@ void PianoRoll::minMarkerDragged(Point<int> position)
         // no need to update
         return;
     }
-    if (keyClicked < Settings::FIRST_KEY_ON_SCREEN) {
+    if (keyClicked < Settings::DEFAULT_FIRST_KEY) {
         return;
     }
     if (keyClicked > sample->rootNote) {
@@ -441,6 +496,7 @@ void PianoRoll::maxMarkerDragged(Point<int> position)
 
 void PianoRoll::resized()
 {
+
 }
 
 std::vector<int> PianoRoll::getActiveMidiNotes()

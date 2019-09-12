@@ -386,13 +386,15 @@ void SoomplerAudioProcessor::setStateInformation (const void* data, int sizeInBy
         loadThumbnailAndSoundFor(sample);
     }
 
+    bool looping = stateManager.state.getPropertyAsValue("loopMode", nullptr).getValue();
+    setLoopEnabled(looping);
+
 //    // restore variables
 //    String sampleName = stateManager.state.getPropertyAsValue("loadedSampleName", nullptr).getValue();
 //    String fullSamplePath = stateManager.state.getPropertyAsValue("loadedSample", nullptr).getValue();
 //    float sampleLength = stateManager.state.getPropertyAsValue("loadedSampleLength", nullptr).getValue();
 //    int64 startSample = stateManager.state.getPropertyAsValue("startSample", nullptr).getValue();
 //    int64 endSample = stateManager.state.getPropertyAsValue("endSample", nullptr).getValue();
-//    bool looping = stateManager.state.getPropertyAsValue("loopMode", nullptr).getValue();
 //    bool reverse = stateManager.state.getPropertyAsValue("reverse", nullptr).getValue();
 //    int rootNote = stateManager.state.getPropertyAsValue("rootNote", nullptr).getValue();
 //    int minNote = stateManager.state.getPropertyAsValue("minNote", nullptr).getValue();
@@ -723,8 +725,10 @@ void SoomplerAudioProcessor::setAdsrParams(ADSR::Parameters params)
 }
 
 void SoomplerAudioProcessor::setLoopEnabled(bool loopEnable) {
-    auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(0));
-    voice->enableLooping(loopEnable);
+    for (int i = 0; i < synth.getNumVoices(); i++) {
+        auto voice = static_cast<soompler::ExtendedVoice*> (synth.getVoice(i));
+        voice->enableLooping(loopEnable);
+    }
 
     stateManager.state.setProperty("loopMode", loopEnable, nullptr);
 }
