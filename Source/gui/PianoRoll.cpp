@@ -3,34 +3,13 @@
 
 void drawNoteTip(Graphics &g, int cNumber, int x);
 //void drawBlackNotes(Graphics& g);
-void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g);
+void drawActiveNoteMask(int x, int width, int height, Graphics &g);
 void drawBlackNote(int coord, Graphics& g);
 
 PianoRoll::PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer)
     : midiSupplier(midiSupplier), midiConsumer(midiConsumer), offset(0)
 {
     draggedMarker = NO_MARKER;
-
-//    leftArrow.reset(new SoomplerImageButton("left"));
-//    leftArrow->setTooltip (TRANS("Move to lower notes\n"));
-//    leftArrow->addListener (this);
-//    leftArrow->setImages (false, true, true,
-//                               ImageCache::getFromMemory (BinaryData::left_png, BinaryData::left_pngSize),
-//                               1.000f, Colour (0x00000000),
-//                               Image(), 1.000f, Colour (0x00000000),
-//                               Image(), 1.000f, Colour (0x00000000));
-
-//    rightArrow.reset(new SoomplerImageButton("right"));
-//    rightArrow->setTooltip (TRANS("Move to higher notes\n"));
-//    rightArrow->addListener (this);
-//    rightArrow->setImages (false, true, true,
-//                               ImageCache::getFromMemory (BinaryData::right_png, BinaryData::right_pngSize),
-//                               1.000f, Colour (0x00000000),
-//                               Image(), 1.000f, Colour (0x00000000),
-//                               Image(), 1.000f, Colour (0x00000000));
-
-//    addAndMakeVisible(leftArrow.get());
-//    addAndMakeVisible(rightArrow.get());
 
     calculateKeysInfo();
 }
@@ -233,7 +212,7 @@ void drawBlackNote(int coord, Graphics &g)
 
 void PianoRoll::drawActiveNotes(Graphics& g, std::vector<int> activeNotes)
 {
-    static auto minNoteNumber = FIRST_C_INDEX;
+    auto minNoteNumber = FIRST_C_INDEX + offset;
 
     float keyCoordX = 0;
     for (auto noteNumber : activeNotes) {
@@ -241,12 +220,12 @@ void PianoRoll::drawActiveNotes(Graphics& g, std::vector<int> activeNotes)
             continue;
         }
 
-        keyCoordX = keysInfo[noteNumber].x;
+        keyCoordX = keysInfo[noteNumber].x - keysInfo[minNoteNumber].x;
         if (keyCoordX > Settings::PIANO_ROLL_WIDTH) {
             continue;
         }
 
-        drawActiveNoteMask(keysInfo[noteNumber], g);
+        drawActiveNoteMask(keyCoordX, keysInfo[noteNumber].width, keysInfo[noteNumber].height, g);
     }
 }
 
@@ -339,10 +318,10 @@ int PianoRoll::getKeyClicked(Point<int> point)
     return -1;
 }
 
-void drawActiveNoteMask(KeyInfo keyInfo, Graphics& g)
+void drawActiveNoteMask(int x, int width, int height, Graphics& g)
 {
     g.setColour(Settings::PIANO_ROLL_ACTIVE_KEY_MASK_COLOR);
-    g.fillRect((float) keyInfo.x, (float) 0, (float) keyInfo.width, (float) keyInfo.height);
+    g.fillRect((float) x, (float) 0, (float) width, (float) height);
 }
 
 void PianoRoll::drawNoteTips(Graphics& g)
@@ -395,7 +374,8 @@ void PianoRoll::createMarkers(std::shared_ptr<SampleInfo> info)
 
 Path PianoRoll::createMarker(int noteNum, bool root)
 {
-    auto x = keysInfo[noteNum].x + (keysInfo[noteNum].width / 2);
+    auto noteX = keysInfo[noteNum].x - keysInfo[FIRST_C_INDEX + offset].x;
+    auto x = noteX + (keysInfo[noteNum].width / 2);
     auto y = -1 * Settings::PIANO_ROLL_RANGE_MARKERS_HEIGHT;
     if (!root) {
         // root marker must be bigger
@@ -412,24 +392,24 @@ Path PianoRoll::createMarker(int noteNum, bool root)
 
 void PianoRoll::drawDisabledNotesMask(Graphics& g)
 {
-    // keys on the left from active range
-    auto key = keysInfo[0];
-    for (int i = sample->minNote - 1; i >= Settings::DEFAULT_FIRST_KEY; i--) {
-        key = keysInfo[i];
+    auto leftKey = keysInfo[sample->minNote];
+    auto leftKeyX = leftKey.x - keysInfo[FIRST_C_INDEX + offset].x;
+    auto maskLeftX = 0;
+    auto maskRightX = leftKeyX;
 
+    if (leftKeyX > 0 && maskLeftX != maskRightX) {
         g.setColour(Settings::PIANO_ROLL_DISABLED_MASK_COLOR);
-        g.fillRect(key.x, .0f, key.width, key.height);
+        g.fillRect((float) maskLeftX, .0f, (float) maskRightX, (float) getHeight());
     }
 
-    // keys on the right from active region
-    for (int i = sample->maxNote + 1; i < keysInfo.size(); i++) {
-        key = keysInfo[i];
-        if (key.x > this->getWidth()) {
-            break;
-        }
+    auto rightKey = keysInfo[sample->maxNote];
+    auto rightKeyX = rightKey.x - keysInfo[FIRST_C_INDEX + offset].x;
+    maskLeftX = rightKeyX + rightKey.width;
+    maskRightX = getWidth();
 
+    if (rightKeyX < getWidth() && maskLeftX != maskRightX) {
         g.setColour(Settings::PIANO_ROLL_DISABLED_MASK_COLOR);
-        g.fillRect(key.x, .0f, key.width, key.height);
+        g.fillRect((float) maskLeftX, .0f, (float) maskRightX, (float) getHeight());
     }
 }
 
@@ -445,25 +425,10 @@ void PianoRoll::noSamplesLeft()
     this->sample = nullptr;
 }
 
-void PianoRoll::buttonClicked(Button *button)
-{
-//    if (button == leftArrow.get()) {
-//        offset--;
-//    } else if (button == rightArrow.get()) {
-//        offset++;
-    //    }
-}
-
 void PianoRoll::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart)
 {
-//    auto oldOffset = offset;
     offset = newRangeStart - Settings::PIANO_ROLL_RANGE_START;
-
-//    if (offset == oldOffset) {
-//        return;
-//    }
-
-//    calculateKeysInfo();
+    createMarkers(sample);
 }
 
 void PianoRoll::rootMarkerDragged(Point<int> position)

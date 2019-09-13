@@ -35,7 +35,7 @@ enum MarkerType
 /**
 
 */
-class PianoRoll  : public Component, public SampleChangeListener, Button::Listener, public ScrollBar::Listener
+class PianoRoll  : public Component, public SampleChangeListener, public ScrollBar::Listener
 {
 public:
     PianoRoll (MidiEventSupplier& midiSupplier, MidiEventConsumer& midiConsumer);
@@ -47,7 +47,6 @@ public:
     void sampleChanged(std::shared_ptr<SampleInfo> info) override;
     void noSamplesLeft();
 
-    void buttonClicked(Button *);
     void scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart);
 
 private:
