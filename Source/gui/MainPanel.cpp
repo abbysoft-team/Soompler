@@ -17,6 +17,11 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
     editor.addToGuiEditor(volumeKnob.get());
     volumeKnob->attachTo("volume", stateManager);
 
+    glideKnob.reset(new SoomplerKnob("Glide"));
+    addAndMakeVisible(glideKnob.get());
+    editor.addToGuiEditor(glideKnob.get());
+    glideKnob->attachTo("glide", stateManager);
+
     openFileButton.reset (new SoomplerImageButton ("open file button"));
     addAndMakeVisible (openFileButton.get());
     editor.addToGuiEditor (openFileButton.get());
@@ -107,20 +112,20 @@ MainPanel::MainPanel (SoomplerAudioProcessor& processor) : stateManager(processo
 
     // place components like adsr panel
     auto miscControllsBaseline = adsrPanel->getY() + 25;
-    volumeKnob->setPosition(60, miscControllsBaseline);
+    volumeKnob->setPosition(20, miscControllsBaseline);
+    glideKnob->setPosition(80, miscControllsBaseline);
     reverseButton->setBounds(380, miscControllsBaseline, 100, 50);
 
+
     // hide some controls until sample is loaded
-    adsrPanel->setVisible(false);
-    volumeKnob->setVisible(false);
-    reverseButton->setVisible(false);
-    loopButton->setVisible(false);
+    noSamplesLeft();
     
     // hide deprecated buttons
     openFileButton->setVisible(false);
 
     // connect knobs to listener
     volumeKnob->addListener(this);
+    glideKnob->addListener(this);
 
     // add GUI editor last
     // it ensures that gui overlay will work properly
@@ -169,6 +174,9 @@ void MainPanel::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         processor.setVolume(volumeKnob->getValue());
         return;
+    } else if (sliderThatWasMoved == glideKnob->getSlider())
+    {
+        processor.setGlide(glideKnob->getValue());
     }
 
 }
@@ -211,8 +219,11 @@ void MainPanel::noSamplesLeft()
     sampleViewer->setVisible(false);
     adsrPanel->setVisible(false);
     volumeKnob->setVisible(false);
+    glideKnob->setVisible(false);
     reverseButton->setVisible(false);
     loopButton->setVisible(false);
+    pianoRoll->setVisible(false);
+    pianoScroll->setVisible(false);
 }
 
 void MainPanel::openFileButtonClicked()
@@ -262,10 +273,12 @@ void MainPanel::transportStateChanged(TransportState state)
         loopButton->setToggled(false);
     case Ready:
         loadSampleTip->setVisible(false);
-
+        pianoRoll->setVisible(true);
+        pianoScroll->setVisible(true);
         sampleViewer->setVisible(true);
         adsrPanel->setVisible(true);
         volumeKnob->setVisible(true);
+        glideKnob->setVisible(true);
         reverseButton->setVisible(true);
         loopButton->setVisible(true);
         reverseButton->setToggled(processor.isSampleReversed());

@@ -25,7 +25,8 @@ ExtendedSound::ExtendedSound (const String& soundName,
     midiNotes (notes),
     midiRootNote (midiNoteForNormalPitch),
     reversed(false),
-    volume(1.0f)
+    volume(1.0f),
+    glideLevel(0.0f)
 {
     if (sourceSampleRate > 0 && source.lengthInSamples > 0)
     {
@@ -89,6 +90,16 @@ float ExtendedSound::getVolume()
     return volume;
 }
 
+void ExtendedSound::setGlide(float glide)
+{
+    glideLevel = glide;
+}
+
+float ExtendedSound::getGlideLevel()
+{
+    return glideLevel;
+}
+
 //==============================================================================
     ExtendedVoice::ExtendedVoice(ChangeListener* listener) : volume(1), loopingEnabled(false), eventListener(listener),
     lastL(0),
@@ -105,7 +116,7 @@ void ExtendedVoice::startNote (int midiNoteNumber, float velocity, SynthesiserSo
 {
     static constexpr auto notesInOctave = 12.0;
 
-    if (auto* sound = dynamic_cast<const ExtendedSound*> (s))
+    if (auto* sound = dynamic_cast<ExtendedSound*> (s))
     {
         // each octave make freq two times bigger
         pitchRatio = std::pow (2.0, (midiNoteNumber - sound->midiRootNote) / notesInOctave)
@@ -119,6 +130,9 @@ void ExtendedVoice::startNote (int midiNoteNumber, float velocity, SynthesiserSo
         adsr.setParameters (sound->params);
 
         adsr.noteOn();
+        glide.setLevel(sound->getGlideLevel());
+        glide.setSampleRate(this->getSampleRate());
+        glide.noteOn(midiNoteNumber);
     }
     else
     {
@@ -159,6 +173,8 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
 
         float diff = 0;
         
+        auto glideLevel = glide.getGlide(numSamples);
+
         // whiling through of block of samples that need to be rendered
         // block is (128, 256, 512 etc) samples
         while (--numSamples >= 0)
@@ -208,7 +224,7 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
             }
             
             // TODO what's that, why pitchratio being added
-            sourceSamplePosition += pitchRatio;
+            sourceSamplePosition += pitchRatio * glideLevel;
 
             // endSample is just sample where end line is placed
             // user can drag that line in gui to change this parameter

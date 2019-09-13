@@ -63,6 +63,7 @@ AudioProcessorValueTreeState::ParameterLayout SoomplerAudioProcessor::createPara
 
     AudioProcessorValueTreeState::ParameterLayout parameterLayout = {
         std::make_unique<AudioParameterFloat>("volume", TRANS("Volume\n"), 0.0f, 1.0f, 0.5f),
+        std::make_unique<AudioParameterFloat>("glide", TRANS("Glide\n"), 0.0f, 1.0f, 0.0f),
         std::make_unique<AudioParameterFloat>("attack", TRANS("Attack\n"), 0.0f, Settings::MAX_ATTACK_TIME, 0.0f),
         std::make_unique<AudioParameterFloat>("decay", TRANS("Decay\n"), 0.0f, Settings::MAX_DECAY_TIME, 0.0f),
         std::make_unique<AudioParameterFloat>("sustain", TRANS("Sustain\n"), 0.0f, 1.0f, 1.0f),
@@ -229,10 +230,16 @@ void SoomplerAudioProcessor::setVolume(double volume)
     this->volume = volume;
     transportSource.setGain(volume);
 
-    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
-    voice->setVolume(volume);
+
+//    auto voice = static_cast<soompler::ExtendedVoice*>(synth.getVoice(0));
+//    voice->setVolume(volume);
 
     sampleManager->getActiveSample()->setVolume(volume);
+}
+
+void SoomplerAudioProcessor::setGlide(double glide)
+{
+    sampleManager->getActiveSample()->sound->setGlide(glide);
 }
 
 void SoomplerAudioProcessor::notifyTransportStateChanged(TransportState state)

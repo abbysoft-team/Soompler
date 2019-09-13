@@ -104,6 +104,7 @@ public:
     void sampleChanged(std::shared_ptr<SampleInfo> info) override;
 
     void setVolume(double volume);
+    void setGlide(double glide);
 
     void notifyTransportStateChanged(TransportState state);
 

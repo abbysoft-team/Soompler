@@ -367,6 +367,10 @@ void PianoRoll::drawNoteRangeAndRoot(Graphics& g)
 
 void PianoRoll::createMarkers(std::shared_ptr<SampleInfo> info)
 {
+    if (info == nullptr) {
+      return;
+    }
+
     rootMarker = createMarker(info->rootNote, true);
     minMarker = createMarker(info->minNote, false);
     maxMarker = createMarker(info->maxNote, false);

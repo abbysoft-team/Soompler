@@ -11,6 +11,8 @@
               pluginAUExportPrefix="soompler_au">
   <MAINGROUP id="Pwscug" name="Soompler">
     <GROUP id="{B2D5FA2C-D197-0FB3-82E2-F943B5E93292}" name="Source">
+      <FILE id="DZpbHx" name="Glide.cpp" compile="1" resource="0" file="Source/synth/Glide.cpp"/>
+      <FILE id="HUwSQJ" name="Glide.h" compile="0" resource="0" file="Source/synth/Glide.h"/>
       <FILE id="Gaejwh" name="SoomplerScrollbar.cpp" compile="1" resource="0"
             file="Source/gui/SoomplerScrollbar.cpp"/>
       <FILE id="UVxXrV" name="SoomplerScrollbar.h" compile="0" resource="0"

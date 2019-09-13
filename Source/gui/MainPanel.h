@@ -46,6 +46,7 @@ private:
     std::unique_ptr<ButtonAttachment> reverseAttachment;
     
     std::unique_ptr<SoomplerKnob> volumeKnob;
+    std::unique_ptr<SoomplerKnob> glideKnob;
     
     std::shared_ptr<AdsrPanel> adsrPanel;
     
