@@ -26,9 +26,21 @@ private:
     int currentNote;
     int prevNote;
     float sampleRate;
+    float relation;
 
     // glide level from 0.0f to 1.0f
     float level;
 
     int samplesLeft;
 };
+
+class GlideTest : UnitTest {
+public:
+    // UnitTest interface
+    GlideTest()  : UnitTest ("Glide testing") {}
+
+    void runTest();
+
+};
+
+static GlideTest test;

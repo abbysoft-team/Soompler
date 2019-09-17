@@ -158,7 +158,9 @@ void ExtendedVoice::controllerMoved (int /*controllerNumber*/, int /*newValue*/)
 
 //==============================================================================
 void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int startSample, int numSamples)
-{
+{    
+    auto glideLevel = glide.getGlide(numSamples * 2);
+
     if (auto* playingSound = static_cast<ExtendedSound*> (getCurrentlyPlayingSound().get()))
     {
         // raw audio data
@@ -172,8 +174,6 @@ void ExtendedVoice::renderNextBlock (AudioBuffer<float>& outputBuffer, int start
         float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
 
         float diff = 0;
-        
-        auto glideLevel = glide.getGlide(numSamples);
 
         // whiling through of block of samples that need to be rendered
         // block is (128, 256, 512 etc) samples

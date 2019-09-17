@@ -29,6 +29,9 @@ SoomplerAudioProcessor::SoomplerAudioProcessor() : AudioProcessor (BusesProperti
                                                    previewSource(nullptr),
                                                    sampleManager(new SampleManager())
 {
+    UnitTestRunner testRunner;
+    testRunner.runAllTests(2095382309);
+
     createVoices(synth, this);
     
     synth.setCurrentPlaybackSampleRate(44100);
